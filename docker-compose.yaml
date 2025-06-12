@@ -1,0 +1,58 @@
+services:
+  app:
+    build:
+      context: .
+      args:
+        ENV: "local"
+    command:
+      - /bin/bash
+      - -c
+      - |
+        ./wait-postgres.sh
+        python3 -m pytest -s . -vv --cov="." --color=yes --cov-report=term-missing
+        ./cmd-local.sh
+    volumes:
+      - ./src:/src # code
+    ports:
+      - 8080:8080
+    env_file:
+      - .env
+    depends_on:
+      - postgres-db
+    networks:
+      example-app-net:
+        ipv4_address: 215.21.0.100
+
+
+  postgres-db:
+    container_name: postgres-db
+    image: postgres:16.1-alpine3.18
+    command: "-c logging_collector=off"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres123}
+      POSTGRES_HOST_AUTH_METHOD: trust
+      PGDATA: /data/postgres
+    volumes:
+      - db:/data/postgres
+      - ./migrations/:/docker-entrypoint-initdb.d/
+    ports:
+      - "15432:5432"
+    restart: unless-stopped
+    networks:
+      example-app-net:
+        ipv4_address: 215.21.0.54
+
+
+volumes:
+  db:
+    driver: local
+
+
+networks:
+  example-app-net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 215.21.0.0/16
