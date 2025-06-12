@@ -8,9 +8,9 @@ services:
       - /bin/bash
       - -c
       - |
-        ./wait-postgres.sh
+        ./wait_postgre.sh
         python3 -m pytest -s . -vv --cov="." --color=yes --cov-report=term-missing
-        ./cmd-local.sh
+        ./cmd_local.sh
     volumes:
       - ./src:/src # code
     ports:

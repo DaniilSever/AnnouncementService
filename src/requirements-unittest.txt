@@ -1,0 +1,15 @@
+# Основное
+pytest==7.4.4
+
+# Асинхронные тесты
+pytest-asyncio==0.23.3
+
+# Покрытие
+pytest-cov==4.1.0
+
+# События startup-shutdown ASGI-приложений типа fastapi
+asgi_lifespan==2.1.0
+
+
+# моки запросов httpx
+respx==0.20.2

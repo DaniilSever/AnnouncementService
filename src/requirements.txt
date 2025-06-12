@@ -1,0 +1,19 @@
+# Логгер
+loguru==0.7.2
+
+# Фреймворк, сервер-ворвер и обработка форм
+fastapi==0.110.0
+uvicorn==0.27.0
+uvloop==0.19.0
+
+
+# Валидация и DTO
+pydantic==2.5.3
+pydantic-settings==2.1.0
+email-validator==2.1.0.post1
+
+# Внешние запросы
+httpx==0.26.0
+
+# ORM (SQLAlchemy 2.x)
+SQLAlchemy==2.0.30
