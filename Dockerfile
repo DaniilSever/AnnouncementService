@@ -14,10 +14,6 @@ RUN apt-get update \
     && pip install --upgrade pip \
     && pip install -r requirements.txt
 
-RUN if [ "$ENV" = "dev" ] || [ "$ENV" = "local" ]; then \
-    pip install -r requirements-unittest.txt; \
-    fi
-
 # Copying source code
 COPY src/ /src/
 

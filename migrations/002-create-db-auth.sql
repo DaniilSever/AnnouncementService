@@ -14,12 +14,13 @@ DROP TABLE IF EXISTS "SignupAccount" CASCADE;
 CREATE TABLE "SignupAccount"
 (
     id                  uuid            PRIMARY KEY DEFAULT uuid_generate_v4(),
-    email               VARCHAR(255)    NOT NULL,
+    email               VARCHAR(255)    NOT NULL UNIQUE,
     pwd_hash            VARCHAR(255)    NOT NULL,
     salt                VARCHAR         NOT NULL,
     code                VARCHAR(10)     NOT NULL,
     created_at          TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-    expired_at          TIMESTAMP       NULL,
+    updated_at          TIMESTAMP       NULL,
+    blocked_till        TIMESTAMP       NULL,
     confirm_attempts    INT             NOT NULL DEFAULT 1 CHECK (confirm_attempts <= 5)
 );
 --
@@ -32,7 +33,8 @@ COMMENT ON COLUMN "SignupAccount".pwd_hash is 'SHA-256-хеш пароля';
 COMMENT ON COLUMN "SignupAccount".salt is 'Соль для хеша';
 COMMENT ON COLUMN "SignupAccount".code is 'Код подтверждения (короткий)';
 COMMENT ON COLUMN "SignupAccount".created_at is 'Создание записи';
-COMMENT ON COLUMN "SignupAccount".expired_at is 'Истекает через сутки';
+COMMENT ON COLUMN "SignupAccount".updated_at is 'Дата последнего обновления';
+COMMENT ON COLUMN "SignupAccount".blocked_till is 'Блокировка на сутки';
 COMMENT ON COLUMN "SignupAccount".confirm_attempts is 'Количество неудачных попыток входа';
 
 -- ------------------------

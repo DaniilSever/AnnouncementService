@@ -4,13 +4,13 @@ from pydantic import BaseModel, EmailStr, UUID4
 class XEmailSignup(BaseModel):
     """Запись в бд SignupAccount"""
     id: UUID4
-    username: str
     email: EmailStr | str
     pwd_hash: str
     salt: str
     code: int
     created_at: datetime = datetime.now()
-    expired_at: datetime | None = None
+    updated_at: datetime | None = None
+    blocked_till: datetime | None = None
     confirm_attempts: int = 1
 
 class XAccountID(BaseModel):
