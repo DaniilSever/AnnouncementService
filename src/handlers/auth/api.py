@@ -1,6 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from core.endpoints import Endpoints as Enp
+from core.depends import get_auth_repo_session
 
 router = APIRouter(tags=["auth"])
 tags = {
@@ -13,5 +14,7 @@ tags = {
     summary="Проверка работоспособности Auth сервиса",
     status_code=200,
 )
-async def healthcheck():
+async def healthcheck(
+    _repo_session = Depends(get_auth_repo_session)
+):
     pass

@@ -5,9 +5,9 @@ from fastapi import FastAPI, APIRouter
 from fastapi.responses import ORJSONResponse
 
 services = {
-    "auth.api": ("api.auth.auth_api", True),
-    "acc.api": ("api.account.account_api", True),
-    "ads.api": ("api.ads.ads_api", True),
+    "auth.api": ("handlers.auth.api", True),
+    "acc.api": ("handlers.account.api", True),
+    "ads.api": ("handlers.ads.api", True),
 }
 
 

@@ -17,7 +17,6 @@ DROP TYPE IF EXISTS "Account" CASCADE;
 CREATE TABLE "Account"
 (
     id              uuid            PRIMARY KEY DEFAULT uuid_generate_v4(),
-    username        VARCHAR(255)    NOT NULL,
     email           VARCHAR(255)    NOT NULL,
     pwd_hash        VARCHAR(255)    NOT NULL,
     salt            VARCHAR         NOT NULL,
@@ -33,7 +32,6 @@ CREATE INDEX ON "Account" (id);
 --
 COMMENT ON TABLE "Account" is 'Аккаунты (Подтвержденные)';
 COMMENT ON COLUMN "Account".id is 'ID аккаунта в системе';
-COMMENT ON COLUMN "Account".username is 'Никнейм аккаунта';
 COMMENT ON COLUMN "Account".email is 'Email аккаунта';
 COMMENT ON COLUMN "Account".pwd_hash is 'SHA-256-хеш пароля';
 COMMENT ON COLUMN "Account".salt is 'Соль для хеша';

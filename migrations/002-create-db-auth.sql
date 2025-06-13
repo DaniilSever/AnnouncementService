@@ -13,29 +13,27 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 DROP TABLE IF EXISTS "SignupAccount" CASCADE;
 CREATE TABLE "SignupAccount"
 (
-    id              uuid            PRIMARY KEY DEFAULT uuid_generate_v4(),
-    username        VARCHAR(255)    NOT NULL,
-    email           VARCHAR(255)    NOT NULL,
-    pwd_hash        VARCHAR(255)    NOT NULL,
-    salt            VARCHAR         NOT NULL,
-    code            VARCHAR(10)     NOT NULL,
-    created_at      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-    expired_at      TIMESTAMP       NULL,
-    login_attempts  INT             NOT NULL DEFAULT 1 CHECK (login_attempts <= 5)
+    id                  uuid            PRIMARY KEY DEFAULT uuid_generate_v4(),
+    email               VARCHAR(255)    NOT NULL,
+    pwd_hash            VARCHAR(255)    NOT NULL,
+    salt                VARCHAR         NOT NULL,
+    code                VARCHAR(10)     NOT NULL,
+    created_at          TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    expired_at          TIMESTAMP       NULL,
+    confirm_attempts    INT             NOT NULL DEFAULT 1 CHECK (confirm_attempts <= 5)
 );
 --
 CREATE INDEX ON "SignupAccount" (id);
 --
 COMMENT ON TABLE "SignupAccount" is 'Регистрация по емейл';
 COMMENT ON COLUMN "SignupAccount".id is 'ID аккаунта в системе';
-COMMENT ON COLUMN "SignupAccount".username is 'Никнейм аккаунта';
 COMMENT ON COLUMN "SignupAccount".email is 'Email аккаунта';
 COMMENT ON COLUMN "SignupAccount".pwd_hash is 'SHA-256-хеш пароля';
 COMMENT ON COLUMN "SignupAccount".salt is 'Соль для хеша';
 COMMENT ON COLUMN "SignupAccount".code is 'Код подтверждения (короткий)';
 COMMENT ON COLUMN "SignupAccount".created_at is 'Создание записи';
 COMMENT ON COLUMN "SignupAccount".expired_at is 'Истекает через сутки';
-COMMENT ON COLUMN "SignupAccount".login_attempts is 'Количество неудачных попыток входа';
+COMMENT ON COLUMN "SignupAccount".confirm_attempts is 'Количество неудачных попыток входа';
 
 -- ------------------------
 
