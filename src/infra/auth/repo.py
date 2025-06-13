@@ -1,5 +1,4 @@
 from uuid import UUID
-from datetime import datetime, timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy import select, delete, update, text
@@ -29,7 +28,7 @@ class AuthRepo(IAuthRepo):
                 index_elements=["email"],
                 set_={
                     "code": code,
-                    "confirm_attempts": SignupAccount.confirm_attempts + 1,
+                    "attempts": SignupAccount.attempts + 1,
                     "updated_at": text("CURRENT_TIMESTAMP(6)"),
                 },
             )
@@ -52,7 +51,7 @@ class AuthRepo(IAuthRepo):
             created_at=row.created_at,
             updated_at=row.updated_at,
             blocked_till=row.blocked_till,
-            confirm_attempts=row.confirm_attempts,
+            attempts=row.attempts,
         )
 
     async def get_email_signup(self, signup_id: UUID) -> XEmailSignup:
@@ -61,7 +60,20 @@ class AuthRepo(IAuthRepo):
             .where(SignupAccount.id == signup_id)
         )
         res = await self.session.execute(req)
-        return res.scalar_one_or_none()
+        row = res.scalar_one_or_none()
+        if row is None:
+            raise KeyError("Отсутствует запись на регистрацию")
+        return XEmailSignup(
+            id=row.id,
+            email=row.email,
+            pwd_hash=row.pwd_hash,
+            salt=row.salt,
+            code=row.code,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+            blocked_till=row.blocked_till,
+            attempts=row.attempts,
+        )
 
     async def delete_email_signup(self, signup_id: UUID) -> None:
         req = delete(SignupAccount).where(SignupAccount.id == signup_id)
@@ -72,25 +84,31 @@ class AuthRepo(IAuthRepo):
         req = (
             update(SignupAccount)
             .values(
-                confirm_attempts=SignupAccount.confirm_attempts + 1,
-                updated_at=datetime.now()
+                attempts=SignupAccount.attempts + 1,
+                updated_at=text("CURRENT_TIMESTAMP(6)")
             )
             .where(SignupAccount.id == signup_id)
             .execution_options(synchronize_session="fetch")
+            .returning(SignupAccount)
         )
-        await self.session.execute(req)
+        try:
+            res = await self.session.execute(req)
+        except IntegrityError as e:
+            await self.session.rollback()
+            raise RecursionError from e
+
         await self.session.commit()
-        await self.session.refresh(req)
+        row = res.scalar_one()
         return XEmailSignup(
-            id=req.id,
-            email=req.email,
-            pwd_hash=req.pwd_hash,
-            salt=req.salt,
-            code=req.code,
-            created_at=req.created_at,
-            updated_at=req.updated_at,
-            blocked_till=req.blocked_till,
-            confirm_attempts=req.confirm_attempts,
+            id=row.id,
+            email=row.email,
+            pwd_hash=row.pwd_hash,
+            salt=row.salt,
+            code=row.code,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+            blocked_till=row.blocked_till,
+            attempts=row.attempts,
         )
 
     async def block_email_confirm_by_email(self, email: str) -> XEmailSignup:
@@ -116,5 +134,5 @@ class AuthRepo(IAuthRepo):
             created_at=row.created_at,
             updated_at=row.updated_at,
             blocked_till=row.blocked_till,
-            confirm_attempts=row.confirm_attempts,
+            attempts=row.attempts,
         )

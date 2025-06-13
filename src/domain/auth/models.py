@@ -30,9 +30,9 @@ class SignupAccount(Base):
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow)
     updated_at = Column(TIMESTAMP, nullable=True)
     blocked_till = Column(TIMESTAMP, nullable=True)
-    confirm_attempts = Column(Integer, nullable=False, default=1)
+    attempts = Column(Integer, nullable=False, default=1)
 
-    __table_args__ = (CheckConstraint("confirm_attempts <= 5", name="check_confirm_attempts"),)
+    __table_args__ = (CheckConstraint("attempts <= 5", name="check_attempts"),)
 
 
 class RefreshToken(Base):

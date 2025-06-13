@@ -11,7 +11,7 @@ class XEmailSignup(BaseModel):
     created_at: datetime = datetime.now()
     updated_at: datetime | None = None
     blocked_till: datetime | None = None
-    confirm_attempts: int = 1
+    attempts: int = 1
 
 class XAccountID(BaseModel):
     """Запись в бд Account"""

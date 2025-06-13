@@ -14,7 +14,7 @@ class QEmailSignup(BaseModel):
 class QConfirmCode(BaseModel):
     """Запрос: подтверждение регистрации"""
     signup_id: UUID4
-    code: int
+    code: str
 
 class QRefreshToken(BaseModel):
     """Запрос: обновления access токена"""
@@ -37,7 +37,7 @@ class ZEmailSignup(BaseModel):
     created_at: datetime = datetime.now()
     updated_at: datetime | None = None
     blocked_till: datetime | None = None
-    confirm_attempts: int = 1
+    attempts: int = 1
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -46,7 +46,7 @@ class ZEmailSignup(BaseModel):
                 "created_at": "2025-12-13 05:37:40.483836",
                 "updated_at": "2025-12-14 05:37:40.483836",
                 "blocked_till": "",
-                "confirm_attempts": 1,
+                "attempts": 1,
             }
         }
     )

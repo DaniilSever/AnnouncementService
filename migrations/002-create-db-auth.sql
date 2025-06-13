@@ -21,7 +21,7 @@ CREATE TABLE "SignupAccount"
     created_at          TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at          TIMESTAMP       NULL,
     blocked_till        TIMESTAMP       NULL,
-    confirm_attempts    INT             NOT NULL DEFAULT 1 CHECK (confirm_attempts <= 5)
+    attempts    INT             NOT NULL DEFAULT 1 CHECK (attempts <= 5)
 );
 --
 CREATE INDEX ON "SignupAccount" (id);
@@ -35,7 +35,7 @@ COMMENT ON COLUMN "SignupAccount".code is 'Код подтверждения (к
 COMMENT ON COLUMN "SignupAccount".created_at is 'Создание записи';
 COMMENT ON COLUMN "SignupAccount".updated_at is 'Дата последнего обновления';
 COMMENT ON COLUMN "SignupAccount".blocked_till is 'Блокировка на сутки';
-COMMENT ON COLUMN "SignupAccount".confirm_attempts is 'Количество неудачных попыток входа';
+COMMENT ON COLUMN "SignupAccount".attempts is 'Количество неудачных попыток входа';
 
 -- ------------------------
 

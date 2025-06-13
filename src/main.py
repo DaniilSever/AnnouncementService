@@ -1,8 +1,9 @@
 import importlib
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Request
 from fastapi.responses import ORJSONResponse
+from core.exception import ErrExp
 
 services = {
     "auth.api": ("handlers.auth.api", True),
@@ -22,6 +23,7 @@ async def lifespan(__app: FastAPI):
         None: Управление возвращается FastAPI во время работы приложения.
     """
     yield
+
 
 def get_services() -> tuple[list[APIRouter], list[dict]]:
     """Импортирует активные сервисы и извлекает их роутеры и метаданные.
@@ -67,5 +69,12 @@ def create_app() -> FastAPI:
 
     for router in all_routers:
         __app.include_router(router)
+
+    @__app.exception_handler(ErrExp)
+    async def error_exception_handler(_: Request, exc: ErrExp):
+        return ORJSONResponse(
+            status_code=int(exc.status_code),
+            content=exc.response.model_dump()
+        )
 
     return __app
