@@ -21,7 +21,7 @@ services:
       - postgres-db
     networks:
       example-app-net:
-        ipv4_address: 215.21.0.100
+        ipv4_address: 190.215.0.100
 
 
   postgres-db:
@@ -41,7 +41,7 @@ services:
     restart: unless-stopped
     networks:
       example-app-net:
-        ipv4_address: 215.21.0.54
+        ipv4_address: 190.215.0.50
 
 
 volumes:
@@ -55,4 +55,4 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 215.21.0.0/16
+        - subnet: 190.215.0.0/16
