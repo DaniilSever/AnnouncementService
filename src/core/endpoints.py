@@ -17,7 +17,6 @@ class _EndpointsACCOUNT:
     ACCOUNT_GET_BY_ID = "/api/acccount/{acc_id}"
     ACCOUNT_GET_WARNINGS = "/api/account/warning"
     ACCOUNT_GET_WARNING_BY_ID = "/api/account/warning/{warn_id}"
-    ACCOUNT_GET_ADS = "/api/account/ads"
 
 
 class _EndpointsADS:
@@ -31,6 +30,7 @@ class _EndpointsADS:
     ADS_DELETE = "/api/ads/delete/{ads_id}"
     ADS_GET_ALL = "/api/ads"
     ADS_GET_BY_ID = "/api/ads/{ads_id}"
+    ADS_GET_BY_ACCOUNT = "/api/ads/{acc_id}"
     ADS_ADD_COMPLAINT = "/api/ads/{ads_id}/complaint"
 
     # --- Действия с комментариями
