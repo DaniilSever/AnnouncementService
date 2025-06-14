@@ -5,9 +5,9 @@ from sqlalchemy import select, delete, update, text
 from sqlalchemy.exc import IntegrityError
 
 from domain.auth.irepo import IAuthRepo
-from domain.auth.models import SignupAccount
+from domain.auth.models import SignupAccount, RefreshToken
 
-from .xdao import XEmailSignup
+from .xdao import XEmailSignup, XRefreshToken
 
 class AuthRepo(IAuthRepo):
     """_"""
@@ -136,3 +136,73 @@ class AuthRepo(IAuthRepo):
             blocked_till=row.blocked_till,
             attempts=row.attempts,
         )
+
+    async def get_refresh_token_for_account(self, acc_id: UUID, token: str) -> XRefreshToken:
+        """Получает refresh-токен по аккаунту и значению токена"""
+        req = (
+            select(RefreshToken)
+            .where(
+                RefreshToken.account_id == acc_id,
+                RefreshToken.token == token,
+                RefreshToken.is_revoked is False,
+                RefreshToken.expires_at > text("NOW()")
+            )
+        )
+        res = await self.session.execute(req)
+        await self.session.commit()
+        row = res.scalar_one_or_none()
+        if row is None:
+            raise KeyError("Отсутствует токен в базе")
+        return XRefreshToken(
+            id=row.id,
+            account_id=row.account_id,
+            token=row.token,
+            is_revoked=row.is_revoked,
+            created_at=row.created_at,
+            expires_at=row.expires_at
+        )
+
+    async def revoke_expired_tokens(self) -> None:
+        """Удаляет или инвалидирует просроченные refresh-токены"""
+        req = delete(RefreshToken).where(RefreshToken.expires_at < text("NOW()"))
+        await self.session.execute(req)
+        await self.session.commit()
+
+    async def save_refresh_token(self, acc_id: UUID, token: str) -> XRefreshToken:
+        """Сохраняет refresh-токен для аккаунта"""
+        req = (
+            insert(RefreshToken)
+            .values(
+                acc_id=acc_id,
+                token=token,
+                expires_at=text("NOW() + INTERVAL '7 DAYS'")
+            )
+            .returning(RefreshToken)
+        )
+        res = await self.session.execute(req)
+        await self.session.commit()
+        row = res.scalar_one()
+        return XRefreshToken(
+            id=row.id,
+            account_id=row.account_id,
+            token=row.token,
+            is_revoked=row.is_revoked,
+            created_at=row.created_at,
+            expires_at=row.expires_at
+        )
+
+    async def revoke_tokens(self, acc_id: UUID) -> int:
+        """Инвалидирует все refresh-токены для аккаунта"""
+        req = (
+            update(RefreshToken)
+            .values(
+                is_revoked=True,
+            )
+            .where(
+                RefreshToken.acc_id == acc_id,
+                RefreshToken.is_revoked is False
+            )
+        )
+        res = await self.session.execute(req)
+        await self.session.commit()
+        return res.rowcount

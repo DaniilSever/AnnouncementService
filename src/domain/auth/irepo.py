@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from infra.auth.xdao import XEmailSignup
+from infra.auth.xdao import XEmailSignup, XRefreshToken
 
 class IAuthRepo:  # pragma: no cover
     """Интерфейс репозитория для операций, связанных с аутентификацией и управлением токенами"""
@@ -25,18 +25,18 @@ class IAuthRepo:  # pragma: no cover
         """Блокирует подтверждение email"""
         raise NotImplementedError
 
-    async def get_refresh_token_for_account(self, acc_id: UUID, token: str):
+    async def get_refresh_token_for_account(self, acc_id: UUID, token: str) -> XRefreshToken:
         """Получает refresh-токен по аккаунту и значению токена"""
         raise NotImplementedError
 
-    async def revoke_expired_tokens(self):
+    async def revoke_expired_tokens(self) -> None:
         """Удаляет или инвалидирует просроченные refresh-токены"""
         raise NotImplementedError
 
-    async def save_refresh_token(self, acc_id: UUID, token: str):
+    async def save_refresh_token(self, acc_id: UUID, token: str) -> XRefreshToken:
         """Сохраняет refresh-токен для аккаунта"""
         raise NotImplementedError
 
-    async def revoke_tokens(self, acc_id: UUID):
+    async def revoke_tokens(self, acc_id: UUID) -> int:
         """Инвалидирует все refresh-токены для аккаунта"""
         raise NotImplementedError

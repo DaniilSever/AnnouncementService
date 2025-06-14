@@ -27,7 +27,7 @@ class SignupAccount(Base):
     pwd_hash = Column(String(255), nullable=False)
     salt = Column(String, nullable=False)
     code = Column(String(10), nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now())
     updated_at = Column(TIMESTAMP, nullable=True)
     blocked_till = Column(TIMESTAMP, nullable=True)
     attempts = Column(Integer, nullable=False, default=1)
@@ -43,7 +43,7 @@ class RefreshToken(Base):
     account_id = Column(UUID(as_uuid=True), nullable=False)
     token = Column(String, nullable=False)
     is_revoked = Column(Boolean, nullable=False, default=False)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now())
     expires_at = Column(TIMESTAMP, nullable=False)
 
     __table_args__ = (
