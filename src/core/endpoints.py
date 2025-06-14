@@ -4,6 +4,7 @@ class _EndpointsAUTH:
     AUTH_HEALTHCHECK = "/api/auth/healthcheck"
     AUTH_SIGNUP_EMAIL = "/api/auth/signup/email"
     AUTH_SIGNIN_EMAIL = "/api/auth/signin/email"
+    AUTH_SIGNIN_EMAIL_FORM = "/api/auth/signin/email/form"
     AUTH_CONFIRM_EMAIL = "/api/auth/confirm/email"
     AUTH_REFRESH_TOKEN = "/api/auth/refresh/token"
     AUTH_REVOKE_TOKEN = "/api/auth/revoke/token"

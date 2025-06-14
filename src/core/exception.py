@@ -6,6 +6,10 @@ class _AuthExpCode:
     AUTH_MANY_CONFIRMATION_ATTEMPTS = "400", "Много попыток подтверждения"
     AUTH_EMAIL_BLOCKED = "400", "Почта заборкипрванна, причина: множество попыток регистрации/подтверждения"
     AUTH_WRONG_CODE = "400", "Неверный код подтверждения"
+    AUTH_SIGNIN_WRONG_PASSWORD = "400", "Неверный пароль"
+    AUTH_INVALID_TOKEN_TYPE = "400", "Неверный тип токена"
+    AUTH_REFRESH_TOKEN_NOT_FOUND = "404", "Токен не найден"
+    AUTH_REVOKE_TOKEN_NOT_FOUND = "404", "Активные токены не найдены"
 
 
 

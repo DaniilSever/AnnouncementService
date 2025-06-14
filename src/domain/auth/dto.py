@@ -62,3 +62,8 @@ class ZAccountID(BaseModel):
             }
         }
     )
+
+class ZRevokedTokens(BaseModel):
+    """Ответ: тоекты отозваны"""
+    success: bool = True
+    message: str

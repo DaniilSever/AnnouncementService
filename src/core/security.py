@@ -3,10 +3,17 @@ import random
 import secrets
 import string
 from datetime import datetime, timedelta
+from typing import Annotated
+from fastapi import Depends
+from fastapi.security import OAuth2PasswordBearer
 
 import jwt
 from jwt.exceptions import InvalidTokenError
 
+from .endpoints import Endpoints as Enp
+from .configs import AuthConfig
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl=Enp.AUTH_SIGNIN_EMAIL_FORM)
 
 def create_password_hash(pwd: str, salt: str | None = None) -> tuple[str, str]:
     """Генерирует хеш пароля с использованием соли.
@@ -89,3 +96,13 @@ async def decode_jwt(token: str, key: str) -> dict:
     except InvalidTokenError as e:
         raise ValueError("incorrect jwt") from e
     return payload
+
+async def get_jwt_payload(
+    token: Annotated[str, Depends(oauth2_scheme)],
+) -> dict:  # pragma: no cover, не знаю как покрыть
+    cfg = AuthConfig()
+    try:
+        res: dict = await decode_jwt(token, cfg.JWT_PUBLIC_KEY)
+    except ValueError as e:
+        raise e
+    return res

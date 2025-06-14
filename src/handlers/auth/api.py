@@ -1,5 +1,6 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, Body
+from fastapi.security import OAuth2PasswordRequestForm
 
 from core.endpoints import Endpoints as Enp
 from core.depends import get_auth_repo_session, AsyncSession
@@ -7,8 +8,8 @@ from core.response import responses, SuccessResp
 
 from app.auth.uc import AuthUseCase
 
-from domain.auth.dto import QEmailSignup, QConfirmCode
-from domain.auth.dto import ZEmailSignup, ZAccountID
+from domain.auth.dto import QEmailSignup, QConfirmCode, QEmailSignin, QRefreshToken, QRevokeToken
+from domain.auth.dto import ZEmailSignup, ZAccountID, ZToken, ZRevokedTokens
 
 from infra.auth.repo import AuthRepo
 
@@ -56,3 +57,62 @@ async def confirm_email(
     uc = AuthUseCase(AuthRepo(_repo_session))
     res = await uc.confirm_email(req)
     return SuccessResp[ZAccountID](payload=res)
+
+@router.post(
+    Enp.AUTH_SIGNIN_EMAIL,
+    summary="Авторизация в системе",
+    status_code=200,
+    responses=responses(400,404)
+)
+async def signin_email(
+    req: Annotated[QEmailSignin, Body()],
+    _repo_session: Annotated[AsyncSession, Depends(get_auth_repo_session)],
+) -> ZToken:
+    uc = AuthUseCase(AuthRepo(_repo_session))
+    res = await uc.signin_email(req)
+    return SuccessResp[ZToken](payload=res)
+
+@router.post(
+    Enp.AUTH_SIGNIN_EMAIL_FORM,
+    summary="Авторизация в системе (сваггер)",
+    status_code=200,
+    responses=responses(400,404)
+)
+async def signin_email_form(
+    form: Annotated[OAuth2PasswordRequestForm, Depends()],
+    _repo_session: Annotated[AsyncSession, Depends(get_auth_repo_session)],
+) -> ZToken:
+    uc = AuthUseCase(AuthRepo(_repo_session))
+    req = QEmailSignin(email=form.username, password=form.password)
+    res = await uc.signin_email(req)
+    return SuccessResp[ZToken](payload=res)
+
+
+@router.post(
+    Enp.AUTH_REFRESH_TOKEN,
+    summary="Рефреш токена",
+    status_code=200,
+    responses=responses(400,404)
+)
+async def refresh_token(
+    req: Annotated[QRefreshToken, Body()],
+    _repo_session: Annotated[AsyncSession, Depends(get_auth_repo_session)],
+) -> ZToken:
+    uc = AuthUseCase(AuthRepo(_repo_session))
+    res = await uc.refresh_token(req)
+    return SuccessResp[ZToken](payload=res)
+
+
+@router.post(
+    Enp.AUTH_REVOKE_TOKEN,
+    summary="Деактивация докетов по acc_id",
+    status_code=200,
+    responses=responses(400,404)
+)
+async def revoke_token(
+    req: Annotated[QRevokeToken, Body()],
+    _repo_session: Annotated[AsyncSession, Depends(get_auth_repo_session)],
+) -> ZRevokedTokens:
+    uc = AuthUseCase(AuthRepo(_repo_session))
+    res = await uc.revoke_token(req)
+    return SuccessResp[ZRevokedTokens](payload=res)
