@@ -10,8 +10,8 @@ from core.exception import ErrExp, ExpCode
 
 from app.ads.uc import AdsUseCase
 
-from domain.ads.dto import QCreateAds, QAdsCategory, QFilter, QChangeAds
-from domain.ads.dto import ZAds
+from domain.ads.dto import QCreateAds, QAdsCategory, QFilter, QChangeAds, QAddAdsComment, QUpdateAdsComment, QDelAdsComment
+from domain.ads.dto import ZAds, ZAdsComment
 
 from infra.ads.repo import AdsRepo
 
@@ -163,4 +163,112 @@ async def delete_ads(
         raise ErrExp(ExpCode.SYS_UNAUTHORIZE)
     acc_id = jwt["sub"]
     await uc.delete_ads(ads_id, acc_id)
+    return SuccessResp()
+
+@router.post(
+    Enp.ADS_ADD_COMMENTARY,
+    summary="Добавить комментарий к объявлению",
+    status_code=200,
+    responses=responses(400, 404)
+)
+async def create_ads_commentary(
+    jwt: AJwt,
+    ads_id: Annotated[UUID, Path()],
+    commentary: Annotated[str, Body()],
+    __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
+) -> SuccessResp[ZAdsComment]:
+    uc = AdsUseCase(AdsRepo(__repo_session))
+
+    if not jwt:
+        raise ErrExp(ExpCode.SYS_UNAUTHORIZE)
+    acc_id = jwt["sub"]
+
+    req = QAddAdsComment(
+        ads_id=ads_id,
+        ads_comment=commentary
+    )
+    res = await uc.create_ads_commentary(req, acc_id)
+    return SuccessResp[ZAdsComment](payload=res)
+
+@router.get (
+    Enp.ADS_GET_COMMENTATIES,
+    summary="Получить список комментариев в объявлении",
+    status_code=200,
+    responses=responses(400, 404)
+)
+async def get_ads_commentaries(
+    ads_id: Annotated[UUID, Path()],
+    __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
+) -> SuccessResp[list[ZAdsComment]]:
+    uc = AdsUseCase(AdsRepo(__repo_session))
+    res = await uc.get_ads_commentaries(ads_id)
+    return SuccessResp[list[ZAdsComment]](payload=res)
+
+@router.get (
+    Enp.ADS_ACTION_COMMENTARY,
+    summary="Получить данные по комментарию в объявлении",
+    status_code=200,
+    responses=responses(400, 404)
+)
+async def get_ads_commentary(
+    ads_id: Annotated[UUID, Path()],
+    comm_id: Annotated[UUID, Path()],
+    __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
+) -> SuccessResp[ZAdsComment]:
+    uc = AdsUseCase(AdsRepo(__repo_session))
+    res = await uc.get_ads_commentary(ads_id, comm_id)
+    return SuccessResp[ZAdsComment](payload=res)
+
+@router.patch (
+    Enp.ADS_ACTION_COMMENTARY,
+    summary="Получить данные по комментарию в объявлении",
+    status_code=200,
+    responses=responses(400, 404)
+)
+async def update_ads_commentary(
+    jwt: AJwt,
+    ads_id: Annotated[UUID, Path()],
+    comm_id: Annotated[UUID, Path()],
+    commentary: Annotated[str, Body()],
+    __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
+) -> SuccessResp[ZAdsComment]:
+    uc = AdsUseCase(AdsRepo(__repo_session))
+
+    if not jwt:
+        raise ErrExp(ExpCode.SYS_UNAUTHORIZE)
+    acc_id = jwt["sub"]
+
+    req = QUpdateAdsComment(
+        comm_id=comm_id,
+        ads_id=ads_id,
+        acccount_id=acc_id,
+        ads_comment=commentary
+    )
+    res = await uc.update_ads_commentary(req)
+    return SuccessResp[ZAdsComment](payload=res)
+
+@router.delete (
+    Enp.ADS_ACTION_COMMENTARY,
+    summary="Получить данные по комментарию в объявлении",
+    status_code=200,
+    responses=responses(400, 404)
+)
+async def delete_ads_commentary(
+    jwt: AJwt,
+    ads_id: Annotated[UUID, Path()],
+    comm_id: Annotated[UUID, Path()],
+    __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
+) -> SuccessResp:
+    uc = AdsUseCase(AdsRepo(__repo_session))
+
+    if not jwt:
+        raise ErrExp(ExpCode.SYS_UNAUTHORIZE)
+    acc_id = jwt["sub"]
+
+    req = QDelAdsComment(
+        comm_id=comm_id,
+        ads_id=ads_id,
+        account_id=acc_id
+    )
+    res = await uc.delete_ads_commentary(req)
     return SuccessResp()

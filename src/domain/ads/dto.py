@@ -58,10 +58,17 @@ class QAddAdsComment(BaseModel):
     ads_id: UUID4
     ads_comment: str
 
+class QUpdateAdsComment(BaseModel):
+    comm_id: UUID4
+    ads_id: UUID4
+    acccount_id: UUID4
+    ads_comment: str
+
 
 class QDelAdsComment(BaseModel):
-    ads_comment_id: UUID4
+    comm_id: UUID4
     ads_id: UUID4
+    account_id: UUID4
 
 class ZAdsComment(BaseModel):
     id: UUID4

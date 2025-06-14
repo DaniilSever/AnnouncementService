@@ -42,9 +42,8 @@ class _EndpointsADS:
 
     # --- Действия с комментариями
     ADS_ADD_COMMENTARY = "/api/ads/{ads_id}/commentary"
-    ADS_GET_COMMENTATIES = "/api/ads/{ads_id}"
-    ADS_CHANGE_COMMENTARY = "/api/ads/{ads_id}/{comm_id}"
-    ADS_DELETE_COMMENTARY = "/api/ads/{ads_id}/{comm_id}"
+    ADS_GET_COMMENTATIES = "/api/ads/{ads_id}/commentaries"
+    ADS_ACTION_COMMENTARY = "/api/ads/{ads_id}/{comm_id}"
     ADS_ADD_COMPLAINT_COMMENTARY = "/api/ads/{ads_id}/{comm_id}/complaint"
 
 

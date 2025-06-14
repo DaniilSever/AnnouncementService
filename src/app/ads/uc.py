@@ -3,11 +3,11 @@ from core.configs import AdsConfig
 from core.exception import ErrExp, ExpCode
 
 from domain.ads.irepo import IAdsRepo
-from domain.ads.dto import QCreateAds, QAdsCategory, QFilter, QChangeAds
-from domain.ads.dto import ZAds
+from domain.ads.dto import QCreateAds, QAdsCategory, QFilter, QChangeAds, QAddAdsComment, QUpdateAdsComment, QDelAdsComment
+from domain.ads.dto import ZAds, ZAdsComment
 
 from infra.ads.repo import AdsRepo
-from infra.ads.xdao import XAds
+from infra.ads.xdao import XAds, XAdsComment
 
 class AdsUseCase:
 
@@ -56,4 +56,41 @@ class AdsUseCase:
 
     async def delete_ads(self, ads_id: UUID, acc_id: UUID) -> bool:
         await self.repo.delete_ads(ads_id, acc_id)
+        return True
+
+    # ---------- AdsCommentary -------------
+
+    async def create_ads_commentary(self, req: QAddAdsComment, acc_id: UUID) -> ZAdsComment:
+        try:
+            res: XAdsComment = await self.repo.create_ads_commentary(req, acc_id)
+        except KeyError as e:
+            raise ErrExp(ExpCode.ADS_NOT_FOUND, str(e)) from e
+        return ZAdsComment.model_validate(res.model_dump(mode="json"))
+
+    async def get_ads_commentary(self, ads_id: UUID, comment_id: UUID) -> ZAdsComment:
+        try:
+            res: XAdsComment = await self.repo.get_ads_commentary(ads_id, comment_id)
+        except KeyError as e:
+            raise ErrExp(ExpCode.ADS_COMMENTARY_NOT_FOUND, str(e)) from e
+        return ZAdsComment.model_validate(res.model_dump(mode="json"))
+
+    async def get_ads_commentaries(self, ads_id: UUID) -> list[ZAdsComment]:
+        xres = await self.repo.get_ads_commentaries(ads_id)
+        res = []
+        for xads in xres:
+            res.append(ZAdsComment(**xads.model_dump(mode="json")))
+        return res
+
+    async def update_ads_commentary(self, req: QUpdateAdsComment) -> ZAdsComment:
+        try:
+            res: XAdsComment = await self.repo.update_ads_commentary(req)
+        except KeyError as e:
+            raise ErrExp(ExpCode.ADS_COMMENTARY_NOT_FOUND, str(e)) from e
+        return ZAdsComment.model_validate(res.model_dump(mode="json"))
+
+    async def delete_ads_commentary(self, req: QDelAdsComment) -> bool:
+        try:
+            await self.repo.delete_ads_commentary(req.ads_id, req.comm_id, req.account_id)
+        except KeyError as e:
+            raise ErrExp(ExpCode.ADS_COMMENTARY_NOT_FOUND, str(e)) from e
         return True
