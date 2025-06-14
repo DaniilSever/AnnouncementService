@@ -10,17 +10,14 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- ------------------------
 
-DROP TYPE IF EXISTS acc_role CASCADE;
-CREATE TYPE acc_role as enum ('base', 'admin');
-
 DROP TYPE IF EXISTS "Account" CASCADE;
 CREATE TABLE "Account"
 (
     id              uuid            PRIMARY KEY DEFAULT uuid_generate_v4(),
-    email           VARCHAR(255)    NOT NULL,
+    email           VARCHAR(255)    NOT NULL UNIQUE,
     pwd_hash        VARCHAR(255)    NOT NULL,
     salt            VARCHAR         NOT NULL,
-    role            acc_role        NOT NULL,
+    role            VARCHAR         NOT NULL,
     is_banned       BOOLEAN         NOT NULL DEFAULT FALSE,
     created_at      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at      TIMESTAMP       NULL,

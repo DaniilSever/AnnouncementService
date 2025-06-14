@@ -173,7 +173,7 @@ class AuthRepo(IAuthRepo):
         req = (
             insert(RefreshToken)
             .values(
-                acc_id=acc_id,
+                account_id=acc_id,
                 token=token,
                 expires_at=text("NOW() + INTERVAL '7 DAYS'")
             )

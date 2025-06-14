@@ -67,7 +67,7 @@ def create_jwt_token(payload: dict, private_key: str, delta: int | None = None) 
         "iat": int(now.timestamp()),
         "iss": "auth.announcenment",
         "exp": int(exp.timestamp()),
-        "exp_at": exp,
+        "exp_at": exp.isoformat(),
         "exp_in": int(delta),
         **payload,
     }

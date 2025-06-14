@@ -16,6 +16,10 @@ class _EndpointsACCOUNT:
     ACCOUNT_HEALTHCHECK = "/api/account/healthcheck"
     ACCOUNT_CURRENT = "/api/account/current"
     ACCOUNT_GET_BY_ID = "/api/acccount/{acc_id}"
+    ACCOUNT_GET_BY_EMAIL = "/api/account/{email}"
+    ACCOUNT_COPY_FOR_SIGNUP = "/api/account/copy/signup"
+    ACCOUNT_GET_ALL = "/api/account/"
+    ACCOUNT_IS_EMAIL_BUSY = "/api/account/{email}/is_busy"
     ACCOUNT_GET_WARNINGS = "/api/account/warning"
     ACCOUNT_GET_WARNING_BY_ID = "/api/account/warning/{warn_id}"
 

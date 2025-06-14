@@ -5,17 +5,25 @@ from core.exception import ErrExp, ExpCode
 from domain.auth.dto import QEmailSignup, QConfirmCode, QEmailSignin, QRefreshToken, QRevokeToken
 from domain.auth.dto import ZEmailSignup, ZAccountID, ZToken, ZRevokedTokens
 from domain.auth.irepo import IAuthRepo
+from domain.account.dto import QEmailSignupData
+from domain.account.dto import ZAccount
 from infra.auth.repo import AuthRepo
 from infra.auth.xdao import XEmailSignup
-
+from services.account.svc import AccService
 
 class AuthUseCase:
 
-    def __init__(self, _repo: AuthRepo):
+    def __init__(self, _repo: AuthRepo, _acc_svc: AccService):
         self.cfg = AuthConfig()
         self.repo: IAuthRepo = _repo
+        self.acc_svc: AccService = _acc_svc
+
 
     async def signup_email(self, req: QEmailSignup) -> ZEmailSignup:
+
+        if await self.acc_svc.is_email_busy(req.email):
+            raise ErrExp(ExpCode.ACC_EMAIL_IS_BUSY)
+
         code = create_confirm_code()
         pwd_hash, salt = create_password_hash(req.password)
 
@@ -45,19 +53,26 @@ class AuthUseCase:
                 raise ErrExp(ExpCode.AUTH_MANY_CONFIRMATION_ATTEMPTS, str(e)) from e
             raise ErrExp(ExpCode.AUTH_WRONG_CODE)
 
-        # TODO: Добавить сохранения записи в Account
+        try:
+            signup = QEmailSignupData(**x_signup.model_dump(mode="json"))
+            acc_id = await self.acc_svc.copy_account_from_signup(signup)
+        except ErrExp as e:
+            raise e
 
         await self.repo.delete_email_signup(x_signup.id)
-        return ZAccountID(id=x_signup.id)
+        return ZAccountID(id=acc_id)
 
     async def signin_email(self, req: QEmailSignin) -> ZToken:
 
-        # TODO: Добавить получение записи из Account
+        try:
+            z_acc: ZAccount = await self.acc_svc.get_account_by_email(req.email)
+        except ErrExp as e:
+            raise e
 
         pwd_hash, _ = create_password_hash(req.password, salt=z_acc.salt)
         if pwd_hash != z_acc.pwd_hash:
             raise ErrExp(ExpCode.AUTH_SIGNIN_WRONG_PASSWORD)
-        
+
         access_payload = {
             "sub": str(z_acc.id),
             "type": "access",

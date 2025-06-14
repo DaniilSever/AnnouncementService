@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, Body
 from fastapi.security import OAuth2PasswordRequestForm
 
 from core.endpoints import Endpoints as Enp
-from core.depends import get_auth_repo_session, AsyncSession
+from core.depends import get_auth_repo_session, AsyncSession, get_account_serivce, AccService
 from core.response import responses, SuccessResp
 
 from app.auth.uc import AuthUseCase
@@ -39,8 +39,9 @@ tags = {
 async def signup_email(
     req: Annotated[QEmailSignup, Body()],
     _repo_session: Annotated[AsyncSession, Depends(get_auth_repo_session)],
+    _acc_svc: Annotated[AccService, Depends(get_account_serivce)],
 ) -> SuccessResp[ZEmailSignup]:
-    uc = AuthUseCase(AuthRepo(_repo_session))
+    uc = AuthUseCase(AuthRepo(_repo_session), _acc_svc)
     res = await uc.signup_email(req)
     return SuccessResp[ZEmailSignup](payload=res)
 
@@ -53,8 +54,9 @@ async def signup_email(
 async def confirm_email(
     req: Annotated[QConfirmCode, Body()],
     _repo_session: Annotated[AsyncSession, Depends(get_auth_repo_session)],
+    _acc_svc: Annotated[AccService, Depends(get_account_serivce)],
 ) -> SuccessResp[ZAccountID]:
-    uc = AuthUseCase(AuthRepo(_repo_session))
+    uc = AuthUseCase(AuthRepo(_repo_session), _acc_svc)
     res = await uc.confirm_email(req)
     return SuccessResp[ZAccountID](payload=res)
 
@@ -67,8 +69,9 @@ async def confirm_email(
 async def signin_email(
     req: Annotated[QEmailSignin, Body()],
     _repo_session: Annotated[AsyncSession, Depends(get_auth_repo_session)],
-) -> ZToken:
-    uc = AuthUseCase(AuthRepo(_repo_session))
+    _acc_svc: Annotated[AccService, Depends(get_account_serivce)],
+) -> SuccessResp[ZToken]:
+    uc = AuthUseCase(AuthRepo(_repo_session), _acc_svc)
     res = await uc.signin_email(req)
     return SuccessResp[ZToken](payload=res)
 
@@ -81,8 +84,9 @@ async def signin_email(
 async def signin_email_form(
     form: Annotated[OAuth2PasswordRequestForm, Depends()],
     _repo_session: Annotated[AsyncSession, Depends(get_auth_repo_session)],
-) -> ZToken:
-    uc = AuthUseCase(AuthRepo(_repo_session))
+    _acc_svc: Annotated[AccService, Depends(get_account_serivce)],
+) -> SuccessResp[ZToken]:
+    uc = AuthUseCase(AuthRepo(_repo_session), _acc_svc)
     req = QEmailSignin(email=form.username, password=form.password)
     res = await uc.signin_email(req)
     return SuccessResp[ZToken](payload=res)
@@ -97,8 +101,9 @@ async def signin_email_form(
 async def refresh_token(
     req: Annotated[QRefreshToken, Body()],
     _repo_session: Annotated[AsyncSession, Depends(get_auth_repo_session)],
-) -> ZToken:
-    uc = AuthUseCase(AuthRepo(_repo_session))
+    _acc_svc: Annotated[AccService, Depends(get_account_serivce)],
+) -> SuccessResp[ZToken]:
+    uc = AuthUseCase(AuthRepo(_repo_session), _acc_svc)
     res = await uc.refresh_token(req)
     return SuccessResp[ZToken](payload=res)
 
@@ -112,7 +117,8 @@ async def refresh_token(
 async def revoke_token(
     req: Annotated[QRevokeToken, Body()],
     _repo_session: Annotated[AsyncSession, Depends(get_auth_repo_session)],
-) -> ZRevokedTokens:
-    uc = AuthUseCase(AuthRepo(_repo_session))
+    _acc_svc: Annotated[AccService, Depends(get_account_serivce)],
+) -> SuccessResp[ZRevokedTokens]:
+    uc = AuthUseCase(AuthRepo(_repo_session), _acc_svc)
     res = await uc.revoke_token(req)
     return SuccessResp[ZRevokedTokens](payload=res)

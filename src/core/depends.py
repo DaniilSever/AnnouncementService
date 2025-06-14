@@ -1,6 +1,7 @@
 from .pg import AsyncAccRepoSession, AsyncAdsRepoSession, AsyncAuthRepoSession
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from .configs import AccountConfig
+from services.account.svc import AccService
 
 async def get_account_repo_session() -> AsyncSession:
     async with AsyncAccRepoSession() as session:
@@ -14,3 +15,7 @@ async def get_auth_repo_session() -> AsyncSession:
 async def get_ads_repo_session() -> AsyncSession:
     async with AsyncAdsRepoSession() as session:
         yield session
+
+def get_account_serivce() -> AccService:
+    cfg = AccountConfig()
+    return AccService(cfg.API_URL)

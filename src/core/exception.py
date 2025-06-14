@@ -11,13 +11,16 @@ class _AuthExpCode:
     AUTH_REFRESH_TOKEN_NOT_FOUND = "404", "Токен не найден"
     AUTH_REVOKE_TOKEN_NOT_FOUND = "404", "Активные токены не найдены"
 
-
+class _AccExpCode:
+    ACC_ACCOUNT_NOT_FOUND = "404", "Аккаунт не найдет"
+    ACC_EMAIL_IS_BUSY = "400", "Емайл занят"
 
 
 
 
 class ExpCode(
     _AuthExpCode,
+    _AccExpCode,
 ):
     """Глобальные класс кодов ошибок"""
 
