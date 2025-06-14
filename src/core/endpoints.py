@@ -31,7 +31,8 @@ class _EndpointsADS:
 
     # --- Действия с объявлениями
     ADS_CREATE = "/api/ads/create"
-    ADS_CHANGE = "/api/ads/change/{ads_id}"
+    ADS_CHANGE = "/api/ads/{ads_id}/change"
+    ADS_CHANGE_CATEGORY = "/api/ads/{ads_id}/change/category"
     ADS_DELETE = "/api/ads/delete/{ads_id}"
     ADS_GET_ALL = "/api/ads"
     ADS_GET_BY_ME = "/api/ads/me"

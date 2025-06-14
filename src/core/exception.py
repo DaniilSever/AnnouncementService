@@ -21,6 +21,8 @@ class __AccExpCode:
 
 class __AdsExpCode:
     ADS_FILTER_ERR = "400", "Неверный фильтр записей"
+    ADS_NOT_FOUND = "404", "Объявление не найдено"
+    ADS_COMMENTARY_NOT_FOUND = "404", "Комментарий не найден"
 
 
 class ExpCode(

@@ -1,5 +1,8 @@
 from uuid import UUID
 
+from domain.ads.dto import QAdsCategory
+from infra.ads.xdao import XAds
+
 class IAdsRepo:
 
     async def create_ads(self, req):
@@ -13,8 +16,8 @@ class IAdsRepo:
 
     async def update_ads(self, req):
         raise NotImplementedError
-
-    async def update_category_ads(self, req):
+    
+    async def update_category_ads(self, ads_id: UUID, new_category: QAdsCategory, acc_id: UUID) -> XAds:
         raise NotImplementedError
 
     async def delete_ads(self, req):

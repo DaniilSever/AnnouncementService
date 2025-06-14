@@ -24,18 +24,16 @@ class QCreateAds(BaseModel):
     title: str
     description: str
     price: int
-    ads_category: QAdsCategory = QAdsCategory.SELLING
 
+class QChangeAds(BaseModel):
+    ads_id: UUID4
+    title: str
+    description: str
+    price: int
 
 class QAdmDeleteAds(BaseModel):
     ads_id: UUID4
     reason_deletion: str
-
-
-class QChangeCategory(BaseModel):
-    ads_id: UUID4
-    new_ads_category: str
-
 
 class ZAds(BaseModel):
     id: UUID4
