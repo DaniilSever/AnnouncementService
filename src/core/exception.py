@@ -1,6 +1,10 @@
 from .response import ErrDetail, ErrResp
 
-class _AuthExpCode:
+class __SysExpCode:
+    SYS_INVALID_JWT_TOKEN = "500", "Неверный токен"
+    SYS_INVALID_API_KEY = "500", "Неверный api ключ"
+    SYS_UNAUTHORIZE = "503", "Не авторизирован"
+class __AuthExpCode:
     AUTH_SINGUP_NOT_FOUND = "404", "Регистрация не найдена"
     AUTH_MANY_REGISTRATION_ATTEMPTS = "400", "Много попыток регистрации"
     AUTH_MANY_CONFIRMATION_ATTEMPTS = "400", "Много попыток подтверждения"
@@ -11,16 +15,19 @@ class _AuthExpCode:
     AUTH_REFRESH_TOKEN_NOT_FOUND = "404", "Токен не найден"
     AUTH_REVOKE_TOKEN_NOT_FOUND = "404", "Активные токены не найдены"
 
-class _AccExpCode:
+class __AccExpCode:
     ACC_ACCOUNT_NOT_FOUND = "404", "Аккаунт не найдет"
     ACC_EMAIL_IS_BUSY = "400", "Емайл занят"
 
-
+class __AdsExpCode:
+    ADS_FILTER_ERR = "400", "Неверный фильтр записей"
 
 
 class ExpCode(
-    _AuthExpCode,
-    _AccExpCode,
+    __SysExpCode,
+    __AuthExpCode,
+    __AccExpCode,
+    __AdsExpCode,
 ):
     """Глобальные класс кодов ошибок"""
 

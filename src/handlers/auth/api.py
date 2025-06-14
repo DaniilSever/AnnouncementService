@@ -85,11 +85,11 @@ async def signin_email_form(
     form: Annotated[OAuth2PasswordRequestForm, Depends()],
     _repo_session: Annotated[AsyncSession, Depends(get_auth_repo_session)],
     _acc_svc: Annotated[AccService, Depends(get_account_serivce)],
-) -> SuccessResp[ZToken]:
+) -> ZToken:
     uc = AuthUseCase(AuthRepo(_repo_session), _acc_svc)
     req = QEmailSignin(email=form.username, password=form.password)
     res = await uc.signin_email(req)
-    return SuccessResp[ZToken](payload=res)
+    return res
 
 
 @router.post(

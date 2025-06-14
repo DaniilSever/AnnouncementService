@@ -26,31 +26,6 @@ async def lifespan(__app: FastAPI):
     """
     yield
 
-def get_custom_openapi(app: FastAPI):
-    if app.openapi_schema:
-        return app.openapi_schema
-    openapi_schema = get_openapi(
-        title=app.title,
-        version="1.0.0",
-        description="Авторизация через JWT токен (OAuth2 password flow)",
-        routes=app.routes,
-    )
-    openapi_schema["components"]["securitySchemes"] = {
-        "OAuth2Password": {
-            "type": "oauth2",
-            "flows": {
-                "password": {
-                    "tokenUrl": Enp.AUTH_SIGNIN_EMAIL_FORM,  # <-- Убедись, что путь соответствует Enp.AUTH_SIGNIN_EMAIL_FORM
-                    "scopes": {},
-                }
-            },
-        }
-    }
-    openapi_schema["security"] = [{"OAuth2Password": []}]
-    app.openapi_schema = openapi_schema
-    return app.openapi_schema
-
-
 def get_services() -> tuple[list[APIRouter], list[dict]]:
     """Импортирует активные сервисы и извлекает их роутеры и метаданные.
 
@@ -92,8 +67,6 @@ def create_app() -> FastAPI:
         redoc_url="/api/redoc",
         default_response_class=ORJSONResponse,
     )
-
-    __app.openapi = lambda: get_custom_openapi(__app)
 
     for router in all_routers:
         __app.include_router(router)

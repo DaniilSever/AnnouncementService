@@ -1,7 +1,7 @@
 class _EndpointsAUTH:
     """Эндпоинты Auth сервиса"""
 
-    AUTH_HEALTHCHECK = "/api/auth/healthcheck"
+    # AUTH_HEALTHCHECK = "/api/auth/healthcheck"
     AUTH_SIGNUP_EMAIL = "/api/auth/signup/email"
     AUTH_SIGNIN_EMAIL = "/api/auth/signin/email"
     AUTH_SIGNIN_EMAIL_FORM = "/api/auth/signin/email/form"
@@ -13,30 +13,31 @@ class _EndpointsAUTH:
 class _EndpointsACCOUNT:
     """Эндпоинты Account сервиса"""
 
-    ACCOUNT_HEALTHCHECK = "/api/account/healthcheck"
-    ACCOUNT_CURRENT = "/api/account/current"
+    # ACCOUNT_HEALTHCHECK = "/api/account/healthcheck"
+    # ACCOUNT_CURRENT = "/api/account/current"
     ACCOUNT_GET_BY_ID = "/api/acccount/{acc_id}"
     ACCOUNT_GET_BY_EMAIL = "/api/account/{email}"
     ACCOUNT_COPY_FOR_SIGNUP = "/api/account/copy/signup"
     ACCOUNT_GET_ALL = "/api/account/"
     ACCOUNT_IS_EMAIL_BUSY = "/api/account/{email}/is_busy"
-    ACCOUNT_GET_WARNINGS = "/api/account/warning"
-    ACCOUNT_GET_WARNING_BY_ID = "/api/account/warning/{warn_id}"
+    # ACCOUNT_GET_WARNINGS = "/api/account/warning"
+    # ACCOUNT_GET_WARNING_BY_ID = "/api/account/warning/{warn_id}"
 
 
 class _EndpointsADS:
     """Эндпоинты ADS сервиса"""
 
-    ADS_HEALTHCHECK = "/api/ads/healthcheck"
+    # ADS_HEALTHCHECK = "/api/ads/healthcheck"
 
     # --- Действия с объявлениями
     ADS_CREATE = "/api/ads/create"
     ADS_CHANGE = "/api/ads/change/{ads_id}"
     ADS_DELETE = "/api/ads/delete/{ads_id}"
     ADS_GET_ALL = "/api/ads"
-    ADS_GET_BY_ID = "/api/ads/{ads_id}"
-    ADS_GET_BY_ACCOUNT = "/api/ads/{acc_id}"
-    ADS_ADD_COMPLAINT = "/api/ads/{ads_id}/complaint"
+    ADS_GET_BY_ME = "/api/ads/me"
+    ADS_GET_BY_ID = "/api/ads/ads"
+    ADS_GET_BY_ACCOUNT = "/api/ads/author"
+    # ADS_ADD_COMPLAINT = "/api/ads/{ads_id}/complaint"
 
     # --- Действия с комментариями
     ADS_ADD_COMMENTARY = "/api/ads/{ads_id}/commentary"

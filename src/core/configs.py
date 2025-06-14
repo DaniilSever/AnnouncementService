@@ -11,6 +11,7 @@ class AuthConfig(BaseSettings):
     """Конфиг Auth сервиса"""
     APP_ENV: str
     API_URL: str
+    API_KEY: str
     AUTH_DB_URL: str
     JWT_PUBLIC_KEY: str
     JWT_PRIVATE_KEY: str
