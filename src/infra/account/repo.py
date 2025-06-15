@@ -228,7 +228,7 @@ class AccRepo(IAccRepo):
             raise KeyError("Аккаунт в бд не найден") from e
         await self.session.commit()
 
-    async def set_ban_account(self, acc_id: UUID, blocked_to: BannedTo, reason_banned: str) -> None:
+    async def set_ban_account(self, acc_id: UUID, blocked_to: BannedTo, reason_banned: str) -> str:
         blocked_mapping = {
             "week": text("NOW() + INTERVAL '7 DAYS'"),
             "month": text("NOW() + INTERVAL '1 MONTH'"),
@@ -248,12 +248,17 @@ class AccRepo(IAccRepo):
                 blocked_to=ban_time,
             )
             .where(Account.id == acc_id)
+            .returning(Account)
         )
         try:
-            await self.session.execute(req)
+            res = await self.session.execute(req)
         except NoResultFound as e:
             raise KeyError("Аккаунт в бд не найден") from e
         await self.session.commit()
+
+        row = res.scalar_one()
+        return str(row.blocked_to)
+
 
     async def set_unban_account(self, acc_id: UUID) -> None:
         req = (

@@ -306,10 +306,10 @@ class AdsRepo(IAdsRepo):
         await self.session.execute(req)
         await self.session.commit()
 
-    # async def adm_delete_ads(self, ads_id: UUID) -> None:
-    #     req = delete(Ads).where(Ads.id == ads_id)
-    #     await self.session.execute(req)
-    #     await self.session.commit()
+    async def adm_delete_ads(self, ads_id: UUID) -> None:
+        req = delete(Ads).where(Ads.id == ads_id)
+        await self.session.execute(req)
+        await self.session.commit()
 
     async def get_count_ads_by_acc_id(self, acc_id: UUID) -> int:
         req = select(func.count()).select_from(Ads).where(Ads.account_id == acc_id)

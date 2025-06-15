@@ -66,7 +66,6 @@ class _EndpointsADM:
     # --- ADS
     ADM_DELETE_ADS = "/api/adm/delete/ads/{ads_id}"
     ADM_DELETE_COMMENTARY = "/api/adm/delete/commentary/{comm_id}"
-    # ADM_WARNING_ACCOUNT = "/api/adm/warn/{acc_id}"
 
     # --- Account
     ADM_SET_ROLE_ACCOUNT = "/api/adm/account/{acc_id}/set/role"

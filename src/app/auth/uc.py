@@ -32,12 +32,14 @@ from domain.account.dto import (
 from infra.auth.repo import AuthRepo
 from infra.auth.xdao import XEmailSignup
 from services.account.svc import AccService
+from services.tg.client import TgClient
+from services.tg.const_msg import get_code_msg
 
 
 class AuthUseCase:
     """Управляет бизнес-логикой аунтификации."""
 
-    def __init__(self, _repo: AuthRepo, _acc_svc: AccService):
+    def __init__(self, _repo: AuthRepo, _acc_svc: AccService, _tg_svc: TgClient):
         """Инициализирует UseCase с репозиторием.
 
         Args:
@@ -50,6 +52,7 @@ class AuthUseCase:
         self.cfg = AuthConfig()
         self.repo: IAuthRepo = _repo
         self.acc_svc: AccService = _acc_svc
+        self.tg_svc: TgClient = _tg_svc
 
     async def signup_email(self, req: QEmailSignup) -> ZEmailSignup:
         """Создаёт заявку на регистрацию по email.
@@ -75,6 +78,9 @@ class AuthUseCase:
                 req.email
             )
             raise ExpError(ExpCode.AUTH_MANY_REGISTRATION_ATTEMPTS, str(e)) from e
+
+        msg = await get_code_msg(str(req.email), str(code))
+        await self.tg_svc.send_message(msg)
 
         return ZEmailSignup.model_validate(x_signup.model_dump(mode="json"))
 

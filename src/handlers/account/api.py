@@ -2,7 +2,7 @@ from uuid import UUID
 from typing import Annotated
 from fastapi import APIRouter, Depends, Path, Body, Query
 
-from core.depends import get_account_repo_session, AsyncSession, get_ads_serivce, AdsService, get_compl_serivce, ComplService
+from core.depends import get_account_repo_session, AsyncSession, get_ads_serivce, AdsService, get_compl_serivce, ComplService, get_tg_bot, TgClient
 from core.endpoints import Endpoints as Enp
 from core.response import responses, SuccessResp
 from core.security import AJwt
@@ -40,10 +40,11 @@ async def get_account_by_id(
     acc_id: Annotated[UUID, Path()],
     __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
     __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)],
-    __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)]
+    __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)]
 ) -> SuccessResp[ZAccount]:
     """Обрабатывает HTTP-запрос на получение аккаунта по его ID."""
-    uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc)
+    uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc, __tg_svc)
     res = await uc.get_account_by_id(acc_id)
     return SuccessResp[ZAccount](payload=res)
 
@@ -58,10 +59,11 @@ async def get_account_by_email(
     req: Annotated[QEmail, Path()],
     __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
     __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)],
-    __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)]
+    __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)]
 ) -> SuccessResp[ZAccount]:
     """Обрабатывает HTTP-запрос на получение аккаунта по email."""
-    uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc)
+    uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc, __tg_svc)
     res = await uc.get_account_by_email(req)
     return SuccessResp[ZAccount](payload=res)
 
@@ -76,10 +78,11 @@ async def copy_account_from_signup(
     req: Annotated[QEmailSignupData, Body()],
     __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
     __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)],
-    __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)]
+    __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)]
 ) -> SuccessResp[ZAccountID]:
     """Обрабатывает HTTP-запрос на копирование аккаунта после регистрации."""
-    uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc)
+    uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc, __tg_svc)
     res = await uc.copy_account_from_signup(req)
     return SuccessResp[ZAccountID](payload=res)
 
@@ -94,10 +97,11 @@ async def is_email_busy(
     req: Annotated[QEmail, Path()],
     __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
     __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)],
-    __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)]
+    __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)]
 ) -> SuccessResp[ZIsBusy]:
     """Обрабатывает HTTP-запрос на проверку существования email."""
-    uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc)
+    uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc, __tg_svc)
     res = await uc.is_email_busy(req)
     return SuccessResp[ZIsBusy](payload=res)
 
@@ -110,10 +114,11 @@ async def is_email_busy(
 async def get_accounts(
     __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
     __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)],
-    __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)]
+    __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)]
 ) -> SuccessResp[list[ZAccount]]:
     """Обрабатывает HTTP-запрос на получение списка всех аккаунтов."""
-    uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc)
+    uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc, __tg_svc)
     res = await uc.get_accounts()
     return SuccessResp[list[ZAccount]](payload=res)
 
@@ -126,10 +131,11 @@ async def get_current_account(
     jwt: AJwt,
     __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
     __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)],
-    __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)]
+    __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)]
 ) -> SuccessResp[ZAccount]:
     """Обрабатывает HTTP-запрос на получение текущего аккаунта."""
-    uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc)
+    uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc, __tg_svc)
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
@@ -151,10 +157,11 @@ async def set_role_account(
     acc_id: Annotated[UUID, Path()],
     __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
     __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)],
-    __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)]
+    __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)]
 ) -> SuccessResp:
     """Обрабатывает HTTP-запрос администратора на изменение роли аккаунта."""
-    uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc)
+    uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc, __tg_svc)
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
@@ -179,9 +186,10 @@ async def set_ban_account(
     __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
     __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)],
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp:
     """Обрабатывает HTTP-запрос администратора на блокировку аккаунта."""
-    uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc)
+    uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc, __tg_svc)
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
@@ -204,9 +212,10 @@ async def set_unban_account(
     __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
     __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)],
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp:
     """Обрабатывает HTTP-запрос администратора на разблокировку аккаунта."""
-    uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc)
+    uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc, __tg_svc)
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
@@ -230,8 +239,9 @@ async def send_complaint(
     __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
     __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)],
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp[ZCompl]:
-    uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc)
+    uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc, __tg_svc)
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)

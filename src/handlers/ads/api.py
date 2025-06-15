@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Body, Header, Query, Path
 
 from core.endpoints import Endpoints as Enp
-from core.depends import get_ads_repo_session, AsyncSession, get_compl_serivce, ComplService
+from core.depends import get_ads_repo_session, AsyncSession, get_compl_serivce, ComplService, get_tg_bot, TgClient
 from core.response import responses, SuccessResp
 from core.security import AJwt, ApiKey
 from core.exception import ExpError, ExpCode
@@ -49,11 +49,12 @@ async def create_ads(
     req: Annotated[QCreateAds, Body()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
     account_id: Annotated[UUID | None, Header(description="Для APIKEY")] = None,
     ads_category: QAdsCategory = QAdsCategory.SELLING,
 ) -> SuccessResp[ZAds] | SuccessResp[ZBanned]:
     """Обрабатывает HTTP-запрос на создание объявления с авторизацией и валидацией."""
-    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc)
+    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc, __tg_svc)
 
     if not apikey and not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
@@ -86,9 +87,10 @@ async def get_ads_all(
     qfilter: Annotated[QFilter, Query()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp[ZManyAds]:
     """Обрабатывает HTTP-запрос на получение всех объявлений по фильтру."""
-    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc)
+    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc, __tg_svc)
     res = await uc.get_ads_all(qfilter)
     return SuccessResp[ZManyAds](payload=res)
 
@@ -103,9 +105,10 @@ async def get_ads_by_id(
     ads_id: Annotated[UUID, Query()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp[ZAds]:
     """Обрабатывает HTTP-запрос на получение объявления по его идентификатору."""
-    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc)
+    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc, __tg_svc)
     res = await uc.get_ads_by_id(ads_id)
     return SuccessResp[ZAds](payload=res)
 
@@ -120,9 +123,10 @@ async def get_ads_by_account(
     acc_id: Annotated[UUID, Query()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp[ZManyAds]:
     """Обрабатывает HTTP-запрос на получение всех объявлений пользователя."""
-    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc)
+    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc, __tg_svc)
     res = await uc.get_ads_by_account_id(acc_id)
     return SuccessResp[ZManyAds](payload=res)
 
@@ -137,9 +141,10 @@ async def get_my_ads(
     jwt: AJwt,
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp[ZManyAds]:
     """Обрабатывает HTTP-запрос на получение моих объявлений с авторизацией."""
-    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc)
+    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc, __tg_svc)
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
@@ -168,8 +173,9 @@ async def get_count_ads_by_acc_id(
     acc_id: Annotated[UUID, Query()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp[int]:
-    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc)
+    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc, __tg_svc)
     res = await uc.get_count_ads_by_acc_id(acc_id)
     return SuccessResp[int](payload=res)
 
@@ -184,9 +190,10 @@ async def change_my_ads(
     req: QChangeAds,
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp[ZAds] | SuccessResp[ZBanned]:
     """Обрабатывает HTTP-запрос на изменение моего объявления с авторизацией."""
-    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc)
+    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc, __tg_svc)
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
@@ -219,9 +226,10 @@ async def change_category_ads(
     req: Annotated[QAdsCategory, Query()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp[ZAds] | SuccessResp[ZBanned]:
     """Обрабатывает HTTP-запрос на изменение категории объявления с авторизацией."""
-    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc)
+    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc, __tg_svc)
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
@@ -253,9 +261,10 @@ async def delete_ads(
     ads_id: Annotated[UUID, Path()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp | SuccessResp[ZBanned]:
     """Обрабатывает HTTP-запрос на удаление объявления с авторизацией."""
-    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc)
+    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc, __tg_svc)
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
@@ -275,6 +284,32 @@ async def delete_ads(
     await uc.delete_ads(ads_id, acc_id)
     return SuccessResp()
 
+@router.delete(
+    Enp.ADM_DELETE_ADS,
+    summary="Удалить объявление",
+    status_code=200,
+    responses=responses(404),
+)
+async def adm_delete_ads(
+    jwt: AJwt,
+    ads_id: Annotated[UUID, Path()],
+    reason: Annotated[str, Body()],
+    __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
+    __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
+) -> SuccessResp | SuccessResp[ZBanned]:
+    """Обрабатывает HTTP-запрос на удаление объявления из общего списка с авторизацией."""
+    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc, __tg_svc)
+
+    if not jwt:
+        raise ExpError(ExpCode.SYS_UNAUTHORIZE)
+
+    if jwt["role"] != AccRole.ADMIN.value:
+        raise ExpError(ExpCode.ADS_INCORRECT_ROLE)
+
+    await uc.adm_delete_ads(ads_id, reason)
+    return SuccessResp()
+
 
 @router.post(
     Enp.ADS_ADD_COMMENTARY,
@@ -288,9 +323,10 @@ async def create_ads_commentary(
     commentary: Annotated[str, Body()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp[ZAdsComment] | SuccessResp[ZBanned]:
     """Обрабатывает HTTP-запрос на добавление комментария к объявлению с авторизацией."""
-    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc)
+    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc, __tg_svc)
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
@@ -323,9 +359,10 @@ async def get_ads_commentaries(
     ads_id: Annotated[UUID, Path()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp[ZManyAdsComment]:
     """Обрабатывает HTTP-запрос на получение списка комментариев в объявлении."""
-    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc)
+    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc, __tg_svc)
     res = await uc.get_ads_commentaries(ads_id)
     return SuccessResp[ZManyAdsComment](payload=res)
 
@@ -341,9 +378,10 @@ async def get_ads_commentary(
     comm_id: Annotated[UUID, Path()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp[ZAdsComment]:
     """Обрабатывает HTTP-запрос на получение данных по комментарию в объявлении."""
-    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc)
+    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc, __tg_svc)
     res = await uc.get_ads_commentary(ads_id, comm_id)
     return SuccessResp[ZAdsComment](payload=res)
 
@@ -361,9 +399,10 @@ async def update_ads_commentary(
     commentary: Annotated[str, Body()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp[ZAdsComment] | SuccessResp[ZBanned]:
     """Обрабатывает HTTP-запрос на изменение комментария в объявлении с авторизацией."""
-    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc)
+    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc, __tg_svc)
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
@@ -400,9 +439,10 @@ async def delete_ads_commentary(
     comm_id: Annotated[UUID, Path()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp | SuccessResp[ZBanned]:
     """Обрабатывает HTTP-запрос на удаление комментария в объявлении."""
-    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc)
+    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc, __tg_svc)
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
@@ -435,9 +475,10 @@ async def adm_delete_ads_commentary(
     comm_id: Annotated[UUID, Path()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp:
     """Обрабатывает HTTP-запрос на удаление комментария в объявлении администратором."""
-    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc)
+    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc, __tg_svc)
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
@@ -460,8 +501,9 @@ async def send_complaint(
     msg: Annotated[str, Body()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp[ZCompl]:
-    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc)
+    uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc, __tg_svc)
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)

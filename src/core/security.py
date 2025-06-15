@@ -53,12 +53,12 @@ def create_password_hash(
 
 
 def create_confirm_code() -> str:
-    """Генерирует 10-значный код подтверждения.
+    """Генерирует 5-значный код подтверждения.
 
     Returns:
-        str: Строка из 10 цифр.
+        str: Строка из 5 цифр.
     """
-    size = 10
+    size = 5
     alphabet = string.digits
     random_str = "".join(random.choice(alphabet) for _ in range(size))
     return random_str

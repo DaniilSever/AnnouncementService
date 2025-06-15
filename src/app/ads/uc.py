@@ -19,11 +19,12 @@ from infra.ads.repo import AdsRepo
 from infra.ads.xdao import XAds, XAdsComment
 
 from services.compl.svc import ComplService
-
+from services.tg.client import TgClient
+from services.tg.const_msg import get_ads_warning_msg
 class AdsUseCase:
     """Управляет бизнес-логикой объявлений."""
 
-    def __init__(self, _repo: AdsRepo, _compl_svc: ComplService):
+    def __init__(self, _repo: AdsRepo, _compl_svc: ComplService, _tg_svc: TgClient):
         """Инициализирует UseCase с репозиторием.
 
         Args:
@@ -35,6 +36,7 @@ class AdsUseCase:
         self.cfg = AdsConfig()
         self.repo: IAdsRepo = _repo
         self.compl_svc: ComplService = _compl_svc
+        self.tg_svc: TgClient = _tg_svc
 
     async def create_ads(
         self, req: QCreateAds, ads_category: QAdsCategory, acc_id: UUID | None = None
@@ -152,6 +154,23 @@ class AdsUseCase:
             bool: True, если удаление прошло успешно.
         """
         await self.repo.delete_ads(ads_id, acc_id)
+        return True
+
+    async def adm_delete_ads(self, ads_id: UUID, reason: str) -> bool:
+        """Удаляет администратором объявление пользователя.
+
+        Args:
+            ads_id (UUID): Идентификатор объявления для удаления.
+
+        Returns:
+            bool: True, если удаление прошло успешно.
+        """
+        ads = await self.repo.get_ads_by_id(ads_id)
+
+        await self.repo.adm_delete_ads(ads_id)
+
+        msg = await get_ads_warning_msg(ads.title, reason)
+        await self.tg_svc.send_message(msg)
         return True
 
     async def get_count_ads_by_acc_id(self, acc_id: UUID) -> int:

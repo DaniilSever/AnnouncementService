@@ -19,12 +19,14 @@ from infra.account.repo import AccRepo
 from infra.account.xdao import XAccount
 from services.ads.svc import AdsService
 from services.compl.svc import ComplService
+from services.tg.client import TgClient
+from services.tg.const_msg import get_acc_ban_warning_msg, get_acc_unban_warning_msg
 
 
 class AccUseCase:
     """Реализует бизнес-логику работы с аккаунтами, используя репозиторий."""
 
-    def __init__(self, _repo: AccRepo, _ads_svc: AdsService, _compl_svc: ComplService):
+    def __init__(self, _repo: AccRepo, _ads_svc: AdsService, _compl_svc: ComplService, _tg_svc: TgClient):
         """Инициализирует use case с репозиторием аккаунтов.
 
         Args:
@@ -35,6 +37,7 @@ class AccUseCase:
         self.repo: IAccRepo = _repo
         self.ads_svc: AdsService = _ads_svc
         self.compl_svc: ComplService = _compl_svc
+        self.tg_svc: TgClient = _tg_svc
 
     async def get_account_by_id(self, acc_id: UUID) -> ZAccount:
         """Получает аккаунт по его ID.
@@ -141,17 +144,25 @@ class AccUseCase:
         return True
 
     async def set_ban_account(self, acc_id: UUID, blocked_to: BannedTo, reason_banned: str) -> bool:
+        xacc = await self.get_account_by_id(acc_id)
         try:
-            await self.repo.set_ban_account(acc_id, blocked_to, reason_banned)
+            res = await self.repo.set_ban_account(acc_id, blocked_to, reason_banned)
         except KeyError as e:
             raise ExpError(ExpCode.ACC_ACCOUNT_NOT_FOUND, str(e)) from e
+
+        msg = await get_acc_ban_warning_msg(str(xacc.email), blocked_to.value, str(res), reason_banned)
+        await self.tg_svc.send_message(msg)
+
         return True
 
     async def set_unban_account(self, acc_id: UUID) -> bool:
+        xacc = await self.get_account_by_id(acc_id)
         try:
             await self.repo.set_unban_account(acc_id)
         except KeyError as e:
             raise ExpError(ExpCode.ACC_ACCOUNT_NOT_FOUND, str(e)) from e
+        msg = await get_acc_unban_warning_msg(str(xacc.email))
+        await self.tg_svc.send_message(msg)
         return True
 
     async def send_complaint(self, req: QCreateCompl) -> ZCompl:

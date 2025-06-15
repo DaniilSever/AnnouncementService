@@ -35,3 +35,9 @@ class ComplConfig(BaseSettings):
     APP_ENV: str
     API_URL: str
     COMPL_DB_URL: str
+
+class TgConfig(BaseSettings):
+    """Конфиг Tg сервиса"""
+
+    TGBOT_TOKEN: str
+    TGBOT_CHATID: str

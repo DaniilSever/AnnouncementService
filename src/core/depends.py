@@ -3,9 +3,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from services.account.svc import AccService
 from services.ads.svc import AdsService
 from services.compl.svc import ComplService
+from services.tg.client import TgClient
 
 from .pg import AsyncAccRepoSession, AsyncAdsRepoSession, AsyncAuthRepoSession, AsyncComplRepoSession
-from .configs import AccountConfig, AdsConfig, ComplConfig
+from .configs import AccountConfig, AdsConfig, ComplConfig, TgConfig
 
 async def get_account_repo_session() -> AsyncSession:
     """Получает асинхронную сессию репозитория аккаунтов.
@@ -72,3 +73,7 @@ def get_compl_serivce() -> ComplService:
     """
     cfg = ComplConfig()
     return ComplService(cfg.API_URL)
+
+def get_tg_bot() -> TgClient:
+    cfg = TgConfig()
+    return TgClient(cfg.TGBOT_TOKEN, cfg.TGBOT_CHATID)
