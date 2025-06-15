@@ -39,7 +39,7 @@
 
 3. **Запуск через Docker**:
     ```bash
-    docker-compose up --builds
+    docker compose up --build
     ```
     Сервис будет доступен на http://localhost:8080.
 
