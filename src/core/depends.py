@@ -1,9 +1,11 @@
-from .pg import AsyncAccRepoSession, AsyncAdsRepoSession, AsyncAuthRepoSession, AsyncComplRepoSession
 from sqlalchemy.ext.asyncio import AsyncSession
-from .configs import AccountConfig, AdsConfig
+
 from services.account.svc import AccService
 from services.ads.svc import AdsService
+from services.compl.svc import ComplService
 
+from .pg import AsyncAccRepoSession, AsyncAdsRepoSession, AsyncAuthRepoSession, AsyncComplRepoSession
+from .configs import AccountConfig, AdsConfig, ComplConfig
 
 async def get_account_repo_session() -> AsyncSession:
     """Получает асинхронную сессию репозитория аккаунтов.
@@ -61,3 +63,12 @@ def get_ads_serivce() -> AdsService:
     """
     cfg = AdsConfig()
     return AdsService(cfg.API_URL)
+
+def get_compl_serivce() -> ComplService:
+    """Создаёт и возвращает сервис для работы с жалобами.
+
+    Returns:
+        ComplService: Сервис для взаимодействия с жалобами.
+    """
+    cfg = ComplConfig()
+    return ComplService(cfg.API_URL)

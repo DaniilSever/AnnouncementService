@@ -11,6 +11,13 @@ class BannedTo(Enum):
     YEAR = "year"
     FOREVER = "forever"
 
+class ZBanned(BaseModel):
+    account_id: UUID4
+    is_banned: bool
+    blocked_at: datetime
+    reason_blocked: str
+    blocked_to: datetime
+
 class ZIsBusy(BaseModel):
     is_busy: bool
 

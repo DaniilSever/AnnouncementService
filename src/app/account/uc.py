@@ -14,15 +14,17 @@ from domain.account.dto import (
     ZIsBusy
 )
 from domain.account.models import AccRole
+from domain.compl.dto import QCreateCompl, ZCompl
 from infra.account.repo import AccRepo
 from infra.account.xdao import XAccount
 from services.ads.svc import AdsService
+from services.compl.svc import ComplService
 
 
 class AccUseCase:
     """Реализует бизнес-логику работы с аккаунтами, используя репозиторий."""
 
-    def __init__(self, _repo: AccRepo, _ads_svc: AdsService):
+    def __init__(self, _repo: AccRepo, _ads_svc: AdsService, _compl_svc: ComplService):
         """Инициализирует use case с репозиторием аккаунтов.
 
         Args:
@@ -32,6 +34,7 @@ class AccUseCase:
         self.cfg = AccountConfig()
         self.repo: IAccRepo = _repo
         self.ads_svc: AdsService = _ads_svc
+        self.compl_svc: ComplService = _compl_svc
 
     async def get_account_by_id(self, acc_id: UUID) -> ZAccount:
         """Получает аккаунт по его ID.
@@ -150,3 +153,10 @@ class AccUseCase:
         except KeyError as e:
             raise ExpError(ExpCode.ACC_ACCOUNT_NOT_FOUND, str(e)) from e
         return True
+
+    async def send_complaint(self, req: QCreateCompl) -> ZCompl:
+        try:
+            res = await self.compl_svc.create_compl(req)
+        except ExpError as e:
+            raise e
+        return res

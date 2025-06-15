@@ -22,7 +22,7 @@ class _EndpointsACCOUNT:
     ACCOUNT_COPY_FOR_SIGNUP = "/api/account/copy/signup"
     ACCOUNT_GET_ALL = "/api/accounts/"
     ACCOUNT_IS_EMAIL_BUSY = "/api/account/{email}/is_busy"
-    # ACCOUNT_SEND_COMPLAINT = "/api/account/{acc_id}/complaint"
+    ACCOUNT_SEND_COMPLAINT = "/api/account/{acc_id}/complaint"
 
 
 class _EndpointsADS:
@@ -40,7 +40,7 @@ class _EndpointsADS:
     ADS_GET_BY_ID = "/api/ads/ads"
     ADS_GET_BY_ACCOUNT = "/api/ads/author"
     ADS_GET_COUNT_ADS_BY_ACCOUNT = "/api/ads/count/author"
-    # ADS_ADD_COMPLAINT = "/api/ads/{ads_id}/complaint"
+    ADS_SEND_COMPLAINT = "/api/ads/{ads_id}/complaint"
 
     # --- Действия с комментариями
     ADS_ADD_COMMENTARY = "/api/ads/{ads_id}/commentary"

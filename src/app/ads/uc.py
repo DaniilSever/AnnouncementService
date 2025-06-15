@@ -13,15 +13,17 @@ from domain.ads.dto import (
     QDelAdsComment,
 )
 from domain.ads.dto import ZAds, ZAdsComment, ZManyAds, ZManyAdsComment
+from domain.compl.dto import QCreateCompl, ZCompl
 
 from infra.ads.repo import AdsRepo
 from infra.ads.xdao import XAds, XAdsComment
 
+from services.compl.svc import ComplService
 
 class AdsUseCase:
     """Управляет бизнес-логикой объявлений."""
 
-    def __init__(self, _repo: AdsRepo):
+    def __init__(self, _repo: AdsRepo, _compl_svc: ComplService):
         """Инициализирует UseCase с репозиторием.
 
         Args:
@@ -32,6 +34,7 @@ class AdsUseCase:
         """
         self.cfg = AdsConfig()
         self.repo: IAdsRepo = _repo
+        self.compl_svc: ComplService = _compl_svc
 
     async def create_ads(
         self, req: QCreateAds, ads_category: QAdsCategory, acc_id: UUID | None = None
@@ -272,3 +275,17 @@ class AdsUseCase:
         except KeyError as e:
             raise ExpError(ExpCode.ADS_COMMENTARY_NOT_FOUND, str(e)) from e
         return True
+
+    async def send_complaint(self, req: QCreateCompl) -> ZCompl:
+        try:
+            res = await self.compl_svc.create_compl(req)
+        except ExpError as e:
+            raise e
+        return res
+
+    async def is_author_complaint_ads(self, ads_id: UUID, acc_id: str) -> bool:
+        ads = await self.get_ads_by_id(ads_id)
+
+        if str(ads.account_id) == acc_id:
+            return True
+        return False

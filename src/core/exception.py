@@ -32,6 +32,7 @@ class _AccExpCode:
     ACC_ACCOUNT_NOT_FOUND = "404", "Аккаунт не найдет"
     ACC_EMAIL_IS_BUSY = "400", "Емайл занят"
     ACC_INCORRECT_ROLE = "400", "Нет прав доступа"
+    ACC_INCORRECT_ACCOUNT = "400", "Неверные данные аккаунта (нельзя жаловаться на самого себя)"
 
 
 class _AdsExpCode:
@@ -41,6 +42,7 @@ class _AdsExpCode:
     ADS_NOT_FOUND = "404", "Объявление не найдено"
     ADS_COMMENTARY_NOT_FOUND = "404", "Комментарий не найден"
     ADS_INCORRECT_ROLE = "400", "Нет прав доступа"
+    ADS_INCORRECT_ADS = "400", "Неверные данные объявления (нельзя жаловаться на свое объявление)"
 
 class _ComplExpCode:
     """Класс с кодми ошибок жалоб"""
