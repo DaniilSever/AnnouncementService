@@ -65,6 +65,7 @@ async def get_my_complaint(
     res = await uc.get_my_complaint(compl_id, account_id)
     return SuccessResp[ZCompl](payload=res)
 
+
 @router.get(
     Enp.COMPL_GET_MY_COMPLAINTS,
     summary="Получить список моих жалоб",
@@ -117,6 +118,7 @@ async def adm_get_complaints(
 
     res = await uc.adm_get_complaints(qfilter)
     return SuccessResp[ZManyCompl](payload=res)
+
 
 @router.get(
     Enp.ADM_GET_COMPLAINT_BY_ID,

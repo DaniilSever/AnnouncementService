@@ -19,7 +19,9 @@ class IAccRepo:
 
         raise NotImplementedError
 
-    async def get_account_by_email(self, email: str, count_ads: int | None = None) -> XAccount:
+    async def get_account_by_email(
+        self, email: str, count_ads: int | None = None
+    ) -> XAccount:
         """Получает аккаунт по email.
 
         Args:

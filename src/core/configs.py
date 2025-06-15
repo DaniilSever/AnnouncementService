@@ -36,6 +36,7 @@ class ComplConfig(BaseSettings):
     API_URL: str
     COMPL_DB_URL: str
 
+
 class TgConfig(BaseSettings):
     """Конфиг Tg сервиса"""
 

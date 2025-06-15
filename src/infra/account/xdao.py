@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel, EmailStr, UUID4
+from pydantic import BaseModel, UUID4
 
 from domain.account.models import AccRole
 

@@ -36,9 +36,7 @@ class AccRepo(IAccRepo):
             KeyError: Если аккаунт не найден.
         """
         update_ads_req = (
-            update(Account)
-            .values(count_ads=count_ads)
-            .where(Account.id==acc_id)
+            update(Account).values(count_ads=count_ads).where(Account.id == acc_id)
         )
         await self.session.execute(update_ads_req)
         await self.session.commit()
@@ -64,7 +62,9 @@ class AccRepo(IAccRepo):
             blocked_to=row.blocked_to,
         )
 
-    async def get_account_by_email(self, email: str, count_ads: int | None = None) -> XAccount:
+    async def get_account_by_email(
+        self, email: str, count_ads: int | None = None
+    ) -> XAccount:
         """Получает аккаунт по email.
 
         Args:
@@ -80,7 +80,7 @@ class AccRepo(IAccRepo):
             update_ads_req = (
                 update(Account)
                 .values(count_ads=count_ads)
-                .where(Account.email==email)
+                .where(Account.email == email)
             )
             await self.session.execute(update_ads_req)
             await self.session.commit()
@@ -176,9 +176,7 @@ class AccRepo(IAccRepo):
 
     async def get_current_account(self, count_ads: int, acc_id: UUID) -> XAccount:
         update_ads_req = (
-            update(Account)
-            .values(count_ads=count_ads)
-            .where(Account.id==acc_id)
+            update(Account).values(count_ads=count_ads).where(Account.id == acc_id)
         )
         await self.session.execute(update_ads_req)
         await self.session.commit()
@@ -217,18 +215,16 @@ class AccRepo(IAccRepo):
         await self.session.commit()
 
     async def set_role_account(self, acc_id: UUID, role: AccRole) -> None:
-        req = (
-            update(Account)
-            .values(role=role.value)
-            .where(Account.id == acc_id)
-        )
+        req = update(Account).values(role=role.value).where(Account.id == acc_id)
         try:
             await self.session.execute(req)
         except NoResultFound as e:
             raise KeyError("Аккаунт в бд не найден") from e
         await self.session.commit()
 
-    async def set_ban_account(self, acc_id: UUID, blocked_to: BannedTo, reason_banned: str) -> str:
+    async def set_ban_account(
+        self, acc_id: UUID, blocked_to: BannedTo, reason_banned: str
+    ) -> str:
         blocked_mapping = {
             "week": text("NOW() + INTERVAL '7 DAYS'"),
             "month": text("NOW() + INTERVAL '1 MONTH'"),
@@ -258,7 +254,6 @@ class AccRepo(IAccRepo):
 
         row = res.scalar_one()
         return str(row.blocked_to)
-
 
     async def set_unban_account(self, acc_id: UUID) -> None:
         req = (

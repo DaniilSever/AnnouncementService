@@ -14,7 +14,6 @@ from domain.auth.dto import (
     QEmailSignin,
     QRefreshToken,
     QRevokeToken,
-
     # ZDTO
     ZEmailSignup,
     ZAccountID,
@@ -25,7 +24,6 @@ from domain.auth.irepo import IAuthRepo
 from domain.account.dto import (
     # QDTO
     QEmailSignupData,
-
     # ZDTO
     ZAccount,
 )
@@ -184,7 +182,9 @@ class AuthUseCase:
             raise ExpError(ExpCode.AUTH_INVALID_TOKEN_TYPE)
 
         try:
-            _ = await self.repo.get_refresh_token_for_account(payload["acc_id"], req.refresh_token)
+            _ = await self.repo.get_refresh_token_for_account(
+                payload["acc_id"], req.refresh_token
+            )
         except KeyError as e:
             raise ExpError(ExpCode.AUTH_REFRESH_TOKEN_NOT_FOUND, str(e)) from e
 

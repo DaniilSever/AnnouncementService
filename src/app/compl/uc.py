@@ -14,6 +14,7 @@ from domain.compl.dto import (
 from infra.compl.repo import ComplRepo
 from infra.compl.xdao import XCompl
 
+
 class ComplUseCase:
 
     def __init__(self, _repo: ComplRepo):
@@ -31,8 +32,12 @@ class ComplUseCase:
             raise ExpError(ExpCode.COMPL_NOT_FOUND, str(e)) from e
         return ZCompl.model_validate(res.model_dump(mode="json"))
 
-    async def get_my_complaints(self, acc_id: UUID, complaints_of: Service | None = None) -> ZManyCompl:
-        total_acc, total_ads, xres = await self.repo.get_my_complaints(acc_id, complaints_of)
+    async def get_my_complaints(
+        self, acc_id: UUID, complaints_of: Service | None = None
+    ) -> ZManyCompl:
+        total_acc, total_ads, xres = await self.repo.get_my_complaints(
+            acc_id, complaints_of
+        )
         res = []
         for xcompl in xres:
             res.append(ZCompl(**xcompl.model_dump(mode="json")))

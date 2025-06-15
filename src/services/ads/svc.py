@@ -3,6 +3,7 @@ import httpx
 from core.endpoints import Endpoints as Enp
 from core.exception import ExpError
 
+
 class AdsService:
     def __init__(self, _base_url: str):
         self.base_url = _base_url

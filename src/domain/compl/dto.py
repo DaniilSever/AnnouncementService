@@ -3,6 +3,7 @@ from pydantic import BaseModel, UUID4
 
 from domain.compl.models import Service
 
+
 class ZBanned(BaseModel):
     account_id: UUID4
     is_banned: bool
@@ -18,6 +19,7 @@ class QFilter(BaseModel):
     is_resolved: bool = False
     limit: int = 10
     offset: int = 0
+
 
 class QCreateCompl(BaseModel):
     compl_on_id: UUID4

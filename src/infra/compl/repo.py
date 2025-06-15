@@ -5,11 +5,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy import select, func
 
 from domain.compl.irepo import IComplRepo
-from domain.compl.dto import (
-    Service,
-    QCreateCompl,
-    QFilter
-)
+from domain.compl.dto import Service, QCreateCompl, QFilter
 from domain.compl.models import Complaints
 
 from .xdao import XCompl
@@ -48,7 +44,9 @@ class ComplRepo(IComplRepo):
         )
 
     async def get_my_complaint(self, compl_id: UUID, acc_id: UUID) -> XCompl:
-        req = select(Complaints).where(Complaints.id == compl_id, Complaints.author_id == acc_id)
+        req = select(Complaints).where(
+            Complaints.id == compl_id, Complaints.author_id == acc_id
+        )
         res = await self.session.execute(req)
         await self.session.commit()
         row = res.scalar_one_or_none()
@@ -66,14 +64,16 @@ class ComplRepo(IComplRepo):
             created_at=row.created_at,
         )
 
-
-
-
-    async def get_my_complaints(self, acc_id: UUID, complaints_of: Service | None = None) -> list[XCompl]:
+    async def get_my_complaints(
+        self, acc_id: UUID, complaints_of: Service | None = None
+    ) -> list[XCompl]:
         count_compl_acc = (
             select(func.count())
             .select_from(Complaints)
-            .where(Complaints.services == Service.ACCOUNT.value, Complaints.author_id == acc_id)
+            .where(
+                Complaints.services == Service.ACCOUNT.value,
+                Complaints.author_id == acc_id,
+            )
         )
         count_res = await self.session.execute(count_compl_acc)
         await self.session.commit()
@@ -82,14 +82,19 @@ class ComplRepo(IComplRepo):
         count_compl_ads = (
             select(func.count())
             .select_from(Complaints)
-            .where(Complaints.services == Service.ADS.value, Complaints.author_id == acc_id)
+            .where(
+                Complaints.services == Service.ADS.value, Complaints.author_id == acc_id
+            )
         )
         count_res = await self.session.execute(count_compl_ads)
         await self.session.commit()
         total_ads = count_res.scalar_one()
 
         if complaints_of is Service.ACCOUNT:
-            compl_acc_req = select(Complaints).where(Complaints.services == complaints_of.value, Complaints.author_id == acc_id)
+            compl_acc_req = select(Complaints).where(
+                Complaints.services == complaints_of.value,
+                Complaints.author_id == acc_id,
+            )
             xres_acc = await self.session.execute(compl_acc_req)
             await self.session.commit()
             res = []
@@ -108,7 +113,10 @@ class ComplRepo(IComplRepo):
                 )
 
         elif complaints_of is Service.ADS:
-            compl_ads_req = select(Complaints).where(Complaints.services == complaints_of.value, Complaints.author_id == acc_id)
+            compl_ads_req = select(Complaints).where(
+                Complaints.services == complaints_of.value,
+                Complaints.author_id == acc_id,
+            )
             xres_ads = await self.session.execute(compl_ads_req)
             await self.session.commit()
             res = []
@@ -166,16 +174,23 @@ class ComplRepo(IComplRepo):
         )
 
     async def adm_get_complaints(self, qfilter: QFilter) -> list[XCompl]:
-        count_compl_acc = select(func.count()).select_from(Complaints).where(Complaints.services == Service.ACCOUNT.value)
+        count_compl_acc = (
+            select(func.count())
+            .select_from(Complaints)
+            .where(Complaints.services == Service.ACCOUNT.value)
+        )
         count_res = await self.session.execute(count_compl_acc)
         await self.session.commit()
         total_acc = count_res.scalar_one()
 
-        count_compl_ads = select(func.count()).select_from(Complaints).where(Complaints.services == Service.ADS.value)
+        count_compl_ads = (
+            select(func.count())
+            .select_from(Complaints)
+            .where(Complaints.services == Service.ADS.value)
+        )
         count_res = await self.session.execute(count_compl_ads)
         await self.session.commit()
         total_ads = count_res.scalar_one()
-
 
         req = select(Complaints).limit(qfilter.limit).offset(qfilter.offset)
 

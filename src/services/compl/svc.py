@@ -4,6 +4,7 @@ from core.exception import ExpError
 
 from domain.compl.dto import QCreateCompl, ZCompl
 
+
 class ComplService:
     def __init__(self, _base_url: str):
         self.base_url = _base_url

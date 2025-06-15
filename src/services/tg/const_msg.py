@@ -1,4 +1,3 @@
-
 ban_mapping = {
     "week": "неделю",
     "month": "месяц",
@@ -6,11 +5,13 @@ ban_mapping = {
     "year": "год",
 }
 
+
 async def get_code_msg(email: str, code: int) -> str:
     msg = "Благодарим за регистрацию!"
     msg += f"\n\nEmail: {email}"
     msg += f"\nКод подтверждения: {code}"
     return msg
+
 
 async def get_ads_warning_msg(ads_title: str, reason: str) -> str:
     msg = "⚠️######WARNING######"
@@ -20,7 +21,10 @@ async def get_ads_warning_msg(ads_title: str, reason: str) -> str:
     msg += "\n\nПросим исправить нарушение"
     return msg
 
-async def get_acc_ban_warning_msg(email: str, ban_time: str, blocked_to: str,  reason: str) -> str:
+
+async def get_acc_ban_warning_msg(
+    email: str, ban_time: str, blocked_to: str, reason: str
+) -> str:
     msg = "⚠️######WARNING######"
     msg += f"\n\nУважаемый, пользователь с почтной: {email}"
     if ban_time == "forever":
@@ -30,6 +34,7 @@ async def get_acc_ban_warning_msg(email: str, ban_time: str, blocked_to: str,  r
     msg += f"\nПричина: {reason}"
     msg += f"\nРазблокировка через: {blocked_to}"
     return msg
+
 
 async def get_acc_unban_warning_msg(email: str) -> str:
     msg = "⚠️######WARNING######"

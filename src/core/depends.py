@@ -5,8 +5,14 @@ from services.ads.svc import AdsService
 from services.compl.svc import ComplService
 from services.tg.client import TgClient
 
-from .pg import AsyncAccRepoSession, AsyncAdsRepoSession, AsyncAuthRepoSession, AsyncComplRepoSession
+from .pg import (
+    AsyncAccRepoSession,
+    AsyncAdsRepoSession,
+    AsyncAuthRepoSession,
+    AsyncComplRepoSession,
+)
 from .configs import AccountConfig, AdsConfig, ComplConfig, TgConfig
+
 
 async def get_account_repo_session() -> AsyncSession:
     """Получает асинхронную сессию репозитория аккаунтов.
@@ -37,6 +43,7 @@ async def get_ads_repo_session() -> AsyncSession:
     async with AsyncAdsRepoSession() as session:
         yield session
 
+
 async def get_compl_repo_session() -> AsyncSession:
     """Получает асинхронную сессию репозитория жалоб.
 
@@ -56,6 +63,7 @@ def get_account_serivce() -> AccService:
     cfg = AccountConfig()
     return AccService(cfg.API_URL)
 
+
 def get_ads_serivce() -> AdsService:
     """Создаёт и возвращает сервис для работы с объявлениями.
 
@@ -65,6 +73,7 @@ def get_ads_serivce() -> AdsService:
     cfg = AdsConfig()
     return AdsService(cfg.API_URL)
 
+
 def get_compl_serivce() -> ComplService:
     """Создаёт и возвращает сервис для работы с жалобами.
 
@@ -73,6 +82,7 @@ def get_compl_serivce() -> ComplService:
     """
     cfg = ComplConfig()
     return ComplService(cfg.API_URL)
+
 
 def get_tg_bot() -> TgClient:
     cfg = TgConfig()

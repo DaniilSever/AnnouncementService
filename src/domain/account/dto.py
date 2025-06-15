@@ -11,12 +11,14 @@ class BannedTo(Enum):
     YEAR = "year"
     FOREVER = "forever"
 
+
 class ZBanned(BaseModel):
     account_id: UUID4
     is_banned: bool
     blocked_at: datetime
     reason_blocked: str
     blocked_to: datetime
+
 
 class ZIsBusy(BaseModel):
     is_busy: bool
@@ -47,7 +49,7 @@ class ZAccount(BaseModel):
     email: str
     pwd_hash: str
     salt: str
-    role: AccRole = AccRole.USER,
+    role: AccRole = (AccRole.USER,)
     count_ads: int
     is_banned: bool = False
     created_at: datetime = datetime.now()

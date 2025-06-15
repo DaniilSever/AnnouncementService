@@ -2,7 +2,16 @@ from uuid import UUID
 from typing import Annotated
 from fastapi import APIRouter, Depends, Path, Body, Query
 
-from core.depends import get_account_repo_session, AsyncSession, get_ads_serivce, AdsService, get_compl_serivce, ComplService, get_tg_bot, TgClient
+from core.depends import (
+    get_account_repo_session,
+    AsyncSession,
+    get_ads_serivce,
+    AdsService,
+    get_compl_serivce,
+    ComplService,
+    get_tg_bot,
+    TgClient,
+)
 from core.endpoints import Endpoints as Enp
 from core.response import responses, SuccessResp
 from core.security import AJwt
@@ -41,7 +50,7 @@ async def get_account_by_id(
     __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
     __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)],
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
-    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)]
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp[ZAccount]:
     """Обрабатывает HTTP-запрос на получение аккаунта по его ID."""
     uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc, __tg_svc)
@@ -60,7 +69,7 @@ async def get_account_by_email(
     __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
     __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)],
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
-    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)]
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp[ZAccount]:
     """Обрабатывает HTTP-запрос на получение аккаунта по email."""
     uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc, __tg_svc)
@@ -79,7 +88,7 @@ async def copy_account_from_signup(
     __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
     __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)],
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
-    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)]
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp[ZAccountID]:
     """Обрабатывает HTTP-запрос на копирование аккаунта после регистрации."""
     uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc, __tg_svc)
@@ -98,7 +107,7 @@ async def is_email_busy(
     __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
     __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)],
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
-    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)]
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp[ZIsBusy]:
     """Обрабатывает HTTP-запрос на проверку существования email."""
     uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc, __tg_svc)
@@ -115,12 +124,13 @@ async def get_accounts(
     __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
     __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)],
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
-    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)]
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp[list[ZAccount]]:
     """Обрабатывает HTTP-запрос на получение списка всех аккаунтов."""
     uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc, __tg_svc)
     res = await uc.get_accounts()
     return SuccessResp[list[ZAccount]](payload=res)
+
 
 @router.get(
     Enp.ACCOUNT_CURRENT,
@@ -132,7 +142,7 @@ async def get_current_account(
     __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
     __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)],
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
-    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)]
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp[ZAccount]:
     """Обрабатывает HTTP-запрос на получение текущего аккаунта."""
     uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc, __tg_svc)
@@ -145,11 +155,12 @@ async def get_current_account(
     res = await uc.get_current_account(acc_id)
     return SuccessResp[ZAccount](payload=res)
 
+
 @router.patch(
     Enp.ADM_SET_ROLE_ACCOUNT,
     summary="Изменить роль аккаунта (Администратор)",
     status_code=200,
-    responses=responses(404)
+    responses=responses(404),
 )
 async def set_role_account(
     jwt: AJwt,
@@ -158,7 +169,7 @@ async def set_role_account(
     __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
     __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)],
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
-    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)]
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp:
     """Обрабатывает HTTP-запрос администратора на изменение роли аккаунта."""
     uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc, __tg_svc)
@@ -172,11 +183,12 @@ async def set_role_account(
     await uc.set_role_account(acc_id, role)
     return SuccessResp()
 
+
 @router.patch(
     Enp.ADM_SET_BAN_ACCOUNT,
     summary="Забанить аккаунт (Администратор)",
     status_code=200,
-    responses=responses(404)
+    responses=responses(404),
 )
 async def set_ban_account(
     jwt: AJwt,
@@ -199,6 +211,7 @@ async def set_ban_account(
 
     await uc.set_ban_account(acc_id, blocked_to, reason_blocked)
     return SuccessResp()
+
 
 @router.patch(
     Enp.ADM_SET_UNBAN_ACCOUNT,
@@ -225,6 +238,7 @@ async def set_unban_account(
 
     await uc.set_unban_account(acc_id)
     return SuccessResp()
+
 
 @router.post(
     Enp.ACCOUNT_SEND_COMPLAINT,

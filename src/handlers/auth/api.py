@@ -50,7 +50,7 @@ async def signup_email(
     req: Annotated[QEmailSignup, Body()],
     __repo_session: Annotated[AsyncSession, Depends(get_auth_repo_session)],
     __acc_svc: Annotated[AccService, Depends(get_account_serivce)],
-    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)]
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp[ZEmailSignup]:
     """Обрабатывает HTTP-запрос на регистрацию пользователя по email с отправкой кода подтверждения."""
     uc = AuthUseCase(AuthRepo(__repo_session), __acc_svc, __tg_svc)
@@ -68,7 +68,7 @@ async def confirm_email(
     req: Annotated[QConfirmCode, Body()],
     __repo_session: Annotated[AsyncSession, Depends(get_auth_repo_session)],
     __acc_svc: Annotated[AccService, Depends(get_account_serivce)],
-    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)]
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp[ZAccountID]:
     """Обрабатывает HTTP-запрос на подтверждение email с помощью кода подтверждения."""
     uc = AuthUseCase(AuthRepo(__repo_session), __acc_svc, __tg_svc)
@@ -86,7 +86,7 @@ async def signin_email(
     req: Annotated[QEmailSignin, Body()],
     __repo_session: Annotated[AsyncSession, Depends(get_auth_repo_session)],
     __acc_svc: Annotated[AccService, Depends(get_account_serivce)],
-    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)]
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp[ZToken]:
     """Обрабатывает HTTP-запрос на авторизацию пользователя по email и паролю."""
     uc = AuthUseCase(AuthRepo(__repo_session), __acc_svc, __tg_svc)
@@ -104,7 +104,7 @@ async def signin_email_form(
     form: Annotated[OAuth2PasswordRequestForm, Depends()],
     __repo_session: Annotated[AsyncSession, Depends(get_auth_repo_session)],
     __acc_svc: Annotated[AccService, Depends(get_account_serivce)],
-    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)]
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> ZToken:
     """Обрабатывает HTTP-запрос на авторизацию пользователя по email и паролю через форму OAuth2."""
     uc = AuthUseCase(AuthRepo(__repo_session), __acc_svc, __tg_svc)
@@ -123,7 +123,7 @@ async def refresh_token(
     req: Annotated[QRefreshToken, Body()],
     __repo_session: Annotated[AsyncSession, Depends(get_auth_repo_session)],
     __acc_svc: Annotated[AccService, Depends(get_account_serivce)],
-    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)]
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp[ZToken]:
     """Обрабатывает HTTP-запрос на обновление access-токена с использованием refresh-токена."""
     uc = AuthUseCase(AuthRepo(__repo_session), __acc_svc, __tg_svc)
@@ -141,7 +141,7 @@ async def revoke_token(
     req: Annotated[QRevokeToken, Body()],
     __repo_session: Annotated[AsyncSession, Depends(get_auth_repo_session)],
     __acc_svc: Annotated[AccService, Depends(get_account_serivce)],
-    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)]
+    __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp[ZRevokedTokens]:
     """Обрабатывает HTTP-запрос на деактивацию (отзыв) токенов по идентификатору аккаунта."""
     uc = AuthUseCase(AuthRepo(__repo_session), __acc_svc, __tg_svc)

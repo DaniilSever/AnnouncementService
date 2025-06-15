@@ -48,6 +48,7 @@ class _EndpointsADS:
     ADS_ACTION_COMMENTARY = "/api/ads/{ads_id}/{comm_id}"
     ADS_ADD_COMPLAINT_COMMENTARY = "/api/ads/{ads_id}/{comm_id}/complaint"
 
+
 class _EndpointsCompl:
     """Эндпоинты Compl сервиса"""
 

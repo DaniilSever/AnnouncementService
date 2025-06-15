@@ -21,6 +21,8 @@ from infra.ads.xdao import XAds, XAdsComment
 from services.compl.svc import ComplService
 from services.tg.client import TgClient
 from services.tg.const_msg import get_ads_warning_msg
+
+
 class AdsUseCase:
     """Управляет бизнес-логикой объявлений."""
 

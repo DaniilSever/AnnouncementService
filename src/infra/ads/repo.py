@@ -508,7 +508,11 @@ class AdsRepo(IAdsRepo):
         Returns:
             None
         """
-        req = update(Ads).values(count_comments=Ads.count_comments - 1).where(Ads.id == ads_id)
+        req = (
+            update(Ads)
+            .values(count_comments=Ads.count_comments - 1)
+            .where(Ads.id == ads_id)
+        )
         try:
             await self.session.execute(req)
         except NoResultFound as e:

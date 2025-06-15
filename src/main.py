@@ -9,7 +9,7 @@ services = {
     "auth.api": ("handlers.auth.api", True),
     "acc.api": ("handlers.account.api", True),
     "ads.api": ("handlers.ads.api", True),
-    "compl.api": ("handlers.compl.api", True)
+    "compl.api": ("handlers.compl.api", True),
 }
 
 

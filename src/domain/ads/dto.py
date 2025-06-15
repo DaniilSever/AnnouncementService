@@ -48,6 +48,7 @@ class ZBanned(BaseModel):
     reason_blocked: str
     blocked_to: datetime
 
+
 class ZAds(BaseModel):
     id: UUID4
     account_id: UUID4

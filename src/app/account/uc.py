@@ -7,11 +7,10 @@ from domain.account.dto import (
     # QDTO
     QEmailSignupData,
     QEmail,
-
     # ZDTO
     ZAccount,
     ZAccountID,
-    ZIsBusy
+    ZIsBusy,
 )
 from domain.account.models import AccRole
 from domain.compl.dto import QCreateCompl, ZCompl
@@ -26,7 +25,13 @@ from services.tg.const_msg import get_acc_ban_warning_msg, get_acc_unban_warning
 class AccUseCase:
     """Реализует бизнес-логику работы с аккаунтами, используя репозиторий."""
 
-    def __init__(self, _repo: AccRepo, _ads_svc: AdsService, _compl_svc: ComplService, _tg_svc: TgClient):
+    def __init__(
+        self,
+        _repo: AccRepo,
+        _ads_svc: AdsService,
+        _compl_svc: ComplService,
+        _tg_svc: TgClient,
+    ):
         """Инициализирует use case с репозиторием аккаунтов.
 
         Args:
@@ -143,14 +148,18 @@ class AccUseCase:
             raise ExpError(ExpCode.ACC_ACCOUNT_NOT_FOUND, str(e)) from e
         return True
 
-    async def set_ban_account(self, acc_id: UUID, blocked_to: BannedTo, reason_banned: str) -> bool:
+    async def set_ban_account(
+        self, acc_id: UUID, blocked_to: BannedTo, reason_banned: str
+    ) -> bool:
         xacc = await self.get_account_by_id(acc_id)
         try:
             res = await self.repo.set_ban_account(acc_id, blocked_to, reason_banned)
         except KeyError as e:
             raise ExpError(ExpCode.ACC_ACCOUNT_NOT_FOUND, str(e)) from e
 
-        msg = await get_acc_ban_warning_msg(str(xacc.email), blocked_to.value, str(res), reason_banned)
+        msg = await get_acc_ban_warning_msg(
+            str(xacc.email), blocked_to.value, str(res), reason_banned
+        )
         await self.tg_svc.send_message(msg)
 
         return True

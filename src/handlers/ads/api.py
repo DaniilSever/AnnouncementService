@@ -3,7 +3,14 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Body, Header, Query, Path
 
 from core.endpoints import Endpoints as Enp
-from core.depends import get_ads_repo_session, AsyncSession, get_compl_serivce, ComplService, get_tg_bot, TgClient
+from core.depends import (
+    get_ads_repo_session,
+    AsyncSession,
+    get_compl_serivce,
+    ComplService,
+    get_tg_bot,
+    TgClient,
+)
 from core.response import responses, SuccessResp
 from core.security import AJwt, ApiKey
 from core.exception import ExpError, ExpCode
@@ -19,7 +26,6 @@ from domain.ads.dto import (
     QAddAdsComment,
     QUpdateAdsComment,
     QDelAdsComment,
-
     # ZDTO
     ZAds,
     ZAdsComment,
@@ -164,6 +170,7 @@ async def get_my_ads(
     res = await uc.get_ads_by_account_id(acc_id)
     return SuccessResp[ZManyAds](payload=res)
 
+
 @router.get(
     Enp.ADS_GET_COUNT_ADS_BY_ACCOUNT,
     summary="Получить колличество объявлений польователя",
@@ -178,6 +185,7 @@ async def get_count_ads_by_acc_id(
     uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc, __tg_svc)
     res = await uc.get_count_ads_by_acc_id(acc_id)
     return SuccessResp[int](payload=res)
+
 
 @router.patch(
     Enp.ADS_CHANGE,
@@ -283,6 +291,7 @@ async def delete_ads(
     acc_id = jwt["acc_id"]
     await uc.delete_ads(ads_id, acc_id)
     return SuccessResp()
+
 
 @router.delete(
     Enp.ADM_DELETE_ADS,
@@ -464,6 +473,7 @@ async def delete_ads_commentary(
     await uc.delete_ads_commentary(req)
     return SuccessResp()
 
+
 @router.delete(
     Enp.ADM_DELETE_COMMENTARY,
     summary="Удалить комментарий в объявлении (Администратор)",
@@ -488,6 +498,7 @@ async def adm_delete_ads_commentary(
 
     await uc.adm_delete_ads_commentary(comm_id)
     return SuccessResp()
+
 
 @router.post(
     Enp.ADS_SEND_COMPLAINT,

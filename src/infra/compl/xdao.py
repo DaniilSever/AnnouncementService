@@ -3,6 +3,7 @@ from pydantic import BaseModel, UUID4
 
 from domain.compl.models import Service
 
+
 class XCompl(BaseModel):
     id: UUID4
     compl_on_id: UUID4
