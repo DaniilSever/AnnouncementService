@@ -71,28 +71,6 @@ COMMENT ON COLUMN "AdsComment".updated_at is 'Дата последнего из
 
 -- ------------------------
 
-DROP TABLE IF EXISTS "ComplaintsAds";
-CREATE TABLE "ComplaintsAds"
-(
-    id  uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    ads_id uuid NOT NULL REFERENCES "Ads" (id) ON DELETE CASCADE,
-    complaints VARCHAR NOT NULL,
-    is_notified BOOLEAN NOT NULL,
-    is_resolved BOOLEAN NOT NULL,
-    created_at      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
-);
---
-CREATE INDEX ON "AdsComment" (ads_id);
---
-COMMENT ON TABLE "ComplaintsAds" is 'Таблица жалоб на объявление';
-COMMENT ON COLUMN "ComplaintsAds".id is 'ID жалобы в системе';
-COMMENT ON COLUMN "ComplaintsAds".ads_id is 'ID Объявления';
-COMMENT ON COLUMN "ComplaintsAds".complaints is 'Жалоба';
-COMMENT ON COLUMN "ComplaintsAds".is_notified is 'Уведомлен ли автор';
-COMMENT ON COLUMN "ComplaintsAds".is_resolved is 'Решена ли жалоба';
-COMMENT ON COLUMN "ComplaintsAds".created_at is 'Дата создания';
-
-
 GRANT ALL PRIVILEGES ON DATABASE ads TO ads;
 GRANT ALL ON SCHEMA public TO ads;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO ads;

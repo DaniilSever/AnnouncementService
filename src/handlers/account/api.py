@@ -140,8 +140,8 @@ async def get_current_account(
     return SuccessResp[ZAccount](payload=res)
 
 @router.patch(
-    Enp.ACCOUNT_SET_ROLE_ACCOUNT,
-    summary="Изменить роль аккаунта",
+    Enp.ADM_SET_ROLE_ACCOUNT,
+    summary="Изменить роль аккаунта (Администратор)",
     status_code=200,
     responses=responses(404)
 )
@@ -152,7 +152,7 @@ async def set_role_account(
     __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
     __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)]
 ) -> SuccessResp:
-    """Обрабатывает HTTP-запрос на изменение роли аккаунта."""
+    """Обрабатывает HTTP-запрос администратора на изменение роли аккаунта."""
     uc = AccUseCase(AccRepo(__repo_session), __ads_svc)
 
     if not jwt:
@@ -165,8 +165,8 @@ async def set_role_account(
     return SuccessResp()
 
 @router.patch(
-    Enp.ACCOUNT_SET_BAN_ACCOUNT,
-    summary="Забанить аккаунт",
+    Enp.ADM_SET_BAN_ACCOUNT,
+    summary="Забанить аккаунт (Администратор)",
     status_code=200,
     responses=responses(404)
 )
@@ -178,7 +178,7 @@ async def set_ban_account(
     __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
     __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)],
 ) -> SuccessResp:
-    """Обрабатывает HTTP-запрос на блокировку аккаунта."""
+    """Обрабатывает HTTP-запрос администратора на блокировку аккаунта."""
     uc = AccUseCase(AccRepo(__repo_session), __ads_svc)
 
     if not jwt:
@@ -191,8 +191,8 @@ async def set_ban_account(
     return SuccessResp()
 
 @router.patch(
-    Enp.ACCOUNT_SET_UNBAN_ACCOUNT,
-    summary="Забанить аккаунт",
+    Enp.ADM_SET_UNBAN_ACCOUNT,
+    summary="Разбанить аккаунт (Администратор)",
     status_code=200,
     responses=responses(404),
 )
@@ -202,7 +202,7 @@ async def set_unban_account(
     __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
     __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)],
 ) -> SuccessResp:
-    """Обрабатывает HTTP-запрос на разблокировку аккаунта."""
+    """Обрабатывает HTTP-запрос администратора на разблокировку аккаунта."""
     uc = AccUseCase(AccRepo(__repo_session), __ads_svc)
 
     if not jwt:
