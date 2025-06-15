@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Body, Query, Path
 
 from core.endpoints import Endpoints as Enp
-from core.depends import get_compl_repo_session, AsyncSession
+from core.depends import get_compl_repo_session
 from core.response import responses, SuccessResp
 from core.security import AJwt
 from core.exception import ExpError, ExpCode
@@ -13,7 +13,7 @@ from domain.compl.models import Service
 from domain.account.models import AccRole
 
 from app.compl.uc import ComplUseCase
-from infra.compl.repo import ComplRepo
+from infra.compl.repo import ComplRepo, AsyncSession
 
 router = APIRouter(tags=["compl"])
 tags = {"name": "compl", "description": "Внутренние эндпоинты жалоб"}
@@ -28,6 +28,7 @@ async def create_compl(
     req: Annotated[QCreateCompl, Body()],
     __repo_session: Annotated[AsyncSession, Depends(get_compl_repo_session)],
 ) -> SuccessResp[ZCompl]:
+    """Обрабатывает HTTP-запрос на создание новой жалобы."""
     uc = ComplUseCase(ComplRepo(__repo_session))
     res = await uc.create_compl(req)
     return SuccessResp[ZCompl](payload=res)
@@ -44,6 +45,7 @@ async def get_my_complaint(
     compl_id: Annotated[UUID, Path()],
     __repo_session: Annotated[AsyncSession, Depends(get_compl_repo_session)],
 ) -> SuccessResp[ZCompl]:
+    """Обрабатывает HTTP-запрос на получение информации по жалобе пользователя."""
     uc = ComplUseCase(ComplRepo(__repo_session))
 
     if not jwt:
@@ -76,6 +78,7 @@ async def get_my_complaints(
     __repo_session: Annotated[AsyncSession, Depends(get_compl_repo_session)],
     complaints_of: Annotated[Service | None, Query()] = None,
 ) -> SuccessResp[ZManyCompl]:
+    """Обрабатывает HTTP-запрос на получение списка жалоб текущего пользователя."""
     uc = ComplUseCase(ComplRepo(__repo_session))
 
     if not jwt:
@@ -108,6 +111,7 @@ async def adm_get_complaints(
     qfilter: Annotated[QFilter, Query()],
     __repo_session: Annotated[AsyncSession, Depends(get_compl_repo_session)],
 ) -> SuccessResp[ZManyCompl]:
+    """Обрабатывает HTTP-запрос администратора на получение списка жалоб."""
     uc = ComplUseCase(ComplRepo(__repo_session))
 
     if not jwt:
@@ -130,6 +134,7 @@ async def adm_get_complaint(
     compl_id: Annotated[UUID, Path()],
     __repo_session: Annotated[AsyncSession, Depends(get_compl_repo_session)],
 ) -> SuccessResp[ZCompl]:
+    """Обрабатывает HTTP-запрос администратора на получение жалобы по ID."""
     uc = ComplUseCase(ComplRepo(__repo_session))
 
     if not jwt:

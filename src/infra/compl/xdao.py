@@ -5,6 +5,8 @@ from domain.compl.models import Service
 
 
 class XCompl(BaseModel):
+    """Модель жалобы на сервис."""
+
     id: UUID4
     compl_on_id: UUID4
     services: Service

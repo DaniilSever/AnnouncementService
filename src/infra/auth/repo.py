@@ -11,14 +11,13 @@ from .xdao import XEmailSignup, XRefreshToken
 
 
 class AuthRepo(IAuthRepo):
-    """Репозиторий для работы с аутентификацией и регистрацией пользователей."""
+    """Репозиторий для работы с аутентификацией и регистрацией пользователей.
+
+    Args:
+        _session (AsyncSession): Асинхронная сессия SQLAlchemy.
+    """
 
     def __init__(self, _session: AsyncSession):
-        """Инициализирует репозиторий с асинхронной сессией базы данных.
-
-        Args:
-            _session (AsyncSession): Асинхронная сессия SQLAlchemy.
-        """
         self.session: AsyncSession = _session
 
     async def create_email_signup(
@@ -77,7 +76,7 @@ class AuthRepo(IAuthRepo):
         )
 
     async def get_email_signup(self, signup_id: UUID) -> XEmailSignup:
-        """Получает данные регистрации по ID.
+        """Получает данные регистрации по идентификатору.
 
         Args:
             signup_id (UUID): Идентификатор регистрации.
@@ -86,7 +85,7 @@ class AuthRepo(IAuthRepo):
             XEmailSignup: DTO с данными регистрации.
 
         Raises:
-            KeyError: Если запись не найдена.
+            KeyError: Если запись регистрации не найдена.
         """
         req = select(SignupAccount).where(SignupAccount.id == signup_id)
         res = await self.session.execute(req)
@@ -106,7 +105,7 @@ class AuthRepo(IAuthRepo):
         )
 
     async def delete_email_signup(self, signup_id: UUID) -> None:
-        """Удаляет запись регистрации по ID.
+        """Удаляет запись регистрации по идентификатору.
 
         Args:
             signup_id (UUID): Идентификатор регистрации.
@@ -160,7 +159,7 @@ class AuthRepo(IAuthRepo):
         )
 
     async def block_email_confirm_by_email(self, email: str) -> XEmailSignup:
-        """Блокирует подтверждение email на сутки для данного email.
+        """Блокирует возможность подтверждения email на сутки для указанного email.
 
         Args:
             email (str): Email пользователя.
@@ -196,7 +195,7 @@ class AuthRepo(IAuthRepo):
     async def get_refresh_token_for_account(
         self, acc_id: UUID, token: str
     ) -> XRefreshToken:
-        """Получает refresh-токен по аккаунту и значению токена.
+        """Получает refresh-токен по идентификатору аккаунта и значению токена.
 
         Args:
             acc_id (UUID): Идентификатор аккаунта.
@@ -206,7 +205,7 @@ class AuthRepo(IAuthRepo):
             XRefreshToken: DTO с данными токена.
 
         Raises:
-            KeyError: Если токен не найден или не валиден.
+            KeyError: Если токен не найден или является недействительным.
         """
         req = select(RefreshToken).where(
             RefreshToken.account_id == acc_id,
@@ -229,14 +228,14 @@ class AuthRepo(IAuthRepo):
         )
 
     async def revoke_expired_tokens(self) -> None:
-        """Удаляет или инвалидирует просроченные refresh-токены."""
+        """Удаляет просроченные refresh-токены из базы данных."""
 
         req = delete(RefreshToken).where(RefreshToken.expires_at < text("NOW()"))
         await self.session.execute(req)
         await self.session.commit()
 
     async def save_refresh_token(self, acc_id: UUID, token: str) -> XRefreshToken:
-        """Сохраняет новый refresh-токен для аккаунта.
+        """Сохраняет новый refresh-токен для аккаунта с сроком действия 7 дней.
 
         Args:
             acc_id (UUID): Идентификатор аккаунта.
@@ -268,7 +267,7 @@ class AuthRepo(IAuthRepo):
         )
 
     async def revoke_tokens(self, acc_id: UUID) -> int:
-        """Инвалидирует все активные refresh-токены для аккаунта.
+        """Инвалидирует (помечает как отозванные) все активные refresh-токены для аккаунта.
 
         Args:
             acc_id (UUID): Идентификатор аккаунта.
@@ -282,7 +281,7 @@ class AuthRepo(IAuthRepo):
             .values(
                 is_revoked=True,
             )
-            .where(RefreshToken.acc_id == acc_id, RefreshToken.is_revoked is False)
+            .where(RefreshToken.acc_id == acc_id, RefreshToken.is_revoked == False)
         )
         res = await self.session.execute(req)
         await self.session.commit()

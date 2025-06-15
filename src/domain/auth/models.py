@@ -15,11 +15,23 @@ from sqlalchemy.orm import DeclarativeBase
 
 
 class Base(DeclarativeBase):
-    """Базовый класс для всех моделей SQLAlchemy"""
+    """Базовый класс для всех моделей SQLAlchemy."""
 
 
 class SignupAccount(Base):
-    """Модель регистрации аккаунта по email"""
+    """Модель регистрации аккаунта по email.
+
+    Attributes:
+        id (UUID): Уникальный идентификатор аккаунта.
+        email (str): Email пользователя.
+        pwd_hash (str): Хеш пароля пользователя.
+        salt (str): Соль для хеширования пароля.
+        code (str): Код подтверждения регистрации.
+        created_at (datetime): Время создания записи.
+        updated_at (datetime | None): Время последнего обновления записи.
+        blocked_till (datetime | None): Время блокировки аккаунта.
+        attempts (int): Количество попыток входа (максимум 5).
+    """
 
     __tablename__ = "SignupAccount"
 
@@ -37,7 +49,17 @@ class SignupAccount(Base):
 
 
 class RefreshToken(Base):
-    """Модель refresh-токена, используемого для продления сессии"""
+    """
+    Модель refresh-токена для продления сессии.
+
+    Attributes:
+        id (UUID): Уникальный идентификатор токена.
+        account_id (UUID): ID аккаунта, которому принадлежит токен.
+        token (str): Строковое представление refresh-токена.
+        is_revoked (bool): Флаг, указывающий, отозван ли токен.
+        created_at (datetime): Время создания токена.
+        expires_at (datetime): Время истечения срока действия токена.
+    """
 
     __tablename__ = "RefreshToken"
 

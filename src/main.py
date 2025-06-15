@@ -14,7 +14,7 @@ services = {
 
 
 @asynccontextmanager
-async def lifespan(__app: FastAPI):
+async def lifespan(__app: FastAPI):  # pragma: no cover
     """Обрабатывает события жизненного цикла FastAPI-приложения.
 
     Args:
@@ -26,7 +26,7 @@ async def lifespan(__app: FastAPI):
     yield
 
 
-def get_services() -> tuple[list[APIRouter], list[dict]]:
+def get_services() -> tuple[list[APIRouter], list[dict]]:  # pragma: no cover
     """Импортирует активные сервисы и извлекает их роутеры и метаданные.
 
     Returns:
@@ -52,7 +52,7 @@ def get_services() -> tuple[list[APIRouter], list[dict]]:
     return routers, metadata
 
 
-def create_app() -> FastAPI:
+def create_app() -> FastAPI:  # pragma: no cover
     """Создаёт и настраивает экземпляр FastAPI-приложения для сервиса объявлений.
 
     Returns:
@@ -73,7 +73,8 @@ def create_app() -> FastAPI:
         __app.include_router(router)
 
     @__app.exception_handler(ExpError)
-    async def error_exception_handler(_: Request, exc: ExpError):
+    async def error_exception_handler(_: Request, exc: ExpError):  # pragma: no cover
+        """Обрабатывает HTTP-запрос на перехват пользовательских исключений ExpError."""
         return ORJSONResponse(
             status_code=int(exc.status_code), content=exc.response.model_dump()
         )

@@ -23,7 +23,14 @@ from services.tg.const_msg import get_acc_ban_warning_msg, get_acc_unban_warning
 
 
 class AccUseCase:
-    """Реализует бизнес-логику работы с аккаунтами, используя репозиторий."""
+    """Реализует бизнес-логику работы с аккаунтами, используя репозиторий.
+
+    Args:
+        _repo (AccRepo): Репозиторий аккаунтов.
+        _ads_svc (AdsService): Сервис для работы с объявлениями.
+        _compl_svc (ComplService): Сервис для работы с жалобами.
+        _tg_svc (TgClient): Клиент для отправки сообщений в Telegram.
+    """
 
     def __init__(
         self,
@@ -32,12 +39,6 @@ class AccUseCase:
         _compl_svc: ComplService,
         _tg_svc: TgClient,
     ):
-        """Инициализирует use case с репозиторием аккаунтов.
-
-        Args:
-            _repo (AccRepo): Репозиторий аккаунтов.
-            _acc_svc (AccService): Сервис для работы с аккаунтами.
-        """
         self.cfg = AccountConfig()
         self.repo: IAccRepo = _repo
         self.ads_svc: AdsService = _ads_svc
@@ -133,6 +134,14 @@ class AccUseCase:
         return res
 
     async def get_current_account(self, acc_id: UUID) -> ZAccount:
+        """Получает текущий аккаунт с количеством объявлений.
+
+        Args:
+            acc_id (UUID): Идентификатор аккаунта.
+
+        Returns:
+            ZAccount: Валидированная модель аккаунта.
+        """
         try:
             count_ads = await self.ads_svc.get_count_ads_by_acc_id(acc_id)
         except ExpError as e:
@@ -142,6 +151,18 @@ class AccUseCase:
         return ZAccount.model_validate(x_acc.model_dump(mode="json"))
 
     async def set_role_account(self, acc_id: UUID, role: AccRole) -> bool:
+        """Устанавливает роль аккаунта.
+
+        Args:
+            acc_id (UUID): Идентификатор аккаунта.
+            role (AccRole): Роль для установки.
+
+        Returns:
+            bool: Успешность операции.
+
+        Raises:
+            ExpError: Если аккаунт не найден.
+        """
         try:
             await self.repo.set_role_account(acc_id, role)
         except KeyError as e:
@@ -151,6 +172,19 @@ class AccUseCase:
     async def set_ban_account(
         self, acc_id: UUID, blocked_to: BannedTo, reason_banned: str
     ) -> bool:
+        """Блокирует аккаунт с указанием причины.
+
+        Args:
+            acc_id (UUID): Идентификатор аккаунта.
+            blocked_to (BannedTo): Тип блокировки.
+            reason_banned (str): Причина блокировки.
+
+        Returns:
+            bool: Успешность операции.
+
+        Raises:
+            ExpError: Если аккаунт не найден.
+        """
         xacc = await self.get_account_by_id(acc_id)
         try:
             res = await self.repo.set_ban_account(acc_id, blocked_to, reason_banned)
@@ -165,6 +199,17 @@ class AccUseCase:
         return True
 
     async def set_unban_account(self, acc_id: UUID) -> bool:
+        """Снимает блокировку с аккаунта.
+
+        Args:
+            acc_id (UUID): Идентификатор аккаунта.
+
+        Returns:
+            bool: Успешность операции.
+
+        Raises:
+            ExpError: Если аккаунт не найден.
+        """
         xacc = await self.get_account_by_id(acc_id)
         try:
             await self.repo.set_unban_account(acc_id)
@@ -175,6 +220,17 @@ class AccUseCase:
         return True
 
     async def send_complaint(self, req: QCreateCompl) -> ZCompl:
+        """Обрабатывает создание жалобы.
+
+        Args:
+            req (QCreateCompl): Данные жалобы.
+
+        Returns:
+            ZCompl: Результат создания жалобы.
+
+        Raises:
+            ExpError: При ошибках создания жалобы.
+        """
         try:
             res = await self.compl_svc.create_compl(req)
         except ExpError as e:

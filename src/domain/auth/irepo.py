@@ -4,7 +4,7 @@ from infra.auth.xdao import XEmailSignup, XRefreshToken
 
 
 class IAuthRepo:  # pragma: no cover
-    """Интерфейс репозитория для операций, связанных с аутентификацией и управлением токенами."""
+    """Интерфейс репозитория для операций аутентификации и управления токенами."""
 
     async def create_email_signup(
         self, email: str, pwd_hash: str, salt: str, code: int
@@ -23,7 +23,7 @@ class IAuthRepo:  # pragma: no cover
         raise NotImplementedError
 
     async def get_email_signup(self, signup_id: UUID) -> XEmailSignup:
-        """Получает данные регистрации по её ID.
+        """Получает данные регистрации по ID.
 
         Args:
             signup_id (UUID): Идентификатор регистрации.
@@ -34,7 +34,7 @@ class IAuthRepo:  # pragma: no cover
         raise NotImplementedError
 
     async def delete_email_signup(self, signup_id: UUID) -> None:
-        """Удаляет запись регистрации по её ID.
+        """Удаляет запись регистрации по ID.
 
         Args:
             signup_id (UUID): Идентификатор регистрации.
@@ -44,7 +44,7 @@ class IAuthRepo:  # pragma: no cover
     async def inc_email_confirm_wrong_code_attempts(
         self, signup_id: UUID
     ) -> XEmailSignup:
-        """Увеличивает счётчик неверных попыток ввода кода подтверждения по email.
+        """Увеличивает счётчик неверных попыток ввода кода подтверждения.
 
         Args:
             signup_id (UUID): Идентификатор регистрации.

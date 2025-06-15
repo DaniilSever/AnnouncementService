@@ -102,6 +102,14 @@ class IAdsRepo:
         raise NotImplementedError
 
     async def get_count_ads_by_acc_id(self, acc_id: UUID) -> int:
+        """Получает количество объявлений по ID аккаунта.
+
+        Args:
+            acc_id (UUID): Идентификатор аккаунта.
+
+        Returns:
+            int: Количество объявлений.
+        """
         raise NotImplementedError
 
     async def create_ads_commentary(
@@ -170,7 +178,24 @@ class IAdsRepo:
         return NotImplementedError
 
     async def get_ads_id_by_comm_id(self, comm_id: UUID) -> UUID:
+        """Получает идентификатор объявления по идентификатору комментария.
+
+        Args:
+            comm_id (UUID): Идентификатор комментария.
+
+        Returns:
+            UUID: Идентификатор объявления.
+        """
         return NotImplementedError
 
     async def adm_delete_ads_commentary(self, comm_id: UUID, ads_id: UUID) -> None:
+        """Администратор удаляет комментарий к объявлению.
+
+        Args:
+            comm_id (UUID): Идентификатор комментария.
+            ads_id (UUID): Идентификатор объявления.
+
+        Returns:
+            None
+        """
         return NotImplementedError

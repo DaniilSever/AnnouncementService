@@ -3,6 +3,8 @@ from pydantic import BaseModel, UUID4
 
 
 class XAds(BaseModel):
+    """Модель данных объявления в системе."""
+
     id: UUID4
     account_id: UUID4
     title: str
@@ -19,6 +21,8 @@ class XAds(BaseModel):
 
 
 class XAdsComment(BaseModel):
+    """Модель данных комментария к объявлению."""
+
     id: UUID4
     ads_id: UUID4
     account_id: UUID4

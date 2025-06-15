@@ -5,7 +5,6 @@ from fastapi.security import OAuth2PasswordRequestForm
 from core.endpoints import Endpoints as Enp
 from core.depends import (
     get_auth_repo_session,
-    AsyncSession,
     get_account_serivce,
     AccService,
     get_tg_bot,
@@ -24,7 +23,7 @@ from domain.auth.dto import (
 )
 from domain.auth.dto import ZEmailSignup, ZAccountID, ZToken, ZRevokedTokens
 
-from infra.auth.repo import AuthRepo
+from infra.auth.repo import AuthRepo, AsyncSession
 
 router = APIRouter(tags=["auth"])
 tags = {"name": "auth", "description": "Внутренние эндпоинты авторизации"}

@@ -4,17 +4,23 @@ from pydantic import BaseModel, UUID4
 
 
 class QAdsCategory(Enum):
+    """Категории объявлений."""
+
     SELLING = "selling"
     BUYING = "buying"
     PROVIDING_SERVICES = "providing services"
 
 
 class QAdsPriceFilter(Enum):
+    """Варианты сортировки по цене."""
+
     BY_INCREASE = "ASC"
     BY_DECREASE = "DESC"
 
 
 class QFilter(BaseModel):
+    """Параметры фильтрации объявлений."""
+
     limit: int = 10
     offset: int = 0
     price: QAdsPriceFilter | None = None
@@ -24,12 +30,16 @@ class QFilter(BaseModel):
 
 
 class QCreateAds(BaseModel):
+    """Данные для создания объявления."""
+
     title: str
     description: str
     price: int
 
 
 class QChangeAds(BaseModel):
+    """Данные для обновления объявления."""
+
     ads_id: UUID4
     title: str
     description: str
@@ -37,11 +47,15 @@ class QChangeAds(BaseModel):
 
 
 class QAdmDeleteAds(BaseModel):
+    """Данные для админского удаления объявления."""
+
     ads_id: UUID4
     reason_deletion: str
 
 
 class ZBanned(BaseModel):
+    """Информация о бане аккаунта."""
+
     account_id: UUID4
     is_banned: bool
     blocked_at: datetime
@@ -50,6 +64,8 @@ class ZBanned(BaseModel):
 
 
 class ZAds(BaseModel):
+    """Модель объявления."""
+
     id: UUID4
     account_id: UUID4
     title: str
@@ -66,6 +82,8 @@ class ZAds(BaseModel):
 
 
 class ZManyAds(BaseModel):
+    """Коллекция объявлений с пагинацией."""
+
     total: int
     count: int
     offeset: int = 0
@@ -76,11 +94,15 @@ class ZManyAds(BaseModel):
 
 
 class QAddAdsComment(BaseModel):
+    """Данные для создания комментария к объявлению."""
+
     ads_id: UUID4
     ads_comment: str
 
 
 class QUpdateAdsComment(BaseModel):
+    """Данные для обновления комментария к объявлению."""
+
     comm_id: UUID4
     ads_id: UUID4
     acccount_id: UUID4
@@ -88,12 +110,16 @@ class QUpdateAdsComment(BaseModel):
 
 
 class QDelAdsComment(BaseModel):
+    """Данные для удаления комментария к объявлению."""
+
     comm_id: UUID4
     ads_id: UUID4
     account_id: UUID4
 
 
 class ZAdsComment(BaseModel):
+    """Модель комментария к объявлению."""
+
     id: UUID4
     ads_id: UUID4
     account_id: UUID4
@@ -103,6 +129,8 @@ class ZAdsComment(BaseModel):
 
 
 class ZManyAdsComment(BaseModel):
+    """Коллекция комментариев с пагинацией."""
+
     total: int
     count: int
     offeset: int = 0

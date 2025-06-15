@@ -1,5 +1,3 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from services.account.svc import AccService
 from services.ads.svc import AdsService
 from services.compl.svc import ComplService
@@ -14,7 +12,7 @@ from .pg import (
 from .configs import AccountConfig, AdsConfig, ComplConfig, TgConfig
 
 
-async def get_account_repo_session() -> AsyncSession:
+async def get_account_repo_session():
     """Получает асинхронную сессию репозитория аккаунтов.
 
     Yields:
@@ -24,7 +22,7 @@ async def get_account_repo_session() -> AsyncSession:
         yield session
 
 
-async def get_auth_repo_session() -> AsyncSession:
+async def get_auth_repo_session():
     """Получает асинхронную сессию репозитория аутентификации.
 
     Yields:
@@ -34,7 +32,7 @@ async def get_auth_repo_session() -> AsyncSession:
         yield session
 
 
-async def get_ads_repo_session() -> AsyncSession:
+async def get_ads_repo_session():
     """Получает асинхронную сессию репозитория объявлений.
 
     Yields:
@@ -44,7 +42,7 @@ async def get_ads_repo_session() -> AsyncSession:
         yield session
 
 
-async def get_compl_repo_session() -> AsyncSession:
+async def get_compl_repo_session():
     """Получает асинхронную сессию репозитория жалоб.
 
     Yields:
@@ -85,5 +83,10 @@ def get_compl_serivce() -> ComplService:
 
 
 def get_tg_bot() -> TgClient:
+    """Создаёт и возвращает клиент Telegram бота.
+
+    Returns:
+        TgClient: Клиент для взаимодействия с Telegram ботом.
+    """
     cfg = TgConfig()
     return TgClient(cfg.TGBOT_TOKEN, cfg.TGBOT_CHATID)

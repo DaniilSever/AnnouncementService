@@ -15,11 +15,27 @@ from sqlalchemy.orm import DeclarativeBase
 
 
 class Base(DeclarativeBase):
-    """Базовый класс для всех моделей SQLAlchemy"""
+    """Базовый класс для всех моделей SQLAlchemy."""
 
 
 class Ads(Base):
-    """Таблица объявлений"""
+    """Модель таблицы объявлений.
+
+    Attributes:
+        id (UUID): ID объявления в системе.
+        account_id (UUID): ID аккаунта владельца объявления.
+        title (str): Название объявления.
+        description (str): Описание объявления.
+        ads_category (str): Категория объявления.
+        price (int): Цена услуги.
+        count_views (int): Количество просмотров объявления.
+        count_comments (int): Количество комментариев.
+        is_deleted (bool): Флаг удаления объявления.
+        created_at (datetime): Дата создания объявления.
+        updated_at (datetime | None): Дата последнего изменения объявления.
+        deleted_at (datetime | None): Дата удаления объявления.
+        reason_deletion (str | None): Причина удаления объявления.
+    """
 
     __tablename__ = "Ads"
 
@@ -58,7 +74,17 @@ class Ads(Base):
 
 
 class AdsComment(Base):
-    """Таблица комментариев к объявлению"""
+    """Модель таблицы комментариев к объявлению.
+
+    Attributes:
+        id (UUID): Уникальный идентификатор комментария.
+        ads_id (UUID): Идентификатор объявления, к которому относится комментарий.
+        account_id (UUID): Идентификатор автора комментария.
+        ads_comment (str): Текст комментария.
+        created_at (datetime): Дата и время создания комментария.
+        updated_at (datetime | None): Дата и время последнего обновления комментария.
+    """
+
 
     __tablename__ = "AdsComment"
 

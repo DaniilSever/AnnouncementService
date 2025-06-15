@@ -1,5 +1,5 @@
 class _EndpointsAUTH:
-    """Эндпоинты Auth сервиса"""
+    """Эндпоинты Auth сервиса."""
 
     # AUTH_HEALTHCHECK = "/api/auth/healthcheck"
 
@@ -12,7 +12,7 @@ class _EndpointsAUTH:
 
 
 class _EndpointsACCOUNT:
-    """Эндпоинты Account сервиса"""
+    """Эндпоинты Account сервиса."""
 
     # ACCOUNT_HEALTHCHECK = "/api/account/healthcheck"
 
@@ -26,7 +26,7 @@ class _EndpointsACCOUNT:
 
 
 class _EndpointsADS:
-    """Эндпоинты ADS сервиса"""
+    """Эндпоинты ADS сервиса."""
 
     # ADS_HEALTHCHECK = "/api/ads/healthcheck"
 
@@ -50,7 +50,7 @@ class _EndpointsADS:
 
 
 class _EndpointsCompl:
-    """Эндпоинты Compl сервиса"""
+    """Эндпоинты Compl сервиса."""
 
     # COMPL_HEALTHCHECK = "/api/compl/healthcheck"
 
@@ -60,7 +60,7 @@ class _EndpointsCompl:
 
 
 class _EndpointsADM:
-    """Админские эндпоинты"""
+    """Админские эндпоинты."""
 
     # ADM_HEALTHCHECK = "/api/adm/healthcheck"
 
@@ -85,4 +85,4 @@ class Endpoints(
     _EndpointsCompl,
     _EndpointsADM,
 ):
-    """Глобальные класс эндпоинтов"""
+    """Глобальный класс эндпоинтов."""

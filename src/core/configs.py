@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings
 
 
 class AccountConfig(BaseSettings):
-    """Конфиг Account сервиса"""
+    """Конфиг Account сервиса."""
 
     APP_ENV: str
     API_URL: str
@@ -10,7 +10,7 @@ class AccountConfig(BaseSettings):
 
 
 class AuthConfig(BaseSettings):
-    """Конфиг Auth сервиса"""
+    """Конфиг Auth сервиса."""
 
     APP_ENV: str
     API_URL: str
@@ -22,7 +22,7 @@ class AuthConfig(BaseSettings):
 
 
 class AdsConfig(BaseSettings):
-    """Конфиг Ads сервиса"""
+    """Конфиг Ads сервиса."""
 
     APP_ENV: str
     API_URL: str
@@ -30,7 +30,7 @@ class AdsConfig(BaseSettings):
 
 
 class ComplConfig(BaseSettings):
-    """Конфиг Compl сервиса"""
+    """Конфиг Compl сервиса."""
 
     APP_ENV: str
     API_URL: str
@@ -38,7 +38,7 @@ class ComplConfig(BaseSettings):
 
 
 class TgConfig(BaseSettings):
-    """Конфиг Tg сервиса"""
+    """Конфиг Tg сервиса."""
 
     TGBOT_TOKEN: str
     TGBOT_CHATID: str

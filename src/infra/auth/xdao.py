@@ -3,7 +3,7 @@ from pydantic import BaseModel, EmailStr, UUID4
 
 
 class XEmailSignup(BaseModel):
-    """Запись в бд SignupAccount"""
+    """Модель данных для регистрации пользователя по email."""
 
     id: UUID4
     email: EmailStr | str
@@ -17,7 +17,7 @@ class XEmailSignup(BaseModel):
 
 
 class XRefreshToken(BaseModel):
-    """Запись в бд RefershToken"""
+    """Модель данных для refresh-токена."""
 
     id: UUID4
     account_id: UUID4

@@ -43,7 +43,7 @@ def create_password_hash(
         salt (str, optional): Соль для хеширования. Если не указана, генерируется автоматически.
 
     Returns:
-        tuple[str, str]: Хеш пароля и соль.
+        tuple[str, str]: Кортеж из хеша пароля и соли.
     """
     if not salt:
         salt = secrets.token_hex(16)
@@ -124,6 +124,17 @@ async def decode_jwt(token: str, key: str) -> dict:  # pragma: no cover
 async def get_jwt_payload(
     token: Annotated[str, Depends(oauth2_scheme)],
 ) -> dict:  # pragma: no cover
+    """Обрабатывает JWT-токен и возвращает полезную нагрузку.
+
+    Args:
+        token (str): JWT-токен из заголовка Authorization.
+
+    Returns:
+        dict: Полезная нагрузка токена.
+
+    Raises:
+        ValueError: Если токен недействителен или истёк.
+    """
     try:
         res: dict = await decode_jwt(token, cfg.JWT_PUBLIC_KEY)
     except ValueError as e:
@@ -134,18 +145,16 @@ async def get_jwt_payload(
 async def check_jwt(
     jwt_token: Annotated[str | None, Depends(oauth2_scheme)],
 ) -> dict | None:
-    """
-    Проверяет авторизацию пользователя через JWT-токен или API-ключ.
+    """Проверяет авторизацию пользователя через JWT-токен.
 
     Args:
-        jwt_token: JWT-токен, полученный из заголовка Authorization.
+        jwt_token (str | None): JWT-токен из заголовка Authorization.
 
     Returns:
-        dict: Расшифрованные данные из JWT-токена, если авторизация прошла успешно.
+        dict | None: Расшифрованные данные из JWT-токена, если авторизация прошла успешно, иначе None.
 
     Raises:
-        c.Failed: Если авторизация не удалась (отсутствуют токен и API-ключ,
-                  неверный токен или неверный API-ключ).
+        ExpError: Если токен некорректен или истёк.
     """
     if not jwt_token:
         return None
@@ -160,18 +169,16 @@ async def check_jwt(
 async def check_apikey(
     api_key: ApiKeyHeader,
 ) -> bool:  # pragma: no cover
-    """
-    Проверяет авторизацию пользователя через JWT-токен или API-ключ.
+    """Проверяет авторизацию пользователя через API-ключ.
 
     Args:
-        api_key: API-ключ, полученный из заголовка.
+        api_key (ApiKeyHeader): API-ключ, полученный из заголовка.
 
     Returns:
-        dict: Расшифрованные данные из JWT-токена, если авторизация прошла успешно.
+        bool: True, если API-ключ валиден, иначе ошибка.
 
     Raises:
-        c.Failed: Если авторизация не удалась (отсутствуют токен и API-ключ,
-                  неверный токен или неверный API-ключ).
+        ExpError: Если API-ключ некорректен.
     """
     if not api_key:
         return False

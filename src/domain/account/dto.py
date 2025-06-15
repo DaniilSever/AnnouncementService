@@ -5,6 +5,8 @@ from .models import AccRole
 
 
 class BannedTo(Enum):
+    """Периоды блокировки аккаунта."""
+
     WEEK = "week"
     MONTH = "month"
     MONTH3 = "month3"
@@ -13,6 +15,8 @@ class BannedTo(Enum):
 
 
 class ZBanned(BaseModel):
+    """Информация о блокировке аккаунта."""
+
     account_id: UUID4
     is_banned: bool
     blocked_at: datetime
@@ -21,15 +25,19 @@ class ZBanned(BaseModel):
 
 
 class ZIsBusy(BaseModel):
+    """Статус занятости, например, email."""
+
     is_busy: bool
 
 
 class QEmail(BaseModel):
+    """Модель для передачи email."""
+
     email: str
 
 
 class QEmailSignupData(BaseModel):
-    """Запись в бд SignupAccount"""
+    """Данные для временной регистрации пользователя."""
 
     id: UUID4
     email: EmailStr | str
@@ -43,7 +51,7 @@ class QEmailSignupData(BaseModel):
 
 
 class ZAccount(BaseModel):
-    """Запись в бд Account"""
+    """Модель подтверждённого аккаунта."""
 
     id: UUID4
     email: str
@@ -60,4 +68,6 @@ class ZAccount(BaseModel):
 
 
 class ZAccountID(BaseModel):
+    """Модель с ID аккаунта."""
+
     id: UUID4

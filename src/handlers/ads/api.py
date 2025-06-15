@@ -5,7 +5,6 @@ from fastapi import APIRouter, Depends, Body, Header, Query, Path
 from core.endpoints import Endpoints as Enp
 from core.depends import (
     get_ads_repo_session,
-    AsyncSession,
     get_compl_serivce,
     ComplService,
     get_tg_bot,
@@ -37,7 +36,7 @@ from domain.account.models import AccRole
 from domain.compl.dto import QCreateCompl, ZCompl
 from domain.compl.models import Service
 
-from infra.ads.repo import AdsRepo
+from infra.ads.repo import AdsRepo, AsyncSession
 
 router = APIRouter(tags=["ads"])
 tags = {"name": "ads", "description": "Внутренние эндпоинты работы с объявлениями"}
@@ -182,6 +181,7 @@ async def get_count_ads_by_acc_id(
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
     __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp[int]:
+    """Обрабатывает HTTP-запрос на получение количества объявлений пользователя."""
     uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc, __tg_svc)
     res = await uc.get_count_ads_by_acc_id(acc_id)
     return SuccessResp[int](payload=res)
@@ -295,7 +295,7 @@ async def delete_ads(
 
 @router.delete(
     Enp.ADM_DELETE_ADS,
-    summary="Удалить объявление",
+    summary="Удалить объявление (Администратор)",
     status_code=200,
     responses=responses(404),
 )
@@ -307,7 +307,7 @@ async def adm_delete_ads(
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
     __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp | SuccessResp[ZBanned]:
-    """Обрабатывает HTTP-запрос на удаление объявления из общего списка с авторизацией."""
+    """Обрабатывает HTTP-запрос на удаление объявления из общего списка с авторизацией администратора."""
     uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc, __tg_svc)
 
     if not jwt:
@@ -450,7 +450,7 @@ async def delete_ads_commentary(
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
     __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp | SuccessResp[ZBanned]:
-    """Обрабатывает HTTP-запрос на удаление комментария в объявлении."""
+    """Обрабатывает HTTP-запрос на удаление комментария в объявлении с авторизацией."""
     uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc, __tg_svc)
 
     if not jwt:
@@ -514,6 +514,7 @@ async def send_complaint(
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
     __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp[ZCompl]:
+    """Обрабатывает HTTP-запрос на отправку жалобы на объявление."""
     uc = AdsUseCase(AdsRepo(__repo_session), __compl_svc, __tg_svc)
 
     if not jwt:

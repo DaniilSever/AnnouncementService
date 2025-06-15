@@ -14,16 +14,29 @@ from sqlalchemy.orm import DeclarativeBase
 
 
 class Service(Enum):
+    """Перечисление доступных сервисов для жалоб."""
+
     ACCOUNT = "account"
     ADS = "ads"
 
 
 class Base(DeclarativeBase):
-    """Базовый класс для всех моделей."""
+    """Базовый класс для всех моделей SQLAlchemy."""
 
 
 class Complaints(Base):
-    """Таблица жалоб на пользователей и объявления."""
+    """Модель таблицы жалоб на пользователей и объявления.
+
+    Attributes:
+        id (UUID): Уникальный идентификатор жалобы.
+        compl_on_id (UUID): ID объекта жалобы (объявление или аккаунт).
+        services (str): Имя сервиса, из которого поступила жалоба.
+        author_id (UUID): ID автора жалобы.
+        complaints (str): Текст жалобы.
+        is_notified (bool): Флаг, уведомлен ли автор жалобы.
+        is_resolved (bool): Флаг, решена ли жалоба.
+        created_at (datetime): Дата и время создания записи.
+    """
 
     __tablename__ = "Complaints"
 

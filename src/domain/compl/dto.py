@@ -5,6 +5,8 @@ from domain.compl.models import Service
 
 
 class ZBanned(BaseModel):
+    """Модель, описывающая статус блокировки аккаунта."""
+
     account_id: UUID4
     is_banned: bool
     blocked_at: datetime
@@ -13,6 +15,8 @@ class ZBanned(BaseModel):
 
 
 class QFilter(BaseModel):
+    """Параметры фильтрации жалоб."""
+
     complaints_of: Service | None = None
     is_today: bool = True
     is_notified: bool = False
@@ -22,6 +26,8 @@ class QFilter(BaseModel):
 
 
 class QCreateCompl(BaseModel):
+    """Модель запроса для создания жалобы."""
+
     compl_on_id: UUID4
     service: Service
     author_id: UUID4
@@ -31,6 +37,8 @@ class QCreateCompl(BaseModel):
 
 
 class ZCompl(BaseModel):
+    """Модель жалобы."""
+
     id: UUID4
     compl_on_id: UUID4
     services: Service
@@ -42,6 +50,8 @@ class ZCompl(BaseModel):
 
 
 class ZManyCompl(BaseModel):
+    """Модель для передачи списка жалоб с метаданными."""
+
     total_ads: int
     total_acc: int
     count: int

@@ -12,11 +12,24 @@ from .xdao import XCompl
 
 
 class ComplRepo(IComplRepo):
+    """Реализация репозитория для работы с жалобами.
+
+    Args:
+        _session (AsyncSession): Асинхронная сессия базы данных.
+    """
 
     def __init__(self, _session: AsyncSession):
         self.session: AsyncSession = _session
 
     async def create_compl(self, req: QCreateCompl) -> XCompl:
+        """Создаёт новую жалобу в базе данных.
+
+        Args:
+            req (QCreateCompl): Данные для создания жалобы.
+
+        Returns:
+            XCompl: Созданный объект жалобы.
+        """
         req = (
             insert(Complaints)
             .values(
@@ -44,6 +57,18 @@ class ComplRepo(IComplRepo):
         )
 
     async def get_my_complaint(self, compl_id: UUID, acc_id: UUID) -> XCompl:
+        """Получает жалобу пользователя по ID.
+
+        Args:
+            compl_id (UUID): ID жалобы.
+            acc_id (UUID): ID автора жалобы.
+
+        Returns:
+            XCompl: Найденная жалоба.
+
+        Raises:
+            KeyError: Если жалоба не найдена.
+        """
         req = select(Complaints).where(
             Complaints.id == compl_id, Complaints.author_id == acc_id
         )
@@ -67,6 +92,15 @@ class ComplRepo(IComplRepo):
     async def get_my_complaints(
         self, acc_id: UUID, complaints_of: Service | None = None
     ) -> list[XCompl]:
+        """Получает список жалоб пользователя, с подсчётом по типам.
+
+        Args:
+            acc_id (UUID): ID автора жалоб.
+            complaints_of (Service | None, optional): Фильтр по типу сервиса. По умолчанию None.
+
+        Returns:
+            tuple[int, int, list[XCompl]]: Количество жалоб на аккаунт, количество жалоб на объявления и список жалоб.
+        """
         count_compl_acc = (
             select(func.count())
             .select_from(Complaints)
@@ -155,6 +189,17 @@ class ComplRepo(IComplRepo):
         return total_acc, total_ads, res
 
     async def adm_get_complaint(self, compl_id: UUID) -> XCompl:
+        """Получает жалобу по ID для администратора.
+
+        Args:
+            compl_id (UUID): ID жалобы.
+
+        Returns:
+            XCompl: Найденная жалоба.
+
+        Raises:
+            KeyError: Если жалоба не найдена.
+        """
         req = select(Complaints).where(Complaints.id == compl_id)
         res = await self.session.execute(req)
         await self.session.commit()
@@ -174,6 +219,14 @@ class ComplRepo(IComplRepo):
         )
 
     async def adm_get_complaints(self, qfilter: QFilter) -> list[XCompl]:
+        """Получает список жалоб для администратора с фильтрацией и подсчётом.
+
+        Args:
+            qfilter (QFilter): Параметры фильтрации и пагинации.
+
+        Returns:
+            tuple[int, int, list[XCompl]]: Количество жалоб на аккаунт, количество жалоб на объявления и список жалоб.
+        """
         count_compl_acc = (
             select(func.count())
             .select_from(Complaints)

@@ -52,7 +52,7 @@ class _AdsExpCode:
 
 
 class _ComplExpCode:
-    """Класс с кодми ошибок жалоб"""
+    """Класс с кодами ошибок жалоб."""
 
     COMPL_NOT_FOUND = "404", "Жалобы не найдены"
 
@@ -64,11 +64,20 @@ class ExpCode(
     _AdsExpCode,
     _ComplExpCode,
 ):
-    """Глобальные класс кодов ошибок"""
+    """Глобальный класс кодов ошибок."""
 
 
 class ExpError(Exception):
-    """Базовое исключение для всех видов ошибок."""
+    """Базовое исключение для всех видов ошибок.
+
+    Args:
+        code_msg (tuple): Кортеж с кодом ошибки (str) и сообщением (str).
+        details (str | None, optional): Дополнительные детали ошибки.
+
+    Attributes:
+        status_code (str): HTTP статус ошибки.
+        response (ErrResp): Объект с информацией об ошибке.
+    """
 
     def __init__(self, code_msg: tuple, details: str | None = None):
         code, msg = code_msg

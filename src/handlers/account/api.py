@@ -4,7 +4,6 @@ from fastapi import APIRouter, Depends, Path, Body, Query
 
 from core.depends import (
     get_account_repo_session,
-    AsyncSession,
     get_ads_serivce,
     AdsService,
     get_compl_serivce,
@@ -25,7 +24,7 @@ from domain.account.models import AccRole
 from domain.compl.dto import QCreateCompl, ZCompl
 from domain.compl.models import Service
 
-from infra.account.repo import AccRepo
+from infra.account.repo import AccRepo, AsyncSession
 
 router = APIRouter(tags=["account"])
 tags = {"name": "account", "description": "Внутренние эндпоинты работы с аккаунтом"}
@@ -186,7 +185,7 @@ async def set_role_account(
 
 @router.patch(
     Enp.ADM_SET_BAN_ACCOUNT,
-    summary="Забанить аккаунт (Администратор)",
+    summary="Заблокировать аккаунт (Администратор)",
     status_code=200,
     responses=responses(404),
 )
@@ -200,7 +199,7 @@ async def set_ban_account(
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
     __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp:
-    """Обрабатывает HTTP-запрос администратора на блокировку аккаунта."""
+    """Обрабатывает HTTP-запрос администратора на блокировку аккаунта"""
     uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc, __tg_svc)
 
     if not jwt:
@@ -215,7 +214,7 @@ async def set_ban_account(
 
 @router.patch(
     Enp.ADM_SET_UNBAN_ACCOUNT,
-    summary="Разбанить аккаунт (Администратор)",
+    summary="Разблокировать аккаунт (Администратор)",
     status_code=200,
     responses=responses(404),
 )
@@ -255,6 +254,7 @@ async def send_complaint(
     __compl_svc: Annotated[ComplService, Depends(get_compl_serivce)],
     __tg_svc: Annotated[TgClient, Depends(get_tg_bot)],
 ) -> SuccessResp[ZCompl]:
+    """Обрабатывает HTTP-запрос на создание жалобы на аккаунт."""
     uc = AccUseCase(AccRepo(__repo_session), __ads_svc, __compl_svc, __tg_svc)
 
     if not jwt:

@@ -24,17 +24,15 @@ from services.tg.const_msg import get_ads_warning_msg
 
 
 class AdsUseCase:
-    """Управляет бизнес-логикой объявлений."""
+    """Управляет бизнес-логикой для работы с объявлениями и комментариями.
+
+    Args:
+        _repo (AdsRepo): Репозиторий для операций с объявлениями.
+        _compl_svc (ComplService): Сервис для работы с жалобами.
+        _tg_svc (TgClient): Клиент для отправки сообщений в Telegram.
+    """
 
     def __init__(self, _repo: AdsRepo, _compl_svc: ComplService, _tg_svc: TgClient):
-        """Инициализирует UseCase с репозиторием.
-
-        Args:
-            _repo (AdsRepo): Репозиторий для работы с объявлениями.
-
-        Returns:
-            None
-        """
         self.cfg = AdsConfig()
         self.repo: IAdsRepo = _repo
         self.compl_svc: ComplService = _compl_svc
@@ -48,7 +46,7 @@ class AdsUseCase:
         Args:
             req (QCreateAds): Данные для создания объявления.
             ads_category (QAdsCategory): Категория объявления.
-            acc_id (UUID | None): Идентификатор аккаунта (необязательно).
+            acc_id (UUID | None): Идентификатор аккаунта, если есть.
 
         Returns:
             ZAds: Созданное объявление.
@@ -57,13 +55,13 @@ class AdsUseCase:
         return ZAds.model_validate(res.model_dump(mode="json"))
 
     async def get_ads_all(self, qfilter: QFilter) -> ZManyAds:
-        """Получает список объявлений по заданному фильтру.
+        """Получает список всех объявлений с учётом фильтра.
 
         Args:
-            qfilter (QFilter): Параметры фильтрации и пагинации.
+            qfilter (QFilter): Фильтр для выборки объявлений.
 
         Returns:
-            ZManyAds: Результат с количеством и списком объявлений.
+            ZManyAds: Множество объявлений с метаданными.
         """
         total, xres = await self.repo.get_ads_all(qfilter)
         res = []
@@ -77,9 +75,6 @@ class AdsUseCase:
         Args:
             ads_id (UUID): Идентификатор объявления.
 
-        Raises:
-            ExpError: Если объявление не найдено.
-
         Returns:
             ZAds: Найденное объявление.
         """
@@ -90,13 +85,13 @@ class AdsUseCase:
         return ZAds.model_validate(res.model_dump(mode="json"))
 
     async def get_ads_by_account_id(self, acc_id: UUID) -> ZAds:
-        """Получает все объявления пользователя по его идентификатору.
+        """Получает объявления по идентификатору аккаунта.
 
         Args:
             acc_id (UUID): Идентификатор аккаунта.
 
         Returns:
-            ZManyAds: Результат с количеством и списком объявлений пользователя.
+            ZManyAds: Множество объявлений данного аккаунта.
         """
         total, xres = await self.repo.get_ads_by_account_id(acc_id)
         res = []
@@ -105,14 +100,11 @@ class AdsUseCase:
         return ZManyAds(total=total, count=len(res), items=res)
 
     async def change_my_ads(self, req: QChangeAds, acc_id: UUID) -> ZAds:
-        """Обновляет данные объявления пользователя.
+        """Обновляет собственное объявление.
 
         Args:
-            req (QChangeAds): Новые данные для объявления.
-            acc_id (UUID): Идентификатор аккаунта владельца объявления.
-
-        Raises:
-            ExpError: Если объявление не найдено.
+            req (QChangeAds): Данные для обновления объявления.
+            acc_id (UUID): Идентификатор аккаунта владельца.
 
         Returns:
             ZAds: Обновлённое объявление.
@@ -131,10 +123,7 @@ class AdsUseCase:
         Args:
             ads_id (UUID): Идентификатор объявления.
             req (QAdsCategory): Новая категория объявления.
-            acc_id (UUID): Идентификатор аккаунта владельца объявления.
-
-        Raises:
-            ExpError: Если объявление не найдено.
+            acc_id (UUID): Идентификатор аккаунта владельца.
 
         Returns:
             ZAds: Обновлённое объявление с новой категорией.
@@ -146,26 +135,27 @@ class AdsUseCase:
         return ZAds.model_validate(res.model_dump(mode="json"))
 
     async def delete_ads(self, ads_id: UUID, acc_id: UUID) -> bool:
-        """Удаляет объявление пользователя.
+        """Удаляет объявление владельцем.
 
         Args:
-            ads_id (UUID): Идентификатор объявления для удаления.
-            acc_id (UUID): Идентификатор аккаунта владельца объявления.
+            ads_id (UUID): Идентификатор объявления.
+            acc_id (UUID): Идентификатор аккаунта владельца.
 
         Returns:
-            bool: True, если удаление прошло успешно.
+            bool: Результат удаления (True при успешном удалении).
         """
         await self.repo.delete_ads(ads_id, acc_id)
         return True
 
     async def adm_delete_ads(self, ads_id: UUID, reason: str) -> bool:
-        """Удаляет администратором объявление пользователя.
+        """Администратор удаляет объявление и отправляет предупреждение в Telegram.
 
         Args:
-            ads_id (UUID): Идентификатор объявления для удаления.
+            ads_id (UUID): Идентификатор объявления.
+            reason (str): Причина удаления.
 
         Returns:
-            bool: True, если удаление прошло успешно.
+            bool: Результат удаления (True при успешном удалении).
         """
         ads = await self.repo.get_ads_by_id(ads_id)
 
@@ -176,6 +166,14 @@ class AdsUseCase:
         return True
 
     async def get_count_ads_by_acc_id(self, acc_id: UUID) -> int:
+        """Получает количество объявлений по идентификатору аккаунта.
+
+        Args:
+            acc_id (UUID): Идентификатор аккаунта.
+
+        Returns:
+            int: Количество объявлений.
+        """
         res = await self.repo.get_count_ads_by_acc_id(acc_id)
         return res
 
@@ -187,11 +185,8 @@ class AdsUseCase:
         """Создаёт комментарий к объявлению.
 
         Args:
-            req (QAddAdsComment): Данные для создания комментария.
-            acc_id (UUID): Идентификатор аккаунта, создающего комментарий.
-
-        Raises:
-            ExpError: Если объявление не найдено.
+            req (QAddAdsComment): Данные комментария.
+            acc_id (UUID): Идентификатор аккаунта автора комментария.
 
         Returns:
             ZAdsComment: Созданный комментарий.
@@ -203,14 +198,11 @@ class AdsUseCase:
         return ZAdsComment.model_validate(res.model_dump(mode="json"))
 
     async def get_ads_commentary(self, ads_id: UUID, comment_id: UUID) -> ZAdsComment:
-        """Получает комментарий к объявлению по его идентификатору.
+        """Получает комментарий по идентификаторам объявления и комментария.
 
         Args:
             ads_id (UUID): Идентификатор объявления.
             comment_id (UUID): Идентификатор комментария.
-
-        Raises:
-            ExpError: Если комментарий не найден.
 
         Returns:
             ZAdsComment: Найденный комментарий.
@@ -228,7 +220,7 @@ class AdsUseCase:
             ads_id (UUID): Идентификатор объявления.
 
         Returns:
-            ZManyAdsComment: Список комментариев с их количеством.
+            ZManyAdsComment: Множество комментариев с метаданными.
         """
         total, xres = await self.repo.get_ads_commentaries(ads_id)
         res = []
@@ -241,9 +233,6 @@ class AdsUseCase:
 
         Args:
             req (QUpdateAdsComment): Данные для обновления комментария.
-
-        Raises:
-            ExpError: Если комментарий не найден.
 
         Returns:
             ZAdsComment: Обновлённый комментарий.
@@ -260,11 +249,8 @@ class AdsUseCase:
         Args:
             req (QDelAdsComment): Данные для удаления комментария.
 
-        Raises:
-            ExpError: Если комментарий не найден.
-
         Returns:
-            bool: True при успешном удалении.
+            bool: Результат удаления (True при успешном удалении).
         """
         try:
             await self.repo.delete_ads_commentary(
@@ -275,16 +261,13 @@ class AdsUseCase:
         return True
 
     async def adm_delete_ads_commentary(self, comm_id: UUID) -> bool:
-        """Удаляет комментарий к объявлению администратором.
+        """Администратор удаляет комментарий к объявлению.
 
         Args:
-            req (QDelAdsComment): Данные для удаления комментария.
-
-        Raises:
-            ExpError: Если комментарий не найден.
+            comm_id (UUID): Идентификатор комментария.
 
         Returns:
-            bool: True при успешном удалении.
+            bool: Результат удаления (True при успешном удалении).
         """
         try:
             ads_id = await self.repo.get_ads_id_by_comm_id(comm_id)
@@ -298,6 +281,14 @@ class AdsUseCase:
         return True
 
     async def send_complaint(self, req: QCreateCompl) -> ZCompl:
+        """Отправляет жалобу.
+
+        Args:
+            req (QCreateCompl): Данные жалобы.
+
+        Returns:
+            ZCompl: Созданная жалоба.
+        """
         try:
             res = await self.compl_svc.create_compl(req)
         except ExpError as e:
@@ -305,6 +296,15 @@ class AdsUseCase:
         return res
 
     async def is_author_complaint_ads(self, ads_id: UUID, acc_id: str) -> bool:
+        """Проверяет, является ли аккаунт автором объявления.
+
+        Args:
+            ads_id (UUID): Идентификатор объявления.
+            acc_id (str): Идентификатор аккаунта.
+
+        Returns:
+            bool: True, если аккаунт является автором объявления, иначе False.
+        """
         ads = await self.get_ads_by_id(ads_id)
 
         if str(ads.account_id) == acc_id:

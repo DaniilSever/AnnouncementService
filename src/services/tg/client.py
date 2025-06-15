@@ -3,29 +3,34 @@ import httpx
 
 
 class TgClient:
-    """Реализация TgBot для работы с Telegram ботом."""
+    """Клиент для взаимодействия с Telegram Bot API."""
 
     def __init__(self, token, chat_id: str | int):
-        """Инициализация TgClient.
+        """Инициализирует клиент Telegram бота.
 
         Args:
-            token: Токен Telegram бота.
-            chat_id: Идентификатор чата или группы.
+            token (str): Токен бота, полученный от @BotFather.
+            chat_id (str | int): ID чата/канала для отправки сообщений.
+                              Может быть числовым ID или username (для публичных чатов).
         """
         self.token = token
         self.chat_id = chat_id
 
     async def send_message(self, message: str) -> dict:
-        """Отправляет сообщение в Telegram чат или группу.
+        """Отправляет форматированное сообщение в Telegram чат.
 
         Args:
-            message: Текст сообщения.
+            message (str): Текст сообщения. Поддерживается HTML-разметка.
+                        Автоматически очищается от тегов <br />.
 
         Returns:
-            dict: Ответ от Telegram API.
+            dict: Ответ Telegram API в формате JSON с информацией об отправке.
 
         Raises:
-            ValueError: Если произошла ошибка при отправке сообщения.
+            ValueError: Если возникла ошибка при:
+                      - обработке ответа API
+                      - API вернуло статус ошибки
+            httpx.RequestError: Если произошла сетевая ошибка при запросе.
         """
         url = f"https://api.telegram.org/bot{self.token}/sendMessage"
         params = {

@@ -22,14 +22,13 @@ from .xdao import XAds, XAdsComment
 
 
 class AdsRepo(IAdsRepo):
-    """Реализация репозитория для работы с объявлениями."""
+    """Реализация репозитория для работы с объявлениями.
+
+    Args:
+        _session (AsyncSession): Асинхронная сессия базы данных.
+    """
 
     def __init__(self, _session: AsyncSession):
-        """Инициализирует репозиторий с асинхронной сессией.
-
-        Args:
-            _session (AsyncSession): Асинхронная сессия базы данных.
-        """
         self.session: AsyncSession = _session
 
     async def create_ads(
@@ -307,11 +306,28 @@ class AdsRepo(IAdsRepo):
         await self.session.commit()
 
     async def adm_delete_ads(self, ads_id: UUID) -> None:
+        """Удаляет объявление администратором по ID объявления.
+
+        Args:
+            ads_id (UUID): Идентификатор объявления.
+
+        Returns:
+            None
+        """
         req = delete(Ads).where(Ads.id == ads_id)
         await self.session.execute(req)
         await self.session.commit()
 
     async def get_count_ads_by_acc_id(self, acc_id: UUID) -> int:
+        """Получает количество объявлений по ID аккаунта.
+
+        Args:
+            acc_id (UUID): Идентификатор аккаунта.
+
+        Returns:
+            int: Количество объявлений аккаунта.
+        """
+
         req = select(func.count()).select_from(Ads).where(Ads.account_id == acc_id)
         count_ads = await self.session.execute(req)
         await self.session.commit()
@@ -490,6 +506,17 @@ class AdsRepo(IAdsRepo):
         await self.session.commit()
 
     async def get_ads_id_by_comm_id(self, comm_id: UUID) -> UUID:
+        """Получает ID объявления по ID комментария.
+
+        Args:
+            comm_id (UUID): Идентификатор комментария.
+
+        Returns:
+            UUID: Идентификатор связанного объявления.
+
+        Raises:
+            KeyError: Если комментарий не найден.
+        """
         req = select(AdsComment).where(AdsComment.id == comm_id)
         res = await self.session.execute(req)
         await self.session.commit()

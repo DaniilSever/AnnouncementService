@@ -13,18 +13,33 @@ from sqlalchemy.orm import DeclarativeBase
 
 
 class Base(DeclarativeBase):
-    """Базовый класс для всех моделей SQLAlchemy"""
+    """Базовый класс для всех моделей SQLAlchemy."""
 
 
 class AccRole(enum.Enum):
-    """Роли пользователей"""
+    """Перечисление ролей пользователей."""
 
     USER = "user"
     ADMIN = "admin"
 
 
 class Account(Base):
-    """Аккаунты (Подтвержденные)"""
+    """Модель аккаунта пользователя.
+
+    Attributes:
+        id (UUID): Уникальный идентификатор аккаунта.
+        email (str): Email аккаунта.
+        pwd_hash (str): SHA-256 хеш пароля.
+        salt (str): Соль для хеша пароля.
+        role (str): Роль пользователя (например, user, admin).
+        count_ads (int): Количество созданных объявлений пользователем.
+        is_banned (bool): Флаг, забанен ли аккаунт.
+        created_at (datetime): Дата создания аккаунта.
+        updated_at (datetime | None): Дата последнего обновления аккаунта.
+        blocked_at (datetime | None): Дата блокировки аккаунта.
+        reason_blocked (str | None): Причина блокировки аккаунта.
+        blocked_to (datetime | None): Дата снятия блокировки.
+    """
 
     __tablename__ = "Account"
 

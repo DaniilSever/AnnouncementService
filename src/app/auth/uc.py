@@ -35,18 +35,15 @@ from services.tg.const_msg import get_code_msg
 
 
 class AuthUseCase:
-    """Управляет бизнес-логикой аунтификации."""
+    """Управляет бизнес-логикой аутентификации и авторизации.
+
+    Args:
+        _repo (AuthRepo): Репозиторий для работы с данными аутентификации.
+        _acc_svc (AccService): Сервис для работы с аккаунтами.
+        _tg_svc (TgClient): Клиент Telegram для отправки сообщений.
+    """
 
     def __init__(self, _repo: AuthRepo, _acc_svc: AccService, _tg_svc: TgClient):
-        """Инициализирует UseCase с репозиторием.
-
-        Args:
-            _repo (AuthRepo): Репозиторий для работы с данными аутентификации.
-            _acc_svc (AccService): Сервис для работы с аккаунтами.
-
-        Returns:
-            None
-        """
         self.cfg = AuthConfig()
         self.repo: IAuthRepo = _repo
         self.acc_svc: AccService = _acc_svc
@@ -56,11 +53,12 @@ class AuthUseCase:
         """Создаёт заявку на регистрацию по email.
 
         Args:
-            req (QEmailSignup): Данные для регистрации по email.
+            req (QEmailSignup): Данные для регистрации.
 
         Returns:
-            ZEmailSignup: Результат создания заявки на регистрацию.
+            ZEmailSignup: Результат создания заявки.
         """
+
         if await self.acc_svc.is_email_busy(req.email):
             raise ExpError(ExpCode.ACC_EMAIL_IS_BUSY)
 
@@ -86,11 +84,12 @@ class AuthUseCase:
         """Подтверждает регистрацию по email с помощью кода подтверждения.
 
         Args:
-            req (QConfirmCode): Запрос с id регистрации и кодом подтверждения.
+            req (QConfirmCode): Запрос с ID заявки и кодом подтверждения.
 
         Returns:
-            ZAccountID: ID созданного аккаунта после успешного подтверждения.
+            ZAccountID: Идентификатор созданного аккаунта.
         """
+
         try:
             x_signup: XEmailSignup = await self.repo.get_email_signup(req.signup_id)
         except KeyError as e:
@@ -120,10 +119,10 @@ class AuthUseCase:
         """Выполняет вход пользователя по email и паролю.
 
         Args:
-            req (QEmailSignin): Данные для входа по email.
+            req (QEmailSignin): Данные для входа.
 
         Returns:
-            ZToken: Токены доступа и обновления для сессии пользователя.
+            ZToken: Access- и refresh-токены сессии.
         """
         try:
             z_acc: ZAccount = await self.acc_svc.get_account_by_email(req.email)
@@ -167,13 +166,13 @@ class AuthUseCase:
         return ZToken(access_token=access_token, refresh_token=refresh_token)
 
     async def refresh_token(self, req: QRefreshToken) -> ZToken:
-        """Обновляет access-токен по refresh-токену.
+        """Обновляет access-токен с использованием refresh-токена.
 
         Args:
             req (QRefreshToken): Запрос с refresh-токеном.
 
         Returns:
-            ZToken: Новый access-токен и тот же refresh-токен.
+            ZToken: Новый access-токен и переданный refresh-токен.
         """
         await self.repo.revoke_expired_tokens()
 
@@ -203,13 +202,13 @@ class AuthUseCase:
         return ZToken(access_token=access_token, refresh_token=req.refresh_token)
 
     async def revoke_token(self, req: QRevokeToken) -> ZRevokedTokens:
-        """Отзывает (аннулирует) все токены пользователя.
+        """Отзывает все refresh-токены аккаунта.
 
         Args:
-            req (QRevokeToken): Запрос с ID аккаунта, для которого нужно отозвать токены.
+            req (QRevokeToken): Запрос с ID аккаунта.
 
         Returns:
-            ZRevokedTokens: Информация об успешном отзыве токенов.
+            ZRevokedTokens: Результат отзыва токенов.
         """
         count = await self.repo.revoke_tokens(acc_id=req.account_id)
 
@@ -225,10 +224,10 @@ class AuthUseCase:
         """Проверяет, заблокирована ли операция по времени блокировки.
 
         Args:
-            dt (datetime | None): Время, до которого блокирована операция.
+            dt (datetime | None): Дата и время окончания блокировки.
 
         Returns:
-            bool: True, если блокировка активна, иначе False.
+            bool: True, если операция заблокирована, иначе False.
         """
         if not dt:
             return False

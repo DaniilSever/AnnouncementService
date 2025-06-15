@@ -3,40 +3,40 @@ from pydantic import BaseModel, EmailStr, UUID4, ConfigDict
 
 
 class QEmailSignin(BaseModel):
-    """Запрос: вход по email"""
+    """Модель запроса для входа по email."""
 
     email: EmailStr
     password: str
 
 
 class QEmailSignup(BaseModel):
-    """Запрос: регистрация по email"""
+    """Модель запроса для регистрации по email."""
 
     email: EmailStr
     password: str
 
 
 class QConfirmCode(BaseModel):
-    """Запрос: подтверждение регистрации"""
+    """Модель запроса для подтверждения регистрации."""
 
     signup_id: UUID4
     code: str
 
 
 class QRefreshToken(BaseModel):
-    """Запрос: обновления access токена"""
+    """Модель запроса для обновления access токена."""
 
     refresh_token: str
 
 
 class QRevokeToken(BaseModel):
-    """Запрос: отозвать токен"""
+    """Модель запроса для отзыва токена."""
 
     account_id: UUID4
 
 
 class ZToken(BaseModel):
-    """Ответ: токен"""
+    """Модель ответа с токенами."""
 
     access_token: str
     refresh_token: str | None
@@ -44,7 +44,7 @@ class ZToken(BaseModel):
 
 
 class ZEmailSignup(BaseModel):
-    """Ответ: заявка на регистрацию создана"""
+    """Модель ответа, подтверждающая создание заявки на регистрацию."""
 
     id: UUID4
     created_at: datetime = datetime.now()
@@ -66,7 +66,7 @@ class ZEmailSignup(BaseModel):
 
 
 class ZAccountID(BaseModel):
-    """Ответ: аккаунт создан"""
+    """Модель ответа с идентификатором созданного аккаунта."""
 
     id: UUID4
 
@@ -80,7 +80,7 @@ class ZAccountID(BaseModel):
 
 
 class ZRevokedTokens(BaseModel):
-    """Ответ: тоекты отозваны"""
+    """Модель ответа об отзыве токенов."""
 
     success: bool = True
     message: str
