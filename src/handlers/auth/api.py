@@ -41,6 +41,7 @@ async def signup_email(
     _repo_session: Annotated[AsyncSession, Depends(get_auth_repo_session)],
     _acc_svc: Annotated[AccService, Depends(get_account_serivce)],
 ) -> SuccessResp[ZEmailSignup]:
+    """Обрабатывает HTTP-запрос на регистрацию пользователя по email с отправкой кода подтверждения."""
     uc = AuthUseCase(AuthRepo(_repo_session), _acc_svc)
     res = await uc.signup_email(req)
     return SuccessResp[ZEmailSignup](payload=res)
@@ -56,6 +57,7 @@ async def confirm_email(
     _repo_session: Annotated[AsyncSession, Depends(get_auth_repo_session)],
     _acc_svc: Annotated[AccService, Depends(get_account_serivce)],
 ) -> SuccessResp[ZAccountID]:
+    """Обрабатывает HTTP-запрос на подтверждение email с помощью кода подтверждения."""
     uc = AuthUseCase(AuthRepo(_repo_session), _acc_svc)
     res = await uc.confirm_email(req)
     return SuccessResp[ZAccountID](payload=res)
@@ -71,6 +73,7 @@ async def signin_email(
     _repo_session: Annotated[AsyncSession, Depends(get_auth_repo_session)],
     _acc_svc: Annotated[AccService, Depends(get_account_serivce)],
 ) -> SuccessResp[ZToken]:
+    """Обрабатывает HTTP-запрос на авторизацию пользователя по email и паролю."""
     uc = AuthUseCase(AuthRepo(_repo_session), _acc_svc)
     res = await uc.signin_email(req)
     return SuccessResp[ZToken](payload=res)
@@ -86,6 +89,7 @@ async def signin_email_form(
     _repo_session: Annotated[AsyncSession, Depends(get_auth_repo_session)],
     _acc_svc: Annotated[AccService, Depends(get_account_serivce)],
 ) -> ZToken:
+    """Обрабатывает HTTP-запрос на авторизацию пользователя по email и паролю через форму OAuth2."""
     uc = AuthUseCase(AuthRepo(_repo_session), _acc_svc)
     req = QEmailSignin(email=form.username, password=form.password)
     res = await uc.signin_email(req)
@@ -103,6 +107,7 @@ async def refresh_token(
     _repo_session: Annotated[AsyncSession, Depends(get_auth_repo_session)],
     _acc_svc: Annotated[AccService, Depends(get_account_serivce)],
 ) -> SuccessResp[ZToken]:
+    """Обрабатывает HTTP-запрос на обновление access-токена с использованием refresh-токена."""
     uc = AuthUseCase(AuthRepo(_repo_session), _acc_svc)
     res = await uc.refresh_token(req)
     return SuccessResp[ZToken](payload=res)
@@ -119,6 +124,7 @@ async def revoke_token(
     _repo_session: Annotated[AsyncSession, Depends(get_auth_repo_session)],
     _acc_svc: Annotated[AccService, Depends(get_account_serivce)],
 ) -> SuccessResp[ZRevokedTokens]:
+    """Обрабатывает HTTP-запрос на деактивацию (отзыв) токенов по идентификатору аккаунта."""
     uc = AuthUseCase(AuthRepo(_repo_session), _acc_svc)
     res = await uc.revoke_token(req)
     return SuccessResp[ZRevokedTokens](payload=res)

@@ -6,12 +6,12 @@ from core.endpoints import Endpoints as Enp
 from core.depends import get_ads_repo_session, AsyncSession
 from core.response import responses, SuccessResp
 from core.security import AJwt, ApiKey
-from core.exception import ErrExp, ExpCode
+from core.exception import ExpError, ExpCode
 
 from app.ads.uc import AdsUseCase
 
 from domain.ads.dto import QCreateAds, QAdsCategory, QFilter, QChangeAds, QAddAdsComment, QUpdateAdsComment, QDelAdsComment
-from domain.ads.dto import ZAds, ZAdsComment
+from domain.ads.dto import ZAds, ZAdsComment, ZManyAds, ZManyAdsComment
 
 from infra.ads.repo import AdsRepo
 
@@ -35,10 +35,11 @@ async def create_ads(
     account_id: Annotated[UUID | None, Header(description="Для APIKEY")] = None,
     ads_category: QAdsCategory = QAdsCategory.SELLING,
 ) -> SuccessResp[ZAds]:
+    """Обрабатывает HTTP-запрос на создание объявления с авторизацией и валидацией."""
     uc = AdsUseCase(AdsRepo(__repo_session))
 
     if not apikey and not jwt:
-        raise ErrExp(ExpCode.SYS_UNAUTHORIZE)
+        raise ExpError(ExpCode.SYS_UNAUTHORIZE)
 
     if jwt:
         account_id = jwt["sub"]
@@ -55,10 +56,11 @@ async def create_ads(
 async def get_ads_all(
     qfilter: Annotated[QFilter, Query()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
-) -> SuccessResp[list[ZAds]]:
+) -> SuccessResp[ZManyAds]:
+    """Обрабатывает HTTP-запрос на получение всех объявлений по фильтру."""
     uc = AdsUseCase(AdsRepo(__repo_session))
     res = await uc.get_ads_all(qfilter)
-    return SuccessResp[list[ZAds]](payload=res)
+    return SuccessResp[ZManyAds](payload=res)
 
 @router.get(
     Enp.ADS_GET_BY_ID,
@@ -70,6 +72,7 @@ async def get_ads_by_id(
     ads_id: Annotated[UUID, Query()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
 ) -> SuccessResp[ZAds]:
+    """Обрабатывает HTTP-запрос на получение объявления по его идентификатору."""
     uc = AdsUseCase(AdsRepo(__repo_session))
     res = await uc.get_ads_by_id(ads_id)
     return SuccessResp[ZAds](payload=res)
@@ -83,10 +86,11 @@ async def get_ads_by_id(
 async def get_ads_by_account(
     acc_id: Annotated[UUID, Query()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
-) -> SuccessResp[list[ZAds]]:
+) -> SuccessResp[ZManyAds]:
+    """Обрабатывает HTTP-запрос на получение всех объявлений пользователя."""
     uc = AdsUseCase(AdsRepo(__repo_session))
     res = await uc.get_ads_by_account_id(acc_id)
-    return SuccessResp[list[ZAds]](payload=res)
+    return SuccessResp[ZManyAds](payload=res)
 
 @router.get(
     Enp.ADS_GET_BY_ME,
@@ -97,14 +101,15 @@ async def get_ads_by_account(
 async def get_my_ads(
     jwt: AJwt,
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
-) -> SuccessResp[list[ZAds]]:
+) -> SuccessResp[ZManyAds]:
+    """Обрабатывает HTTP-запрос на получение моих объявлений с авторизацией."""
     uc = AdsUseCase(AdsRepo(__repo_session))
 
     if not jwt:
-        raise ErrExp(ExpCode.SYS_UNAUTHORIZE)
+        raise ExpError(ExpCode.SYS_UNAUTHORIZE)
     acc_id = jwt["sub"]
     res = await uc.get_ads_by_account_id(acc_id)
-    return SuccessResp[list[ZAds]](payload=res)
+    return SuccessResp[ZManyAds](payload=res)
 
 
 @router.patch(
@@ -118,10 +123,11 @@ async def change_my_ads(
     req: QChangeAds,
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
 ) -> SuccessResp[ZAds]:
+    """Обрабатывает HTTP-запрос на изменение моего объявления с авторизацией."""
     uc = AdsUseCase(AdsRepo(__repo_session))
 
     if not jwt:
-        raise ErrExp(ExpCode.SYS_UNAUTHORIZE)
+        raise ExpError(ExpCode.SYS_UNAUTHORIZE)
     acc_id = jwt["sub"]
     res = await uc.change_my_ads(req, acc_id)
     return SuccessResp[ZAds](payload=res)
@@ -138,10 +144,11 @@ async def change_category_ads(
     req: Annotated[QAdsCategory, Query()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
 ) -> SuccessResp[ZAds]:
+    """Обрабатывает HTTP-запрос на изменение категории объявления с авторизацией."""
     uc = AdsUseCase(AdsRepo(__repo_session))
 
     if not jwt:
-        raise ErrExp(ExpCode.SYS_UNAUTHORIZE)
+        raise ExpError(ExpCode.SYS_UNAUTHORIZE)
     acc_id = jwt["sub"]
     res = await uc.change_category_ads(ads_id, req, acc_id)
     return SuccessResp[ZAds](payload=res)
@@ -157,10 +164,11 @@ async def delete_ads(
     ads_id: Annotated[UUID, Path()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
 ) -> SuccessResp:
+    """Обрабатывает HTTP-запрос на удаление объявления с авторизацией."""
     uc = AdsUseCase(AdsRepo(__repo_session))
 
     if not jwt:
-        raise ErrExp(ExpCode.SYS_UNAUTHORIZE)
+        raise ExpError(ExpCode.SYS_UNAUTHORIZE)
     acc_id = jwt["sub"]
     await uc.delete_ads(ads_id, acc_id)
     return SuccessResp()
@@ -177,10 +185,11 @@ async def create_ads_commentary(
     commentary: Annotated[str, Body()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
 ) -> SuccessResp[ZAdsComment]:
+    """Обрабатывает HTTP-запрос на добавление комментария к объявлению с авторизацией."""
     uc = AdsUseCase(AdsRepo(__repo_session))
 
     if not jwt:
-        raise ErrExp(ExpCode.SYS_UNAUTHORIZE)
+        raise ExpError(ExpCode.SYS_UNAUTHORIZE)
     acc_id = jwt["sub"]
 
     req = QAddAdsComment(
@@ -199,10 +208,11 @@ async def create_ads_commentary(
 async def get_ads_commentaries(
     ads_id: Annotated[UUID, Path()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
-) -> SuccessResp[list[ZAdsComment]]:
+) -> SuccessResp[ZManyAdsComment]:
+    """Обрабатывает HTTP-запрос на получение списка комментариев в объявлении."""
     uc = AdsUseCase(AdsRepo(__repo_session))
     res = await uc.get_ads_commentaries(ads_id)
-    return SuccessResp[list[ZAdsComment]](payload=res)
+    return SuccessResp[ZManyAdsComment](payload=res)
 
 @router.get (
     Enp.ADS_ACTION_COMMENTARY,
@@ -215,13 +225,14 @@ async def get_ads_commentary(
     comm_id: Annotated[UUID, Path()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
 ) -> SuccessResp[ZAdsComment]:
+    """Обрабатывает HTTP-запрос на получение данных по комментарию в объявлении."""
     uc = AdsUseCase(AdsRepo(__repo_session))
     res = await uc.get_ads_commentary(ads_id, comm_id)
     return SuccessResp[ZAdsComment](payload=res)
 
 @router.patch (
     Enp.ADS_ACTION_COMMENTARY,
-    summary="Получить данные по комментарию в объявлении",
+    summary="Изменить комментарий в объявлении",
     status_code=200,
     responses=responses(400, 404)
 )
@@ -232,10 +243,11 @@ async def update_ads_commentary(
     commentary: Annotated[str, Body()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
 ) -> SuccessResp[ZAdsComment]:
+    """Обрабатывает HTTP-запрос на изменение комментария в объявлении с авторизацией."""
     uc = AdsUseCase(AdsRepo(__repo_session))
 
     if not jwt:
-        raise ErrExp(ExpCode.SYS_UNAUTHORIZE)
+        raise ExpError(ExpCode.SYS_UNAUTHORIZE)
     acc_id = jwt["sub"]
 
     req = QUpdateAdsComment(
@@ -249,7 +261,7 @@ async def update_ads_commentary(
 
 @router.delete (
     Enp.ADS_ACTION_COMMENTARY,
-    summary="Получить данные по комментарию в объявлении",
+    summary="Удалить комментарий в объявлении",
     status_code=200,
     responses=responses(400, 404)
 )
@@ -259,10 +271,11 @@ async def delete_ads_commentary(
     comm_id: Annotated[UUID, Path()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
 ) -> SuccessResp:
+    """Обрабатывает HTTP-запрос на удаление комментария в объявлении."""
     uc = AdsUseCase(AdsRepo(__repo_session))
 
     if not jwt:
-        raise ErrExp(ExpCode.SYS_UNAUTHORIZE)
+        raise ExpError(ExpCode.SYS_UNAUTHORIZE)
     acc_id = jwt["sub"]
 
     req = QDelAdsComment(
@@ -270,5 +283,5 @@ async def delete_ads_commentary(
         ads_id=ads_id,
         account_id=acc_id
     )
-    res = await uc.delete_ads_commentary(req)
+    await uc.delete_ads_commentary(req)
     return SuccessResp()

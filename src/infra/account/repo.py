@@ -1,7 +1,7 @@
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy import select, delete, update, text
+from sqlalchemy import select, delete
 
 from domain.account.irepo import IAccRepo
 from domain.account.models import Account, AccRole
@@ -10,11 +10,29 @@ from domain.account.dto import QEmailSignupData
 from .xdao import XAccount, XAccountID
 
 class AccRepo(IAccRepo):
+    """Реализация репозитория для работы с пользовательскими аккаунтами через AsyncSession."""
 
     def __init__(self, _session: AsyncSession):
+        """Инициализирует репозиторий с сессией базы данных.
+
+        Args:
+            _session (AsyncSession): Асинхронная сессия работы с базой данных.
+        """
+
         self.session: AsyncSession = _session
 
     async def get_account_by_id(self, acc_id: UUID) -> XAccount:
+        """Получает аккаунт по его ID.
+
+        Args:
+            acc_id (UUID): Уникальный идентификатор аккаунта.
+
+        Returns:
+            XAccount: Объект аккаунта.
+
+        Raises:
+            KeyError: Если аккаунт не найден.
+        """
         req = (
             select(Account)
             .where(Account.id == acc_id)
@@ -38,6 +56,17 @@ class AccRepo(IAccRepo):
         )
 
     async def get_account_by_email(self, email: str) -> XAccount:
+        """Получает аккаунт по email.
+
+        Args:
+            email (str): Электронная почта пользователя.
+
+        Returns:
+            XAccount: Объект аккаунта.
+
+        Raises:
+            KeyError: Если аккаунт не найден.
+        """
         req = (
             select(Account)
             .where(Account.email == email)
@@ -61,6 +90,14 @@ class AccRepo(IAccRepo):
         )
 
     async def copy_account_from_signup(self, x_signup: QEmailSignupData) -> XAccountID:
+        """Копирует данные из временной регистрации в аккаунт.
+
+        Args:
+            x_signup (QEmailSignupData): Данные временной регистрации.
+
+        Returns:
+            XAccountID: Идентификатор созданного аккаунта.
+        """
         req = (
             insert(Account)
             .values(
@@ -77,6 +114,14 @@ class AccRepo(IAccRepo):
         return XAccountID(id=row.id)
 
     async def is_email_busy(self, email: str) -> bool:
+        """Проверяет, занят ли email.
+
+        Args:
+            email (str): Электронная почта для проверки.
+
+        Returns:
+            bool: True, если email занят, иначе False.
+        """
         req = (
             select(Account)
             .where(Account.email == email)
@@ -87,6 +132,11 @@ class AccRepo(IAccRepo):
         return row is not None
 
     async def get_accounts(self) -> list[XAccount]:
+        """Возвращает список всех аккаунтов (до 10 штук).
+
+        Returns:
+            list[XAccount]: Список аккаунтов.
+        """
         req = (
             select(Account)
             .limit(10)
@@ -112,6 +162,14 @@ class AccRepo(IAccRepo):
         return res
 
     async def delete_acc(self, acc_id: UUID) -> None:
+        """Удаляет аккаунт по ID.
+
+        Args:
+            acc_id (UUID): Уникальный идентификатор аккаунта.
+
+        Returns:
+            None
+        """
         req = delete(Account).where(Account.id == acc_id)
         await self.session.execute(req)
         await self.session.commit()

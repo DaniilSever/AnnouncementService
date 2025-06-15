@@ -1,7 +1,7 @@
 from uuid import UUID
 import httpx
 from core.endpoints import Endpoints as Enp
-from core.exception import ErrExp
+from core.exception import ExpError
 from domain.account.dto import QEmailSignupData
 from domain.account.dto import ZAccount
 
@@ -16,7 +16,7 @@ class AccService:
             resp = await client.post(url)
             resp_js = resp.json()
             if not resp_js["ok"]:
-                raise ErrExp(code_msg=(resp_js["err"]["code"], resp_js["err"]["msg"]))
+                raise ExpError(code_msg=(resp_js["err"]["code"], resp_js["err"]["msg"]))
             res = resp_js["payload"]
             return res.get("is_busy", False)
 
@@ -26,7 +26,7 @@ class AccService:
             resp = await client.post(url, json=signup.model_dump(mode="json"))
             resp_js = resp.json()
             if not resp_js["ok"]:
-                raise ErrExp(code_msg=(resp_js["err"]["code"], resp_js["err"]["msg"]))
+                raise ExpError(code_msg=(resp_js["err"]["code"], resp_js["err"]["msg"]))
             res = resp_js["payload"]
             return res.get("id")
 
@@ -36,6 +36,6 @@ class AccService:
             resp = await client.get(url)
             resp_js = resp.json()
             if not resp_js["ok"]:
-                raise ErrExp(code_msg=(resp_js["err"]["code"], resp_js["err"]["msg"]))
+                raise ExpError(code_msg=(resp_js["err"]["code"], resp_js["err"]["msg"]))
             res = resp_js["payload"]
             return ZAccount.model_validate(res)

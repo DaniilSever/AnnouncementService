@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, APIRouter, Request
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import ORJSONResponse
-from core.exception import ErrExp
+from core.exception import ExpError
 from core.endpoints import Endpoints as Enp
 
 services = {
@@ -71,8 +71,8 @@ def create_app() -> FastAPI:
     for router in all_routers:
         __app.include_router(router)
 
-    @__app.exception_handler(ErrExp)
-    async def error_exception_handler(_: Request, exc: ErrExp):
+    @__app.exception_handler(ExpError)
+    async def error_exception_handler(_: Request, exc: ExpError):
         return ORJSONResponse(
             status_code=int(exc.status_code),
             content=exc.response.model_dump()

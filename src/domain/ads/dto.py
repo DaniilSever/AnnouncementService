@@ -50,6 +50,11 @@ class ZAds(BaseModel):
     deleted_at: datetime | None = None
     reason_deletion: str | None = None
 
+class ZManyAds(BaseModel):
+    total: int
+    count: int
+    offeset: int = 0
+    items: list[ZAds] = []
 
 # ---------- AdsComment ---------
 
@@ -77,3 +82,9 @@ class ZAdsComment(BaseModel):
     ads_comment: str
     created_at: datetime = datetime.now()
     updated_at: datetime | None = None
+
+class ZManyAdsComment(BaseModel):
+    total: int
+    count: int
+    offeset: int
+    items: list[ZAdsComment] = []

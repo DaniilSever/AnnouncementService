@@ -1,10 +1,10 @@
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy import select, delete, update, text
+from sqlalchemy import select, delete, update, text, func
 from sqlalchemy.exc import NoResultFound
 
-from core.exception import ErrExp, ExpCode
+from core.exception import ExpError, ExpCode
 
 from domain.ads.irepo import IAdsRepo
 from domain.ads.dto import QCreateAds, QFilter, QAdsCategory, QAdsPriceFilter, QChangeAds, QAddAdsComment, QUpdateAdsComment
@@ -14,11 +14,27 @@ from .xdao import XAds, XAdsComment
 
 
 class AdsRepo(IAdsRepo):
+    """Реализация репозитория для работы с объявлениями."""
 
     def __init__(self, _session: AsyncSession):
+        """Инициализирует репозиторий с асинхронной сессией.
+
+        Args:
+            _session (AsyncSession): Асинхронная сессия базы данных.
+        """
         self.session: AsyncSession = _session
 
     async def create_ads(self, ads: QCreateAds, ads_category: QAdsCategory, acc_id: UUID | None = None) -> XAds:
+        """Создаёт объявление в базе данных.
+
+        Args:
+            ads (QCreateAds): Данные объявления.
+            ads_category (QAdsCategory): Категория объявления.
+            acc_id (UUID | None): Идентификатор аккаунта (необязательно).
+
+        Returns:
+            XAds: Созданное объявление.
+        """
         req = (
             insert(Ads)
             .values(
@@ -49,7 +65,20 @@ class AdsRepo(IAdsRepo):
             reason_deletion=row.reason_deletion,
         )
 
-    async def get_ads_all(self, qfilter: QFilter) -> list[XAds]:
+    async def get_ads_all(self, qfilter: QFilter) -> tuple[int, list[XAds]]:
+        """Получает все объявления с учётом фильтров и пагинации.
+
+        Args:
+            qfilter (QFilter): Параметры фильтрации и пагинации.
+
+        Returns:
+            tuple[int, list[XAds]]: Общее количество объявлений и список объявлений.
+        """
+        count_req = select(func.count()).select_from(Ads)
+        count_res = await self.session.execute(count_req)
+        await self.session.commit()
+        total = count_res.scalar_one()
+
         req = (
             select(Ads)
             .limit(qfilter.limit)
@@ -64,7 +93,7 @@ class AdsRepo(IAdsRepo):
             elif qfilter.price == QAdsPriceFilter.BY_INCREASE:
                 req = req.order_by(Ads.price.asc())
             else:
-                raise ErrExp(ExpCode.ADS_FILTER_ERR)
+                raise ExpError(ExpCode.ADS_FILTER_ERR)
 
         if qfilter.price_from:
             req = req.where(Ads.price > qfilter.price_from)
@@ -93,9 +122,17 @@ class AdsRepo(IAdsRepo):
                     reason_deletion=row.reason_deletion,
                 )
             )
-        return res
+        return total, res
 
     async def get_ads_by_id(self, ads_id: UUID) -> XAds:
+        """Получает объявление по ID и увеличивает счётчик просмотров.
+
+        Args:
+            ads_id (UUID): Идентификатор объявления.
+
+        Returns:
+            XAds: Объявление с указанным ID.
+        """
         req = (
             update(Ads)
             .values(
@@ -136,7 +173,20 @@ class AdsRepo(IAdsRepo):
             reason_deletion=row.reason_deletion,
         )
 
-    async def get_ads_by_account_id(self, acc_id: UUID) -> list[XAds]:
+    async def get_ads_by_account_id(self, acc_id: UUID) -> tuple[int, list[XAds]]:
+        """Получает все объявления по идентификатору аккаунта.
+
+        Args:
+            acc_id (UUID): Идентификатор аккаунта.
+
+        Returns:
+            tuple[int, list[XAds]]: Общее количество объявлений и список объявлений аккаунта.
+        """
+        count_req = select(func.count()).select_from(Ads)
+        count_res = await self.session.execute(count_req)
+        await self.session.commit()
+        total = count_res.scalar_one()
+
         req = select(Ads).where(Ads.account_id == acc_id)
         xres = await self.session.execute(req)
         await self.session.commit()
@@ -159,9 +209,18 @@ class AdsRepo(IAdsRepo):
                     reason_deletion=row.reason_deletion,
                 )
             )
-        return res
+        return total, res
 
     async def update_ads(self, new_ads: QChangeAds, acc_id: UUID) -> XAds:
+        """Обновляет объявление по данным и идентификатору аккаунта.
+
+        Args:
+            new_ads (QChangeAds): Новые данные объявления.
+            acc_id (UUID): Идентификатор аккаунта.
+
+        Returns:
+            XAds: Обновлённое объявление.
+        """
         req = (
             update(Ads)
             .values(
@@ -199,6 +258,16 @@ class AdsRepo(IAdsRepo):
         )
 
     async def update_category_ads(self, ads_id: UUID, new_category: QAdsCategory, acc_id: UUID) -> XAds:
+        """Обновляет категорию объявления по ID объявления и аккаунта.
+
+        Args:
+            ads_id (UUID): Идентификатор объявления.
+            new_category (QAdsCategory): Новая категория объявления.
+            acc_id (UUID): Идентификатор аккаунта.
+
+        Returns:
+            XAds: Обновлённое объявление с новой категорией.
+        """
         req = (
             update(Ads)
             .values(
@@ -231,6 +300,15 @@ class AdsRepo(IAdsRepo):
         )
 
     async def delete_ads(self, ads_id: UUID, acc_id: UUID) -> None:
+        """Удаляет объявление по ID объявления и аккаунта.
+
+        Args:
+            ads_id (UUID): Идентификатор объявления.
+            acc_id (UUID): Идентификатор аккаунта.
+
+        Returns:
+            None
+        """
         req = (
             delete(Ads)
             .where(
@@ -241,14 +319,23 @@ class AdsRepo(IAdsRepo):
         await self.session.execute(req)
         await self.session.commit()
 
-    async def adm_delete_ads(self, ads_id: UUID) -> None:
-        req = delete(Ads).where(Ads.id == ads_id)
-        await self.session.execute(req)
-        await self.session.commit()
+    # async def adm_delete_ads(self, ads_id: UUID) -> None:
+    #     req = delete(Ads).where(Ads.id == ads_id)
+    #     await self.session.execute(req)
+    #     await self.session.commit()
 
     # -------------------- AdsCommentary -------------------
 
     async def create_ads_commentary(self, new_comment: QAddAdsComment, acc_id: UUID) -> XAdsComment:
+        """Создаёт комментарий к объявлению и увеличивает счётчик комментариев.
+
+        Args:
+            new_comment (QAddAdsComment): Данные нового комментария.
+            acc_id (UUID): Идентификатор аккаунта, создающего комментарий.
+
+        Returns:
+            XAdsComment: Созданный комментарий к объявлению.
+        """
         req = (
             update(Ads)
             .values(
@@ -287,6 +374,15 @@ class AdsRepo(IAdsRepo):
 
 
     async def get_ads_commentary(self, ads_id: UUID, comment_id: UUID) -> XAdsComment:
+        """Получает комментарий по ID объявления и комментария.
+
+        Args:
+            ads_id (UUID): Идентификатор объявления.
+            comment_id (UUID): Идентификатор комментария.
+
+        Returns:
+            XAdsComment: Найденный комментарий.
+        """
         req = (
             select(AdsComment)
             .where(
@@ -308,7 +404,20 @@ class AdsRepo(IAdsRepo):
             updated_at=row.updated_at
         )
 
-    async def get_ads_commentaries(self, ads_id: UUID) -> list[XAdsComment]:
+    async def get_ads_commentaries(self, ads_id: UUID) -> tuple[int, list[XAdsComment]]:
+        """Получает все комментарии к объявлению и их общее количество.
+
+        Args:
+            ads_id (UUID): Идентификатор объявления.
+
+        Returns:
+            tuple[int, list[XAdsComment]]: Общее количество комментариев и список комментариев.
+        """
+        count_req = select(func.count()).select_from(Ads)
+        count_res = await self.session.execute(count_req)
+        await self.session.commit()
+        total = count_res.scalar_one()
+
         req = (
             select(AdsComment)
             .where(
@@ -329,9 +438,17 @@ class AdsRepo(IAdsRepo):
                     updated_at=row.updated_at
                 )
             )
-        return res
+        return total, res
 
     async def update_ads_commentary(self, update_comm: QUpdateAdsComment) -> XAdsComment:
+        """Обновляет комментарий к объявлению.
+
+        Args:
+            update_comm (QUpdateAdsComment): Данные для обновления комментария.
+
+        Returns:
+            XAdsComment: Обновлённый комментарий.
+        """
         req = (
             update(AdsComment)
             .values(
@@ -360,7 +477,17 @@ class AdsRepo(IAdsRepo):
             updated_at=row.updated_at
         )
 
-    async def delete_ads_commentary(self, ads_id: UUID, comm_id: UUID, acc_id: UUID):
+    async def delete_ads_commentary(self, ads_id: UUID, comm_id: UUID, acc_id: UUID) -> None:
+        """Удаляет комментарий к объявлению и обновляет счётчик комментариев.
+
+        Args:
+            ads_id (UUID): Идентификатор объявления.
+            comm_id (UUID): Идентификатор комментария.
+            acc_id (UUID): Идентификатор аккаунта, к которому принадлежит комментарий.
+
+        Returns:
+            None
+        """
         req = (
             update(Ads)
             .values(

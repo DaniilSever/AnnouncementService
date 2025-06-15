@@ -10,12 +10,31 @@ from domain.auth.models import SignupAccount, RefreshToken
 from .xdao import XEmailSignup, XRefreshToken
 
 class AuthRepo(IAuthRepo):
-    """_"""
+    """Репозиторий для работы с аутентификацией и регистрацией пользователей."""
 
     def __init__(self, _session: AsyncSession):
+        """Инициализирует репозиторий с асинхронной сессией базы данных.
+
+        Args:
+            _session (AsyncSession): Асинхронная сессия SQLAlchemy.
+        """
         self.session: AsyncSession = _session
 
     async def create_email_signup(self, email: str, pwd_hash: str, salt: str, code: int) -> XEmailSignup:
+        """Создаёт или обновляет запись регистрации по email с учётом попыток.
+
+        Args:
+            email (str): Email пользователя.
+            pwd_hash (str): Хэш пароля.
+            salt (str): Соль для хэша.
+            code (int): Код подтверждения.
+
+        Returns:
+            XEmailSignup: DTO с данными регистрации.
+
+        Raises:
+            RecursionError: При конфликте целостности данных.
+        """
         req = (
             insert(SignupAccount)
             .values(
@@ -55,6 +74,17 @@ class AuthRepo(IAuthRepo):
         )
 
     async def get_email_signup(self, signup_id: UUID) -> XEmailSignup:
+        """Получает данные регистрации по ID.
+
+        Args:
+            signup_id (UUID): Идентификатор регистрации.
+
+        Returns:
+            XEmailSignup: DTO с данными регистрации.
+
+        Raises:
+            KeyError: Если запись не найдена.
+        """
         req = (
             select(SignupAccount)
             .where(SignupAccount.id == signup_id)
@@ -76,11 +106,27 @@ class AuthRepo(IAuthRepo):
         )
 
     async def delete_email_signup(self, signup_id: UUID) -> None:
+        """Удаляет запись регистрации по ID.
+
+        Args:
+            signup_id (UUID): Идентификатор регистрации.
+        """
         req = delete(SignupAccount).where(SignupAccount.id == signup_id)
         await self.session.execute(req)
         await self.session.commit()
 
     async def inc_email_confirm_wrong_code_attempts(self, signup_id: UUID) -> XEmailSignup:
+        """Увеличивает счётчик попыток неправильного ввода кода подтверждения.
+
+        Args:
+            signup_id (UUID): Идентификатор регистрации.
+
+        Returns:
+            XEmailSignup: Обновлённые данные регистрации.
+
+        Raises:
+            RecursionError: При конфликте целостности данных.
+        """
         req = (
             update(SignupAccount)
             .values(
@@ -112,6 +158,14 @@ class AuthRepo(IAuthRepo):
         )
 
     async def block_email_confirm_by_email(self, email: str) -> XEmailSignup:
+        """Блокирует подтверждение email на сутки для данного email.
+
+        Args:
+            email (str): Email пользователя.
+
+        Returns:
+            XEmailSignup: Обновлённые данные регистрации.
+        """
         req = (
             update(SignupAccount)
             .values(
@@ -138,7 +192,18 @@ class AuthRepo(IAuthRepo):
         )
 
     async def get_refresh_token_for_account(self, acc_id: UUID, token: str) -> XRefreshToken:
-        """Получает refresh-токен по аккаунту и значению токена"""
+        """Получает refresh-токен по аккаунту и значению токена.
+
+        Args:
+            acc_id (UUID): Идентификатор аккаунта.
+            token (str): Значение refresh-токена.
+
+        Returns:
+            XRefreshToken: DTO с данными токена.
+
+        Raises:
+            KeyError: Если токен не найден или не валиден.
+        """
         req = (
             select(RefreshToken)
             .where(
@@ -163,13 +228,23 @@ class AuthRepo(IAuthRepo):
         )
 
     async def revoke_expired_tokens(self) -> None:
-        """Удаляет или инвалидирует просроченные refresh-токены"""
+        """Удаляет или инвалидирует просроченные refresh-токены."""
+
         req = delete(RefreshToken).where(RefreshToken.expires_at < text("NOW()"))
         await self.session.execute(req)
         await self.session.commit()
 
     async def save_refresh_token(self, acc_id: UUID, token: str) -> XRefreshToken:
-        """Сохраняет refresh-токен для аккаунта"""
+        """Сохраняет новый refresh-токен для аккаунта.
+
+        Args:
+            acc_id (UUID): Идентификатор аккаунта.
+            token (str): Значение refresh-токена.
+
+        Returns:
+            XRefreshToken: DTO с данными сохранённого токена.
+        """
+
         req = (
             insert(RefreshToken)
             .values(
@@ -192,7 +267,15 @@ class AuthRepo(IAuthRepo):
         )
 
     async def revoke_tokens(self, acc_id: UUID) -> int:
-        """Инвалидирует все refresh-токены для аккаунта"""
+        """Инвалидирует все активные refresh-токены для аккаунта.
+
+        Args:
+            acc_id (UUID): Идентификатор аккаунта.
+
+        Returns:
+            int: Количество инвалидированных токенов.
+        """
+
         req = (
             update(RefreshToken)
             .values(

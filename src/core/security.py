@@ -11,7 +11,7 @@ from fastapi.security.api_key import APIKeyHeader
 import jwt
 from jwt.exceptions import InvalidTokenError
 
-from .exception import ExpCode, ErrExp
+from .exception import ExpCode, ExpError
 from .endpoints import Endpoints as Enp
 from .configs import AuthConfig
 
@@ -145,7 +145,7 @@ async def check_jwt(
     try:
         res: dict = await decode_jwt(jwt_token, cfg.JWT_PUBLIC_KEY)
     except ValueError as e:
-        raise ErrExp(ExpCode.SYS_INVALID_JWT_TOKEN, str(e)) from e
+        raise ExpError(ExpCode.SYS_INVALID_JWT_TOKEN, str(e)) from e
     return res
 
 
@@ -169,7 +169,7 @@ async def check_apikey(
         return False
 
     if api_key != cfg.API_KEY:
-        raise ErrExp(ExpCode.SYS_INVALID_API_KEY)
+        raise ExpError(ExpCode.SYS_INVALID_API_KEY)
     return True
 
 
