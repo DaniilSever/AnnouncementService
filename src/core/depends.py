@@ -1,4 +1,4 @@
-from .pg import AsyncAccRepoSession, AsyncAdsRepoSession, AsyncAuthRepoSession
+from .pg import AsyncAccRepoSession, AsyncAdsRepoSession, AsyncAuthRepoSession, AsyncComplRepoSession
 from sqlalchemy.ext.asyncio import AsyncSession
 from .configs import AccountConfig, AdsConfig
 from services.account.svc import AccService
@@ -32,6 +32,15 @@ async def get_ads_repo_session() -> AsyncSession:
         AsyncSession: Асинхронная сессия для работы с объявлениями.
     """
     async with AsyncAdsRepoSession() as session:
+        yield session
+
+async def get_compl_repo_session() -> AsyncSession:
+    """Получает асинхронную сессию репозитория жалоб.
+
+    Yields:
+        AsyncSession: Асинхронная сессия для работы с жалобами.
+    """
+    async with AsyncComplRepoSession() as session:
         yield session
 
 

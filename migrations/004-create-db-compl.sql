@@ -10,46 +10,36 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- ------------------------
 
-DROP TABLE IF EXISTS "ComplaintsAccount";
-CREATE TABLE "ComplaintsAccount"
+DROP TABLE IF EXISTS "Complaints";
+CREATE TABLE "Complaints"
 (
     id  uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    account_id uuid NOT NULL,
+    compl_on_id uuid NOT NULL,
+    services VARCHAR NOT NULL,
+    author_id uuid NOT NULL,
     complaints VARCHAR NOT NULL,
     is_notified BOOLEAN NOT NULL,
     is_resolved BOOLEAN NOT NULL,
     created_at      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
 );
 --
-CREATE INDEX ON "ComplaintsAccount" (account_id);
+CREATE INDEX ON "Complaints" (compl_on_id);
+CREATE INDEX ON "Complaints" (services);
+CREATE INDEX ON "Complaints" (author_id);
 --
-COMMENT ON TABLE "ComplaintsAccount" is 'Таблица жалоб на пользователей';
-COMMENT ON COLUMN "ComplaintsAccount".id is 'ID жалобы в системе';
-COMMENT ON COLUMN "ComplaintsAccount".account_id is 'ID Пользователя';
-COMMENT ON COLUMN "ComplaintsAccount".complaints is 'Жалоба';
-COMMENT ON COLUMN "ComplaintsAccount".is_notified is 'Уведомлен ли автор';
-COMMENT ON COLUMN "ComplaintsAccount".is_resolved is 'Решена ли жалоба';
-COMMENT ON COLUMN "ComplaintsAccount".created_at is 'Дата создания';
+COMMENT ON TABLE "Complaints" is 'Таблица жалоб на пользователей';
+COMMENT ON COLUMN "Complaints".id is 'ID жалобы в системе';
+COMMENT ON COLUMN "Complaints".compl_on_id is 'Жалоба на ID (Ads | Account)';
+COMMENT ON COLUMN "Complaints".services is 'Сервис из которого жалоба (Ads | Account)';
+COMMENT ON COLUMN "Complaints".author_id is 'ID автора жалобы';
+COMMENT ON COLUMN "Complaints".complaints is 'Жалоба';
+COMMENT ON COLUMN "Complaints".is_notified is 'Уведомлен ли автор';
+COMMENT ON COLUMN "Complaints".is_resolved is 'Решена ли жалоба';
+COMMENT ON COLUMN "Complaints".created_at is 'Дата создания';
 
 -- ------------------------
 
-DROP TABLE IF EXISTS "ComplaintsAds";
-CREATE TABLE "ComplaintsAds"
-(
-    id  uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    ads_id uuid NOT NULL,
-    complaints VARCHAR NOT NULL,
-    is_notified BOOLEAN NOT NULL,
-    is_resolved BOOLEAN NOT NULL,
-    created_at      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
-);
---
-CREATE INDEX ON "ComplaintsAds" (ads_id);
---
-COMMENT ON TABLE "ComplaintsAds" is 'Таблица жалоб на объявление';
-COMMENT ON COLUMN "ComplaintsAds".id is 'ID жалобы в системе';
-COMMENT ON COLUMN "ComplaintsAds".ads_id is 'ID Объявления';
-COMMENT ON COLUMN "ComplaintsAds".complaints is 'Жалоба';
-COMMENT ON COLUMN "ComplaintsAds".is_notified is 'Уведомлен ли автор';
-COMMENT ON COLUMN "ComplaintsAds".is_resolved is 'Решена ли жалоба';
-COMMENT ON COLUMN "ComplaintsAds".created_at is 'Дата создания';
+GRANT ALL PRIVILEGES ON DATABASE compl TO compl;
+GRANT ALL ON SCHEMA public TO compl;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO compl;
+GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE ON ALL TABLES IN SCHEMA public TO compl;

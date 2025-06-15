@@ -2,6 +2,7 @@ class _EndpointsAUTH:
     """Эндпоинты Auth сервиса"""
 
     # AUTH_HEALTHCHECK = "/api/auth/healthcheck"
+
     AUTH_SIGNUP_EMAIL = "/api/auth/signup/email"
     AUTH_SIGNIN_EMAIL = "/api/auth/signin/email"
     AUTH_SIGNIN_EMAIL_FORM = "/api/auth/signin/email/form"
@@ -14,14 +15,14 @@ class _EndpointsACCOUNT:
     """Эндпоинты Account сервиса"""
 
     # ACCOUNT_HEALTHCHECK = "/api/account/healthcheck"
+
     ACCOUNT_CURRENT = "/api/account/"
     ACCOUNT_GET_BY_ID = "/api/acccount/{acc_id}"
     ACCOUNT_GET_BY_EMAIL = "/api/account/{email}"
     ACCOUNT_COPY_FOR_SIGNUP = "/api/account/copy/signup"
     ACCOUNT_GET_ALL = "/api/accounts/"
     ACCOUNT_IS_EMAIL_BUSY = "/api/account/{email}/is_busy"
-    # ACCOUNT_GET_WARNINGS = "/api/account/warning"
-    # ACCOUNT_GET_WARNING_BY_ID = "/api/account/warning/{warn_id}"
+    # ACCOUNT_SEND_COMPLAINT = "/api/account/{acc_id}/complaint"
 
 
 class _EndpointsADS:
@@ -47,6 +48,15 @@ class _EndpointsADS:
     ADS_ACTION_COMMENTARY = "/api/ads/{ads_id}/{comm_id}"
     ADS_ADD_COMPLAINT_COMMENTARY = "/api/ads/{ads_id}/{comm_id}/complaint"
 
+class _EndpointsCompl:
+    """Эндпоинты Compl сервиса"""
+
+    # COMPL_HEALTHCHECK = "/api/compl/healthcheck"
+
+    COMPL_ADD_COMPLAINT = "/api/compl/create"
+    COMPL_GET_MY_COMPLAINTS = "/api/compl/me"
+    COMPL_GET_MY_COMPLAINT = "/api/compl/me/{compl_id}"
+
 
 class _EndpointsADM:
     """Админские эндпоинты"""
@@ -57,7 +67,7 @@ class _EndpointsADM:
     ADM_DELETE_ADS = "/api/adm/delete/ads/{ads_id}"
     ADM_DELETE_COMMENTARY = "/api/adm/delete/commentary/{comm_id}"
     # ADM_WARNING_ACCOUNT = "/api/adm/warn/{acc_id}"
-    
+
     # --- Account
     ADM_SET_ROLE_ACCOUNT = "/api/adm/account/{acc_id}/set/role"
     ADM_SET_BAN_ACCOUNT = "/api/adm/account/{acc_id}/set/ban"
@@ -65,13 +75,14 @@ class _EndpointsADM:
 
     # --- Compl
     ADM_GET_COMPLAINTS = "/api/adm/complaint"
-    ADM_GET_COMPLAINT_BY_ID = "/api/adm/complaint/{comp_id}"
+    ADM_GET_COMPLAINT_BY_ID = "/api/adm/complaint/{compl_id}"
 
 
 class Endpoints(
     _EndpointsAUTH,
     _EndpointsACCOUNT,
     _EndpointsADS,
+    _EndpointsCompl,
     _EndpointsADM,
 ):
     """Глобальные класс эндпоинтов"""

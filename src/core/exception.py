@@ -42,12 +42,17 @@ class _AdsExpCode:
     ADS_COMMENTARY_NOT_FOUND = "404", "Комментарий не найден"
     ADS_INCORRECT_ROLE = "400", "Нет прав доступа"
 
+class _ComplExpCode:
+    """Класс с кодми ошибок жалоб"""
+
+    COMPL_NOT_FOUND = "404", "Жалобы не найдены"
 
 class ExpCode(
     _SysExpCode,
     _AuthExpCode,
     _AccExpCode,
     _AdsExpCode,
+    _ComplExpCode,
 ):
     """Глобальные класс кодов ошибок"""
 

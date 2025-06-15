@@ -136,6 +136,18 @@ async def get_my_ads(
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
+
+    if jwt["is_banned"] == str(True):
+        return SuccessResp[ZBanned](
+            payload=ZBanned(
+                account_id=jwt["acc_id"],
+                is_banned=jwt["is_banned"],
+                blocked_at=jwt["blocked_at"],
+                reason_blocked=jwt["reason_blocked"],
+                blocked_to=jwt["blocked_to"],
+            )
+        )
+
     acc_id = jwt["acc_id"]
     res = await uc.get_ads_by_account_id(acc_id)
     return SuccessResp[ZManyAds](payload=res)

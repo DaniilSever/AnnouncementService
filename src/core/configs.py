@@ -27,3 +27,11 @@ class AdsConfig(BaseSettings):
     APP_ENV: str
     API_URL: str
     ADS_DB_URL: str
+
+
+class ComplConfig(BaseSettings):
+    """Конфиг Compl сервиса"""
+
+    APP_ENV: str
+    API_URL: str
+    COMPL_DB_URL: str
