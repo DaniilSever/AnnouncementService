@@ -41,10 +41,10 @@ tags = {"name": "account", "description": "Внутренние эндпоинт
 )
 async def get_account_by_id(
     acc_id: Annotated[UUID, Path()],
-    _repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
+    __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
 ) -> SuccessResp[ZAccount]:
     """Обрабатывает HTTP-запрос на получение аккаунта по его ID."""
-    uc = AccUseCase(AccRepo(_repo_session))
+    uc = AccUseCase(AccRepo(__repo_session))
     res = await uc.get_account_by_id(acc_id)
     return SuccessResp[ZAccount](payload=res)
 
@@ -57,10 +57,10 @@ async def get_account_by_id(
 )
 async def get_account_by_email(
     req: Annotated[QEmail, Path()],
-    _repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
+    __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
 ) -> SuccessResp[ZAccount]:
     """Обрабатывает HTTP-запрос на получение аккаунта по email."""
-    uc = AccUseCase(AccRepo(_repo_session))
+    uc = AccUseCase(AccRepo(__repo_session))
     res = await uc.get_account_by_email(req)
     return SuccessResp[ZAccount](payload=res)
 
@@ -73,10 +73,10 @@ async def get_account_by_email(
 )
 async def copy_account_from_signup(
     req: Annotated[QEmailSignupData, Body()],
-    _repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
+    __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
 ) -> SuccessResp[ZAccountID]:
     """Обрабатывает HTTP-запрос на копирование аккаунта после регистрации."""
-    uc = AccUseCase(AccRepo(_repo_session))
+    uc = AccUseCase(AccRepo(__repo_session))
     res = await uc.copy_account_from_signup(req)
     return SuccessResp[ZAccountID](payload=res)
 
@@ -89,10 +89,10 @@ async def copy_account_from_signup(
 )
 async def is_email_busy(
     req: Annotated[QEmail, Path()],
-    _repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
+    __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
 ) -> SuccessResp[ZIsBusy]:
     """Обрабатывает HTTP-запрос на проверку существования email."""
-    uc = AccUseCase(AccRepo(_repo_session))
+    uc = AccUseCase(AccRepo(__repo_session))
     res = await uc.is_email_busy(req)
     return SuccessResp[ZIsBusy](payload=res)
 
@@ -103,10 +103,10 @@ async def is_email_busy(
     status_code=200,
 )
 async def get_accounts(
-    _repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)]
+    __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)]
 ) -> SuccessResp[list[ZAccount]]:
     """Обрабатывает HTTP-запрос на получение списка всех аккаунтов."""
-    uc = AccUseCase(AccRepo(_repo_session))
+    uc = AccUseCase(AccRepo(__repo_session))
     res = await uc.get_accounts()
     return SuccessResp[list[ZAccount]](payload=res)
 
