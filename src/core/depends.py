@@ -1,7 +1,8 @@
 from .pg import AsyncAccRepoSession, AsyncAdsRepoSession, AsyncAuthRepoSession
 from sqlalchemy.ext.asyncio import AsyncSession
-from .configs import AccountConfig
+from .configs import AccountConfig, AdsConfig
 from services.account.svc import AccService
+from services.ads.svc import AdsService
 
 
 async def get_account_repo_session() -> AsyncSession:
@@ -42,3 +43,12 @@ def get_account_serivce() -> AccService:
     """
     cfg = AccountConfig()
     return AccService(cfg.API_URL)
+
+def get_ads_serivce() -> AdsService:
+    """Создаёт и возвращает сервис для работы с объявлениями.
+
+    Returns:
+        AdsService: Сервис для взаимодействия с объявлениями.
+    """
+    cfg = AdsConfig()
+    return AdsService(cfg.API_URL)

@@ -101,6 +101,9 @@ class IAdsRepo:
         """
         raise NotImplementedError
 
+    async def get_count_ads_by_acc_id(self, acc_id: UUID) -> int:
+        raise NotImplementedError
+
     async def create_ads_commentary(
         self, new_comment: QAddAdsComment, acc_id: UUID
     ) -> XAdsComment:
@@ -164,4 +167,10 @@ class IAdsRepo:
         Returns:
             None
         """
+        return NotImplementedError
+
+    async def get_ads_id_by_comm_id(self, comm_id: UUID) -> UUID:
+        return NotImplementedError
+
+    async def adm_delete_ads_commentary(self, comm_id: UUID, ads_id: UUID) -> None:
         return NotImplementedError

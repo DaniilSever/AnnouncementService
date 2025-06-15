@@ -6,6 +6,7 @@ from sqlalchemy import (
     String,
     TIMESTAMP,
     Boolean,
+    Integer,
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import DeclarativeBase
@@ -37,6 +38,7 @@ class Account(Base):
     pwd_hash = Column(String(255), nullable=False, comment="SHA-256-хеш пароля")
     salt = Column(String, nullable=False, comment="Соль для хеша")
     role = Column(String, nullable=False, comment="Роли пользователей")
+    count_ads = Column(Integer, nullable=False, comment="Количество созданных объявлений")
     is_banned = Column(
         Boolean, nullable=False, default=False, comment="Забанен ли аккаунт"
     )

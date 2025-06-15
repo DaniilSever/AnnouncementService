@@ -1,7 +1,7 @@
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, update
 
 from domain.account.irepo import IAccRepo
 from domain.account.models import Account, AccRole
@@ -22,7 +22,7 @@ class AccRepo(IAccRepo):
 
         self.session: AsyncSession = _session
 
-    async def get_account_by_id(self, acc_id: UUID) -> XAccount:
+    async def get_account_by_id(self, count_ads: int, acc_id: UUID) -> XAccount:
         """Получает аккаунт по его ID.
 
         Args:
@@ -34,6 +34,14 @@ class AccRepo(IAccRepo):
         Raises:
             KeyError: Если аккаунт не найден.
         """
+        update_ads_req = (
+            update(Account)
+            .values(count_ads=count_ads)
+            .where(Account.id==acc_id)
+        )
+        await self.session.execute(update_ads_req)
+        await self.session.commit()
+
         req = select(Account).where(Account.id == acc_id)
         res = await self.session.execute(req)
         await self.session.commit()
@@ -46,6 +54,7 @@ class AccRepo(IAccRepo):
             pwd_hash=row.pwd_hash,
             salt=row.salt,
             role=row.role,
+            count_ads=row.count_ads,
             is_banned=row.is_banned,
             created_at=row.created_at,
             updated_at=row.updated_at,
@@ -53,7 +62,7 @@ class AccRepo(IAccRepo):
             blocked_till=row.blocked_till,
         )
 
-    async def get_account_by_email(self, email: str) -> XAccount:
+    async def get_account_by_email(self, email: str, count_ads: int | None = None) -> XAccount:
         """Получает аккаунт по email.
 
         Args:
@@ -65,6 +74,15 @@ class AccRepo(IAccRepo):
         Raises:
             KeyError: Если аккаунт не найден.
         """
+        if count_ads:
+            update_ads_req = (
+                update(Account)
+                .values(count_ads=count_ads)
+                .where(Account.email==email)
+            )
+            await self.session.execute(update_ads_req)
+            await self.session.commit()
+
         req = select(Account).where(Account.email == email)
         res = await self.session.execute(req)
         await self.session.commit()
@@ -77,6 +95,7 @@ class AccRepo(IAccRepo):
             pwd_hash=row.pwd_hash,
             salt=row.salt,
             role=row.role,
+            count_ads=row.count_ads,
             is_banned=row.is_banned,
             created_at=row.created_at,
             updated_at=row.updated_at,
@@ -141,6 +160,7 @@ class AccRepo(IAccRepo):
                     pwd_hash=row.pwd_hash,
                     salt=row.salt,
                     role=row.role,
+                    count_ads=row.count_ads,
                     is_banned=row.is_banned,
                     created_at=row.created_at,
                     updated_at=row.updated_at,
@@ -149,6 +169,34 @@ class AccRepo(IAccRepo):
                 )
             )
         return res
+
+    async def get_current_account(self, count_ads: int, acc_id: UUID) -> XAccount:
+        update_ads_req = (
+            update(Account)
+            .values(count_ads=count_ads)
+            .where(Account.id==acc_id)
+        )
+        await self.session.execute(update_ads_req)
+        await self.session.commit()
+
+        req = select(Account).where(Account.id == acc_id)
+        res = await self.session.execute(req)
+        await self.session.commit()
+        row = res.scalar_one()
+
+        return XAccount(
+            id=row.id,
+            email=row.email,
+            pwd_hash=row.pwd_hash,
+            salt=row.salt,
+            role=row.role,
+            count_ads=row.count_ads,
+            is_banned=row.is_banned,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+            blocked_at=row.blocked_at,
+            blocked_till=row.blocked_till,
+        )
 
     async def delete_acc(self, acc_id: UUID) -> None:
         """Удаляет аккаунт по ID.

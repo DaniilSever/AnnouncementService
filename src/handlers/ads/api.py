@@ -11,6 +11,7 @@ from core.exception import ExpError, ExpCode
 from app.ads.uc import AdsUseCase
 
 from domain.ads.dto import (
+    # QDTO
     QCreateAds,
     QAdsCategory,
     QFilter,
@@ -18,8 +19,14 @@ from domain.ads.dto import (
     QAddAdsComment,
     QUpdateAdsComment,
     QDelAdsComment,
+
+    # ZDTO
+    ZAds,
+    ZAdsComment,
+    ZManyAds,
+    ZManyAdsComment,
 )
-from domain.ads.dto import ZAds, ZAdsComment, ZManyAds, ZManyAdsComment
+from domain.account.models import AccRole
 
 from infra.ads.repo import AdsRepo
 
@@ -48,7 +55,7 @@ async def create_ads(
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
 
     if jwt:
-        account_id = jwt["sub"]
+        account_id = jwt["acc_id"]
 
     res = await uc.create_ads(req, ads_category, account_id)
     return SuccessResp[ZAds](payload=res)
@@ -117,10 +124,22 @@ async def get_my_ads(
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
-    acc_id = jwt["sub"]
+    acc_id = jwt["acc_id"]
     res = await uc.get_ads_by_account_id(acc_id)
     return SuccessResp[ZManyAds](payload=res)
 
+@router.get(
+    Enp.ADS_GET_COUNT_ADS_BY_ACCOUNT,
+    summary="Получить колличество объявлений польователя",
+    status_code=200,
+)
+async def get_count_ads_by_acc_id(
+    acc_id: Annotated[UUID, Query()],
+    __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
+) -> SuccessResp[int]:
+    uc = AdsUseCase(AdsRepo(__repo_session))
+    res = await uc.get_count_ads_by_acc_id(acc_id)
+    return SuccessResp[int](payload=res)
 
 @router.patch(
     Enp.ADS_CHANGE,
@@ -138,7 +157,7 @@ async def change_my_ads(
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
-    acc_id = jwt["sub"]
+    acc_id = jwt["acc_id"]
     res = await uc.change_my_ads(req, acc_id)
     return SuccessResp[ZAds](payload=res)
 
@@ -160,7 +179,7 @@ async def change_category_ads(
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
-    acc_id = jwt["sub"]
+    acc_id = jwt["acc_id"]
     res = await uc.change_category_ads(ads_id, req, acc_id)
     return SuccessResp[ZAds](payload=res)
 
@@ -181,7 +200,7 @@ async def delete_ads(
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
-    acc_id = jwt["sub"]
+    acc_id = jwt["acc_id"]
     await uc.delete_ads(ads_id, acc_id)
     return SuccessResp()
 
@@ -203,7 +222,7 @@ async def create_ads_commentary(
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
-    acc_id = jwt["sub"]
+    acc_id = jwt["acc_id"]
 
     req = QAddAdsComment(ads_id=ads_id, ads_comment=commentary)
     res = await uc.create_ads_commentary(req, acc_id)
@@ -261,7 +280,7 @@ async def update_ads_commentary(
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
-    acc_id = jwt["sub"]
+    acc_id = jwt["acc_id"]
 
     req = QUpdateAdsComment(
         comm_id=comm_id, ads_id=ads_id, acccount_id=acc_id, ads_comment=commentary
@@ -287,8 +306,31 @@ async def delete_ads_commentary(
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
-    acc_id = jwt["sub"]
+    acc_id = jwt["acc_id"]
 
     req = QDelAdsComment(comm_id=comm_id, ads_id=ads_id, account_id=acc_id)
     await uc.delete_ads_commentary(req)
+    return SuccessResp()
+
+@router.delete(
+    Enp.ADM_DELETE_COMMENTARY,
+    summary="Удалить комментарий в объявлении (Администратор)",
+    status_code=200,
+    responses=responses(400, 404),
+)
+async def adm_delete_ads_commentary(
+    jwt: AJwt,
+    comm_id: Annotated[UUID, Path()],
+    __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
+) -> SuccessResp:
+    """Обрабатывает HTTP-запрос на удаление комментария в объявлении администратором."""
+    uc = AdsUseCase(AdsRepo(__repo_session))
+
+    if not jwt:
+        raise ExpError(ExpCode.SYS_UNAUTHORIZE)
+
+    if jwt["role"] != AccRole.ADMIN.value:
+        raise ExpError(ExpCode.ADS_INCORRECT_ROLE)
+
+    await uc.adm_delete_ads_commentary(comm_id)
     return SuccessResp()

@@ -39,6 +39,7 @@ class _AdsExpCode:
     ADS_FILTER_ERR = "400", "Неверный фильтр записей"
     ADS_NOT_FOUND = "404", "Объявление не найдено"
     ADS_COMMENTARY_NOT_FOUND = "404", "Комментарий не найден"
+    ADS_INCORRECT_ROLE = "400", "Нет прав доступа"
 
 
 class ExpCode(

@@ -2,9 +2,11 @@ from uuid import UUID
 from typing import Annotated
 from fastapi import APIRouter, Depends, Path, Body
 
-from core.depends import get_account_repo_session, AsyncSession
+from core.depends import get_account_repo_session, AsyncSession, get_ads_serivce, AdsService
 from core.endpoints import Endpoints as Enp
 from core.response import responses, SuccessResp
+from core.security import AJwt
+from core.exception import ExpError, ExpCode
 
 from app.account.uc import AccUseCase
 
@@ -42,9 +44,10 @@ tags = {"name": "account", "description": "Внутренние эндпоинт
 async def get_account_by_id(
     acc_id: Annotated[UUID, Path()],
     __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
+    __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)]
 ) -> SuccessResp[ZAccount]:
     """Обрабатывает HTTP-запрос на получение аккаунта по его ID."""
-    uc = AccUseCase(AccRepo(__repo_session))
+    uc = AccUseCase(AccRepo(__repo_session), __ads_svc)
     res = await uc.get_account_by_id(acc_id)
     return SuccessResp[ZAccount](payload=res)
 
@@ -58,9 +61,10 @@ async def get_account_by_id(
 async def get_account_by_email(
     req: Annotated[QEmail, Path()],
     __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
+    __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)]
 ) -> SuccessResp[ZAccount]:
     """Обрабатывает HTTP-запрос на получение аккаунта по email."""
-    uc = AccUseCase(AccRepo(__repo_session))
+    uc = AccUseCase(AccRepo(__repo_session), __ads_svc)
     res = await uc.get_account_by_email(req)
     return SuccessResp[ZAccount](payload=res)
 
@@ -74,9 +78,10 @@ async def get_account_by_email(
 async def copy_account_from_signup(
     req: Annotated[QEmailSignupData, Body()],
     __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
+    __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)]
 ) -> SuccessResp[ZAccountID]:
     """Обрабатывает HTTP-запрос на копирование аккаунта после регистрации."""
-    uc = AccUseCase(AccRepo(__repo_session))
+    uc = AccUseCase(AccRepo(__repo_session), __ads_svc)
     res = await uc.copy_account_from_signup(req)
     return SuccessResp[ZAccountID](payload=res)
 
@@ -90,9 +95,10 @@ async def copy_account_from_signup(
 async def is_email_busy(
     req: Annotated[QEmail, Path()],
     __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
+    __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)]
 ) -> SuccessResp[ZIsBusy]:
     """Обрабатывает HTTP-запрос на проверку существования email."""
-    uc = AccUseCase(AccRepo(__repo_session))
+    uc = AccUseCase(AccRepo(__repo_session), __ads_svc)
     res = await uc.is_email_busy(req)
     return SuccessResp[ZIsBusy](payload=res)
 
@@ -103,12 +109,34 @@ async def is_email_busy(
     status_code=200,
 )
 async def get_accounts(
-    __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)]
+    __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
+    __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)]
 ) -> SuccessResp[list[ZAccount]]:
     """Обрабатывает HTTP-запрос на получение списка всех аккаунтов."""
-    uc = AccUseCase(AccRepo(__repo_session))
+    uc = AccUseCase(AccRepo(__repo_session), __ads_svc)
     res = await uc.get_accounts()
     return SuccessResp[list[ZAccount]](payload=res)
+
+@router.get(
+    Enp.ACCOUNT_CURRENT,
+    summary="Получить текущий аккаунт",
+    status_code=200,
+)
+async def get_current_account(
+    jwt: AJwt,
+    __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
+    __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)]
+) -> SuccessResp[ZAccount]:
+    """Обрабатывает HTTP-запрос на получение текущего аккаунта."""
+    uc = AccUseCase(AccRepo(__repo_session), __ads_svc)
+
+    if not jwt:
+        raise ExpError(ExpCode.SYS_UNAUTHORIZE)
+
+    acc_id = jwt["acc_id"]
+
+    res = await uc.get_current_account(acc_id)
+    return SuccessResp[ZAccount](payload=res)
 
 
 # @router.get(

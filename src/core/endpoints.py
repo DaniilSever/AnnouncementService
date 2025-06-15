@@ -14,11 +14,11 @@ class _EndpointsACCOUNT:
     """Эндпоинты Account сервиса"""
 
     # ACCOUNT_HEALTHCHECK = "/api/account/healthcheck"
-    # ACCOUNT_CURRENT = "/api/account/current"
+    ACCOUNT_CURRENT = "/api/account/"
     ACCOUNT_GET_BY_ID = "/api/acccount/{acc_id}"
     ACCOUNT_GET_BY_EMAIL = "/api/account/{email}"
     ACCOUNT_COPY_FOR_SIGNUP = "/api/account/copy/signup"
-    ACCOUNT_GET_ALL = "/api/account/"
+    ACCOUNT_GET_ALL = "/api/account/all"
     ACCOUNT_IS_EMAIL_BUSY = "/api/account/{email}/is_busy"
     # ACCOUNT_GET_WARNINGS = "/api/account/warning"
     # ACCOUNT_GET_WARNING_BY_ID = "/api/account/warning/{warn_id}"
@@ -38,6 +38,7 @@ class _EndpointsADS:
     ADS_GET_BY_ME = "/api/ads/me"
     ADS_GET_BY_ID = "/api/ads/ads"
     ADS_GET_BY_ACCOUNT = "/api/ads/author"
+    ADS_GET_COUNT_ADS_BY_ACCOUNT = "/api/ads/count/author"
     # ADS_ADD_COMPLAINT = "/api/ads/{ads_id}/complaint"
 
     # --- Действия с комментариями
@@ -50,7 +51,7 @@ class _EndpointsADS:
 class _EndpointsADM:
     """Админские эндпоинты"""
 
-    ADM_HEALTHCHECK = "/api/adm/healthcheck"
+    # ADM_HEALTHCHECK = "/api/adm/healthcheck"
     ADM_DELETE_ADS = "/api/adm/delete/ads/{ads_id}"
     ADM_DELETE_COMMENTARY = "/api/adm/delete/commentary/{comm_id}"
     ADM_BAN_ACCOUNT = "/api/adm/ban/{acc_id}"

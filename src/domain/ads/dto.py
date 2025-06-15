@@ -97,5 +97,5 @@ class ZAdsComment(BaseModel):
 class ZManyAdsComment(BaseModel):
     total: int
     count: int
-    offeset: int
+    offeset: int = 0
     items: list[ZAdsComment] = []

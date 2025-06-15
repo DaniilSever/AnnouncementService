@@ -112,7 +112,6 @@ async def decode_jwt(token: str, key: str) -> dict:  # pragma: no cover
     Raises:
         ValueError: Если токен истек или некорректен.
     """
-
     try:
         payload = jwt.decode(token, key.strip(), algorithms=["RS512"])
     except jwt.ExpiredSignatureError as e:
@@ -148,7 +147,6 @@ async def check_jwt(
         c.Failed: Если авторизация не удалась (отсутствуют токен и API-ключ,
                   неверный токен или неверный API-ключ).
     """
-    print(jwt_token)
     if not jwt_token:
         return None
 

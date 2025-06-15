@@ -8,16 +8,27 @@ from core.security import (
 )
 from core.exception import ExpError, ExpCode
 from domain.auth.dto import (
+    # QDTO
     QEmailSignup,
     QConfirmCode,
     QEmailSignin,
     QRefreshToken,
     QRevokeToken,
+
+    # ZDTO
+    ZEmailSignup,
+    ZAccountID,
+    ZToken,
+    ZRevokedTokens,
 )
-from domain.auth.dto import ZEmailSignup, ZAccountID, ZToken, ZRevokedTokens
 from domain.auth.irepo import IAuthRepo
-from domain.account.dto import QEmailSignupData
-from domain.account.dto import ZAccount
+from domain.account.dto import (
+    # QDTO
+    QEmailSignupData,
+
+    # ZDTO
+    ZAccount,
+)
 from infra.auth.repo import AuthRepo
 from infra.auth.xdao import XEmailSignup
 from services.account.svc import AccService
@@ -120,7 +131,8 @@ class AuthUseCase:
             raise ExpError(ExpCode.AUTH_SIGNIN_WRONG_PASSWORD)
 
         access_payload = {
-            "sub": str(z_acc.id),
+            "acc_id": str(z_acc.id),
+            "role": str(z_acc.role.value),
             "type": "access",
         }
         access_token = create_jwt_token(
@@ -128,7 +140,8 @@ class AuthUseCase:
         )
 
         refresh_payload = {
-            "sub": str(z_acc.id),
+            "acc_id": str(z_acc.id),
+            "role": str(z_acc.role.value),
             "type": "refresh",
         }
         refresh_token = create_jwt_token(
@@ -156,14 +169,15 @@ class AuthUseCase:
         if payload.get("type") != "refresh":
             raise ExpError(ExpCode.AUTH_INVALID_TOKEN_TYPE)
 
-        acc_id = payload["sub"]
-
         try:
-            _ = await self.repo.get_refresh_token_for_account(acc_id, req.refresh_token)
+            _ = await self.repo.get_refresh_token_for_account(payload["acc_id"], req.refresh_token)
         except KeyError as e:
             raise ExpError(ExpCode.AUTH_REFRESH_TOKEN_NOT_FOUND, str(e)) from e
 
-        access_payload = {"sub": str(acc_id)}
+        access_payload = {
+            "acc_id": payload["acc_id"],
+            "role": payload["role"],
+        }
         access_token = create_jwt_token(
             access_payload, self.cfg.JWT_PRIVATE_KEY, delta=3600
         )

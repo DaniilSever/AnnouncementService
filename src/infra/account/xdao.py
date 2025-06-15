@@ -18,6 +18,7 @@ class XAccount(BaseModel):
     pwd_hash: str
     salt: str
     role: AccRole = AccRole.USER
+    count_ads: int
     is_banned: bool = False
     created_at: datetime = datetime.now()
     updated_at: datetime | None = None

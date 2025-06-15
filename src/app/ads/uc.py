@@ -151,6 +151,10 @@ class AdsUseCase:
         await self.repo.delete_ads(ads_id, acc_id)
         return True
 
+    async def get_count_ads_by_acc_id(self, acc_id: UUID) -> int:
+        res = await self.repo.get_count_ads_by_acc_id(acc_id)
+        return res
+
     # ---------- AdsCommentary -------------
 
     async def create_ads_commentary(
@@ -206,7 +210,7 @@ class AdsUseCase:
         res = []
         for xads in xres:
             res.append(ZAdsComment(**xads.model_dump(mode="json")))
-        return ZManyAds(total=total, count=len(res), items=res)
+        return ZManyAdsComment(total=total, count=len(res), items=res)
 
     async def update_ads_commentary(self, req: QUpdateAdsComment) -> ZAdsComment:
         """Обновляет комментарий к объявлению.
@@ -242,6 +246,29 @@ class AdsUseCase:
             await self.repo.delete_ads_commentary(
                 req.ads_id, req.comm_id, req.account_id
             )
+        except KeyError as e:
+            raise ExpError(ExpCode.ADS_COMMENTARY_NOT_FOUND, str(e)) from e
+        return True
+
+    async def adm_delete_ads_commentary(self, comm_id: UUID) -> bool:
+        """Удаляет комментарий к объявлению администратором.
+
+        Args:
+            req (QDelAdsComment): Данные для удаления комментария.
+
+        Raises:
+            ExpError: Если комментарий не найден.
+
+        Returns:
+            bool: True при успешном удалении.
+        """
+        try:
+            ads_id = await self.repo.get_ads_id_by_comm_id(comm_id)
+        except KeyError as e:
+            raise ExpError(ExpCode.ADS_COMMENTARY_NOT_FOUND, str(e)) from e
+
+        try:
+            await self.repo.adm_delete_ads_commentary(comm_id, ads_id)
         except KeyError as e:
             raise ExpError(ExpCode.ADS_COMMENTARY_NOT_FOUND, str(e)) from e
         return True

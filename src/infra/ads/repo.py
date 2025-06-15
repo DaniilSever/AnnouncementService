@@ -311,6 +311,12 @@ class AdsRepo(IAdsRepo):
     #     await self.session.execute(req)
     #     await self.session.commit()
 
+    async def get_count_ads_by_acc_id(self, acc_id: UUID) -> int:
+        req = select(func.count()).select_from(Ads).where(Ads.account_id == acc_id)
+        count_ads = await self.session.execute(req)
+        await self.session.commit()
+        return count_ads.scalar_one()
+
     # -------------------- AdsCommentary -------------------
 
     async def create_ads_commentary(
@@ -393,7 +399,7 @@ class AdsRepo(IAdsRepo):
         Returns:
             tuple[int, list[XAdsComment]]: Общее количество комментариев и список комментариев.
         """
-        count_req = select(func.count()).select_from(Ads)
+        count_req = select(func.count()).select_from(AdsComment)
         count_res = await self.session.execute(count_req)
         await self.session.commit()
         total = count_res.scalar_one()
@@ -477,6 +483,39 @@ class AdsRepo(IAdsRepo):
 
         req = delete(AdsComment).where(
             AdsComment.account_id == acc_id,
+            AdsComment.ads_id == ads_id,
+            AdsComment.id == comm_id,
+        )
+        await self.session.execute(req)
+        await self.session.commit()
+
+    async def get_ads_id_by_comm_id(self, comm_id: UUID) -> UUID:
+        req = select(AdsComment).where(AdsComment.id == comm_id)
+        res = await self.session.execute(req)
+        await self.session.commit()
+
+        row = res.scalar_one_or_none()
+        if row is None:
+            raise KeyError("Объявление в бд не найдено")
+        return row.ads_id
+
+    async def adm_delete_ads_commentary(self, comm_id: UUID, ads_id: UUID) -> None:
+        """Удаляет администратором комментарий к объявлению и обновляет счётчик комментариев.
+
+        Args:
+            comm_id (UUID): Идентификатор комментария.
+
+        Returns:
+            None
+        """
+        req = update(Ads).values(count_comments=Ads.count_comments - 1).where(Ads.id == ads_id)
+        try:
+            await self.session.execute(req)
+        except NoResultFound as e:
+            raise KeyError("Объявление не найдено") from e
+        await self.session.commit()
+
+        req = delete(AdsComment).where(
             AdsComment.ads_id == ads_id,
             AdsComment.id == comm_id,
         )

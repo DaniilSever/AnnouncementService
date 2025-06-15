@@ -1,10 +1,13 @@
 from uuid import UUID
 
+from domain.account.dto import QEmailSignupData
+from infra.account.xdao import XAccount, XAccountID
+
 
 class IAccRepo:
     """Интерфейс репозитория для работы с пользовательскими аккаунтами"""
 
-    async def get_account_by_id(self, acc_id: UUID):
+    async def get_account_by_id(self, count_ads: int, acc_id: UUID) -> XAccount:
         """Получает аккаунт по его ID.
 
         Args:
@@ -16,7 +19,7 @@ class IAccRepo:
 
         raise NotImplementedError
 
-    async def get_account_by_email(self, email: str):
+    async def get_account_by_email(self, email: str, count_ads: int | None = None) -> XAccount:
         """Получает аккаунт по email.
 
         Args:
@@ -28,7 +31,7 @@ class IAccRepo:
 
         raise NotImplementedError
 
-    async def copy_account_from_signup(self, x_signup):
+    async def copy_account_from_signup(self, x_signup: QEmailSignupData) -> XAccountID:
         """Копирует данные из временной регистрации в аккаунт.
 
         Args:
@@ -40,7 +43,7 @@ class IAccRepo:
 
         raise NotImplementedError
 
-    async def is_email_busy(self, email: str):
+    async def is_email_busy(self, email: str) -> bool:
         """Проверяет, занят ли email.
 
         Args:
@@ -52,7 +55,7 @@ class IAccRepo:
 
         raise NotImplementedError
 
-    async def get_accounts(self) -> list:
+    async def get_accounts(self) -> list[XAccount]:
         """Возвращает список всех аккаунтов.
 
         Returns:
@@ -71,4 +74,7 @@ class IAccRepo:
             None
         """
 
+        raise NotImplementedError
+
+    async def get_current_account(self, count_ads: int, acc_id: UUID) -> XAccount:
         raise NotImplementedError
