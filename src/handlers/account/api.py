@@ -1,6 +1,6 @@
 from uuid import UUID
 from typing import Annotated
-from fastapi import APIRouter, Depends, Path, Body
+from fastapi import APIRouter, Depends, Path, Body, Query
 
 from core.depends import get_account_repo_session, AsyncSession, get_ads_serivce, AdsService
 from core.endpoints import Endpoints as Enp
@@ -10,8 +10,9 @@ from core.exception import ExpError, ExpCode
 
 from app.account.uc import AccUseCase
 
-from domain.account.dto import QEmail, QEmailSignupData
+from domain.account.dto import BannedTo, QEmail, QEmailSignupData
 from domain.account.dto import ZAccount, ZAccountID, ZIsBusy
+from domain.account.models import AccRole
 
 from infra.account.repo import AccRepo
 
@@ -138,6 +139,80 @@ async def get_current_account(
     res = await uc.get_current_account(acc_id)
     return SuccessResp[ZAccount](payload=res)
 
+@router.patch(
+    Enp.ACCOUNT_SET_ROLE_ACCOUNT,
+    summary="Изменить роль аккаунта",
+    status_code=200,
+    responses=responses(404)
+)
+async def set_role_account(
+    jwt: AJwt,
+    role: Annotated[AccRole, Query()],
+    acc_id: Annotated[UUID, Path()],
+    __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
+    __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)]
+) -> SuccessResp:
+    """Обрабатывает HTTP-запрос на изменение роли аккаунта."""
+    uc = AccUseCase(AccRepo(__repo_session), __ads_svc)
+
+    if not jwt:
+        raise ExpError(ExpCode.SYS_UNAUTHORIZE)
+
+    if jwt["role"] != AccRole.ADMIN.value:
+        raise ExpError(ExpCode.ACC_INCORRECT_ROLE)
+
+    await uc.set_role_account(acc_id, role)
+    return SuccessResp()
+
+@router.patch(
+    Enp.ACCOUNT_SET_BAN_ACCOUNT,
+    summary="Забанить аккаунт",
+    status_code=200,
+    responses=responses(404)
+)
+async def set_ban_account(
+    jwt: AJwt,
+    acc_id: Annotated[UUID, Path()],
+    blocked_to: Annotated[BannedTo, Query()],
+    reason_blocked: Annotated[str, Body()],
+    __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
+    __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)],
+) -> SuccessResp:
+    """Обрабатывает HTTP-запрос на блокировку аккаунта."""
+    uc = AccUseCase(AccRepo(__repo_session), __ads_svc)
+
+    if not jwt:
+        raise ExpError(ExpCode.SYS_UNAUTHORIZE)
+
+    if jwt["role"] != AccRole.ADMIN.value:
+        raise ExpError(ExpCode.ACC_INCORRECT_ROLE)
+
+    await uc.set_ban_account(acc_id, blocked_to, reason_blocked)
+    return SuccessResp()
+
+@router.patch(
+    Enp.ACCOUNT_SET_UNBAN_ACCOUNT,
+    summary="Забанить аккаунт",
+    status_code=200,
+    responses=responses(404),
+)
+async def set_unban_account(
+    jwt: AJwt,
+    acc_id: Annotated[UUID, Path()],
+    __repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
+    __ads_svc: Annotated[AdsService, Depends(get_ads_serivce)],
+) -> SuccessResp:
+    """Обрабатывает HTTP-запрос на разблокировку аккаунта."""
+    uc = AccUseCase(AccRepo(__repo_session), __ads_svc)
+
+    if not jwt:
+        raise ExpError(ExpCode.SYS_UNAUTHORIZE)
+
+    if jwt["role"] != AccRole.ADMIN.value:
+        raise ExpError(ExpCode.ACC_INCORRECT_ROLE)
+
+    await uc.set_unban_account(acc_id)
+    return SuccessResp()
 
 # @router.get(
 #     Enp.ACCOUNT_GET_WARNINGS,

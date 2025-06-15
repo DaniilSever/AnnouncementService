@@ -41,6 +41,13 @@ class QAdmDeleteAds(BaseModel):
     reason_deletion: str
 
 
+class ZBanned(BaseModel):
+    account_id: UUID4
+    is_banned: bool
+    blocked_at: datetime
+    reason_blocked: str
+    blocked_to: datetime
+
 class ZAds(BaseModel):
     id: UUID4
     account_id: UUID4

@@ -1,7 +1,15 @@
+from enum import Enum
 from datetime import datetime
 from pydantic import BaseModel, EmailStr, UUID4
 from .models import AccRole
 
+
+class BannedTo(Enum):
+    WEEK = "week"
+    MONTH = "month"
+    MONTH3 = "month3"
+    YEAR = "year"
+    FOREVER = "forever"
 
 class ZIsBusy(BaseModel):
     is_busy: bool
@@ -38,7 +46,8 @@ class ZAccount(BaseModel):
     created_at: datetime = datetime.now()
     updated_at: datetime | None = None
     blocked_at: datetime | None = None
-    blocked_till: datetime | None = None
+    reason_blocked: str | None = None
+    blocked_to: datetime | None = None
 
 
 class ZAccountID(BaseModel):

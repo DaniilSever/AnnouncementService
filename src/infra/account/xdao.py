@@ -23,4 +23,5 @@ class XAccount(BaseModel):
     created_at: datetime = datetime.now()
     updated_at: datetime | None = None
     blocked_at: datetime | None = None
-    blocked_till: datetime | None = None
+    reason_blocked: str | None = None
+    blocked_to: datetime | None = None

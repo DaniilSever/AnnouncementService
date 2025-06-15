@@ -2,8 +2,18 @@ from uuid import UUID
 from core.configs import AccountConfig
 from core.exception import ExpError, ExpCode
 from domain.account.irepo import IAccRepo
-from domain.account.dto import QEmailSignupData, QEmail
-from domain.account.dto import ZAccount, ZAccountID, ZIsBusy
+from domain.account.dto import (
+    BannedTo,
+    # QDTO
+    QEmailSignupData,
+    QEmail,
+
+    # ZDTO
+    ZAccount,
+    ZAccountID,
+    ZIsBusy
+)
+from domain.account.models import AccRole
 from infra.account.repo import AccRepo
 from infra.account.xdao import XAccount
 from services.ads.svc import AdsService
@@ -116,6 +126,27 @@ class AccUseCase:
             count_ads = await self.ads_svc.get_count_ads_by_acc_id(acc_id)
         except ExpError as e:
             raise e
-        print(count_ads)
+
         x_acc = await self.repo.get_current_account(count_ads, acc_id)
         return ZAccount.model_validate(x_acc.model_dump(mode="json"))
+
+    async def set_role_account(self, acc_id: UUID, role: AccRole) -> bool:
+        try:
+            await self.repo.set_role_account(acc_id, role)
+        except KeyError as e:
+            raise ExpError(ExpCode.ACC_ACCOUNT_NOT_FOUND, str(e)) from e
+        return True
+
+    async def set_ban_account(self, acc_id: UUID, blocked_to: BannedTo, reason_banned: str) -> bool:
+        try:
+            await self.repo.set_ban_account(acc_id, blocked_to, reason_banned)
+        except KeyError as e:
+            raise ExpError(ExpCode.ACC_ACCOUNT_NOT_FOUND, str(e)) from e
+        return True
+
+    async def set_unban_account(self, acc_id: UUID) -> bool:
+        try:
+            await self.repo.set_unban_account(acc_id)
+        except KeyError as e:
+            raise ExpError(ExpCode.ACC_ACCOUNT_NOT_FOUND, str(e)) from e
+        return True

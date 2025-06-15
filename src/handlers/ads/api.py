@@ -25,6 +25,7 @@ from domain.ads.dto import (
     ZAdsComment,
     ZManyAds,
     ZManyAdsComment,
+    ZBanned,
 )
 from domain.account.models import AccRole
 
@@ -47,7 +48,7 @@ async def create_ads(
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
     account_id: Annotated[UUID | None, Header(description="Для APIKEY")] = None,
     ads_category: QAdsCategory = QAdsCategory.SELLING,
-) -> SuccessResp[ZAds]:
+) -> SuccessResp[ZAds] | SuccessResp[ZBanned]:
     """Обрабатывает HTTP-запрос на создание объявления с авторизацией и валидацией."""
     uc = AdsUseCase(AdsRepo(__repo_session))
 
@@ -55,6 +56,17 @@ async def create_ads(
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
 
     if jwt:
+        if jwt["is_banned"] == str(True):
+            return SuccessResp[ZBanned](
+                payload=ZBanned(
+                    account_id=jwt["acc_id"],
+                    is_banned=jwt["is_banned"],
+                    blocked_at=jwt["blocked_at"],
+                    reason_blocked=jwt["reason_blocked"],
+                    blocked_to=jwt["blocked_to"],
+                )
+            )
+
         account_id = jwt["acc_id"]
 
     res = await uc.create_ads(req, ads_category, account_id)
@@ -151,12 +163,24 @@ async def change_my_ads(
     jwt: AJwt,
     req: QChangeAds,
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
-) -> SuccessResp[ZAds]:
+) -> SuccessResp[ZAds] | SuccessResp[ZBanned]:
     """Обрабатывает HTTP-запрос на изменение моего объявления с авторизацией."""
     uc = AdsUseCase(AdsRepo(__repo_session))
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
+
+    if jwt["is_banned"] == str(True):
+        return SuccessResp[ZBanned](
+            payload=ZBanned(
+                account_id=jwt["acc_id"],
+                is_banned=jwt["is_banned"],
+                blocked_at=jwt["blocked_at"],
+                reason_blocked=jwt["reason_blocked"],
+                blocked_to=jwt["blocked_to"],
+            )
+        )
+
     acc_id = jwt["acc_id"]
     res = await uc.change_my_ads(req, acc_id)
     return SuccessResp[ZAds](payload=res)
@@ -173,12 +197,24 @@ async def change_category_ads(
     ads_id: Annotated[UUID, Path()],
     req: Annotated[QAdsCategory, Query()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
-) -> SuccessResp[ZAds]:
+) -> SuccessResp[ZAds] | SuccessResp[ZBanned]:
     """Обрабатывает HTTP-запрос на изменение категории объявления с авторизацией."""
     uc = AdsUseCase(AdsRepo(__repo_session))
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
+
+    if jwt["is_banned"] == str(True):
+        return SuccessResp[ZBanned](
+            payload=ZBanned(
+                account_id=jwt["acc_id"],
+                is_banned=jwt["is_banned"],
+                blocked_at=jwt["blocked_at"],
+                reason_blocked=jwt["reason_blocked"],
+                blocked_to=jwt["blocked_to"],
+            )
+        )
+
     acc_id = jwt["acc_id"]
     res = await uc.change_category_ads(ads_id, req, acc_id)
     return SuccessResp[ZAds](payload=res)
@@ -194,12 +230,24 @@ async def delete_ads(
     jwt: AJwt,
     ads_id: Annotated[UUID, Path()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
-) -> SuccessResp:
+) -> SuccessResp | SuccessResp[ZBanned]:
     """Обрабатывает HTTP-запрос на удаление объявления с авторизацией."""
     uc = AdsUseCase(AdsRepo(__repo_session))
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
+
+    if jwt["is_banned"] == str(True):
+        return SuccessResp[ZBanned](
+            payload=ZBanned(
+                account_id=jwt["acc_id"],
+                is_banned=jwt["is_banned"],
+                blocked_at=jwt["blocked_at"],
+                reason_blocked=jwt["reason_blocked"],
+                blocked_to=jwt["blocked_to"],
+            )
+        )
+
     acc_id = jwt["acc_id"]
     await uc.delete_ads(ads_id, acc_id)
     return SuccessResp()
@@ -216,12 +264,24 @@ async def create_ads_commentary(
     ads_id: Annotated[UUID, Path()],
     commentary: Annotated[str, Body()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
-) -> SuccessResp[ZAdsComment]:
+) -> SuccessResp[ZAdsComment] | SuccessResp[ZBanned]:
     """Обрабатывает HTTP-запрос на добавление комментария к объявлению с авторизацией."""
     uc = AdsUseCase(AdsRepo(__repo_session))
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
+
+    if jwt["is_banned"] == str(True):
+        return SuccessResp[ZBanned](
+            payload=ZBanned(
+                account_id=jwt["acc_id"],
+                is_banned=jwt["is_banned"],
+                blocked_at=jwt["blocked_at"],
+                reason_blocked=jwt["reason_blocked"],
+                blocked_to=jwt["blocked_to"],
+            )
+        )
+
     acc_id = jwt["acc_id"]
 
     req = QAddAdsComment(ads_id=ads_id, ads_comment=commentary)
@@ -274,12 +334,24 @@ async def update_ads_commentary(
     comm_id: Annotated[UUID, Path()],
     commentary: Annotated[str, Body()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
-) -> SuccessResp[ZAdsComment]:
+) -> SuccessResp[ZAdsComment] | SuccessResp[ZBanned]:
     """Обрабатывает HTTP-запрос на изменение комментария в объявлении с авторизацией."""
     uc = AdsUseCase(AdsRepo(__repo_session))
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
+
+    if jwt["is_banned"] == str(True):
+        return SuccessResp[ZBanned](
+            payload=ZBanned(
+                account_id=jwt["acc_id"],
+                is_banned=jwt["is_banned"],
+                blocked_at=jwt["blocked_at"],
+                reason_blocked=jwt["reason_blocked"],
+                blocked_to=jwt["blocked_to"],
+            )
+        )
+
     acc_id = jwt["acc_id"]
 
     req = QUpdateAdsComment(
@@ -300,12 +372,24 @@ async def delete_ads_commentary(
     ads_id: Annotated[UUID, Path()],
     comm_id: Annotated[UUID, Path()],
     __repo_session: Annotated[AsyncSession, Depends(get_ads_repo_session)],
-) -> SuccessResp:
+) -> SuccessResp | SuccessResp[ZBanned]:
     """Обрабатывает HTTP-запрос на удаление комментария в объявлении."""
     uc = AdsUseCase(AdsRepo(__repo_session))
 
     if not jwt:
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
+
+    if jwt["is_banned"] == str(True):
+        return SuccessResp[ZBanned](
+            payload=ZBanned(
+                account_id=jwt["acc_id"],
+                is_banned=jwt["is_banned"],
+                blocked_at=jwt["blocked_at"],
+                reason_blocked=jwt["reason_blocked"],
+                blocked_to=jwt["blocked_to"],
+            )
+        )
+
     acc_id = jwt["acc_id"]
 
     req = QDelAdsComment(comm_id=comm_id, ads_id=ads_id, account_id=acc_id)

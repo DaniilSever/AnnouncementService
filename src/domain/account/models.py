@@ -47,4 +47,5 @@ class Account(Base):
     )
     updated_at = Column(TIMESTAMP, nullable=True, comment="Дата обновления аккаунта")
     blocked_at = Column(TIMESTAMP, nullable=True, comment="Дата блокировки аккаунта")
-    blocked_till = Column(TIMESTAMP, nullable=True, comment="Дата снятие блокировки")
+    reason_blocked = Column(String, nullable=True, comment="Причина блокировки")
+    blocked_to = Column(TIMESTAMP, nullable=True, comment="Дата снятие блокировки")

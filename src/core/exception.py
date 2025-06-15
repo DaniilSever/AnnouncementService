@@ -31,6 +31,7 @@ class _AccExpCode:
 
     ACC_ACCOUNT_NOT_FOUND = "404", "Аккаунт не найдет"
     ACC_EMAIL_IS_BUSY = "400", "Емайл занят"
+    ACC_INCORRECT_ROLE = "400", "Нет прав доступа"
 
 
 class _AdsExpCode:

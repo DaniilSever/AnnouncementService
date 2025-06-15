@@ -1,11 +1,12 @@
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy import select, delete, update
+from sqlalchemy import select, delete, update, text
+from sqlalchemy.exc import NoResultFound
 
 from domain.account.irepo import IAccRepo
 from domain.account.models import Account, AccRole
-from domain.account.dto import QEmailSignupData
+from domain.account.dto import QEmailSignupData, BannedTo
 
 from .xdao import XAccount, XAccountID
 
@@ -59,7 +60,8 @@ class AccRepo(IAccRepo):
             created_at=row.created_at,
             updated_at=row.updated_at,
             blocked_at=row.blocked_at,
-            blocked_till=row.blocked_till,
+            reason_blocked=row.reason_blocked,
+            blocked_to=row.blocked_to,
         )
 
     async def get_account_by_email(self, email: str, count_ads: int | None = None) -> XAccount:
@@ -100,7 +102,8 @@ class AccRepo(IAccRepo):
             created_at=row.created_at,
             updated_at=row.updated_at,
             blocked_at=row.blocked_at,
-            blocked_till=row.blocked_till,
+            reason_blocked=row.reason_blocked,
+            blocked_to=row.blocked_to,
         )
 
     async def copy_account_from_signup(self, x_signup: QEmailSignupData) -> XAccountID:
@@ -165,7 +168,8 @@ class AccRepo(IAccRepo):
                     created_at=row.created_at,
                     updated_at=row.updated_at,
                     blocked_at=row.blocked_at,
-                    blocked_till=row.blocked_till,
+                    reason_blocked=row.reason_blocked,
+                    blocked_to=row.blocked_to,
                 )
             )
         return res
@@ -195,7 +199,8 @@ class AccRepo(IAccRepo):
             created_at=row.created_at,
             updated_at=row.updated_at,
             blocked_at=row.blocked_at,
-            blocked_till=row.blocked_till,
+            reason_blocked=row.reason_blocked,
+            blocked_to=row.blocked_to,
         )
 
     async def delete_acc(self, acc_id: UUID) -> None:
@@ -209,4 +214,60 @@ class AccRepo(IAccRepo):
         """
         req = delete(Account).where(Account.id == acc_id)
         await self.session.execute(req)
+        await self.session.commit()
+
+    async def set_role_account(self, acc_id: UUID, role: AccRole) -> None:
+        req = (
+            update(Account)
+            .values(role=role.value)
+            .where(Account.id == acc_id)
+        )
+        try:
+            await self.session.execute(req)
+        except NoResultFound as e:
+            raise KeyError("Аккаунт в бд не найден") from e
+        await self.session.commit()
+
+    async def set_ban_account(self, acc_id: UUID, blocked_to: BannedTo, reason_banned: str) -> None:
+        blocked_mapping = {
+            "week": text("NOW() + INTERVAL '7 DAYS'"),
+            "month": text("NOW() + INTERVAL '1 MONTH'"),
+            "month3": text("NOW() + INTERVAL '3 MONTHS'"),
+            "year": text("NOW() + INTERVAL '1 YEAR'"),
+            "forever": text("'infinity'::timestamp"),
+        }
+
+        ban_time = blocked_mapping.get(blocked_to.value)
+
+        req = (
+            update(Account)
+            .values(
+                is_banned=True,
+                blocked_at=text("NOW()"),
+                reason_blocked=reason_banned,
+                blocked_to=ban_time,
+            )
+            .where(Account.id == acc_id)
+        )
+        try:
+            await self.session.execute(req)
+        except NoResultFound as e:
+            raise KeyError("Аккаунт в бд не найден") from e
+        await self.session.commit()
+
+    async def set_unban_account(self, acc_id: UUID) -> None:
+        req = (
+            update(Account)
+            .values(
+                is_banned=False,
+                blocked_at=None,
+                reason_blocked=None,
+                blocked_to=None,
+            )
+            .where(Account.id == acc_id)
+        )
+        try:
+            await self.session.execute(req)
+        except NoResultFound as e:
+            raise KeyError("Аккаунт в бд не найден") from e
         await self.session.commit()

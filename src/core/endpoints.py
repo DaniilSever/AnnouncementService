@@ -18,8 +18,11 @@ class _EndpointsACCOUNT:
     ACCOUNT_GET_BY_ID = "/api/acccount/{acc_id}"
     ACCOUNT_GET_BY_EMAIL = "/api/account/{email}"
     ACCOUNT_COPY_FOR_SIGNUP = "/api/account/copy/signup"
-    ACCOUNT_GET_ALL = "/api/account/all"
+    ACCOUNT_GET_ALL = "/api/accounts/"
     ACCOUNT_IS_EMAIL_BUSY = "/api/account/{email}/is_busy"
+    ACCOUNT_SET_ROLE_ACCOUNT = "/api/account/{acc_id}/set/role"
+    ACCOUNT_SET_BAN_ACCOUNT = "/api/account/{acc_id}/set/ban"
+    ACCOUNT_SET_UNBAN_ACCOUNT = "/api/account/{acc_id}/set/unban"
     # ACCOUNT_GET_WARNINGS = "/api/account/warning"
     # ACCOUNT_GET_WARNING_BY_ID = "/api/account/warning/{warn_id}"
 

@@ -133,6 +133,10 @@ class AuthUseCase:
         access_payload = {
             "acc_id": str(z_acc.id),
             "role": str(z_acc.role.value),
+            "is_banned": str(z_acc.is_banned),
+            "blocked_at": str(z_acc.blocked_at),
+            "reason_blocked": str(z_acc.reason_blocked),
+            "blocked_to": str(z_acc.blocked_to),
             "type": "access",
         }
         access_token = create_jwt_token(
@@ -142,7 +146,11 @@ class AuthUseCase:
         refresh_payload = {
             "acc_id": str(z_acc.id),
             "role": str(z_acc.role.value),
-            "type": "refresh",
+            "is_banned": str(z_acc.is_banned),
+            "blocked_at": str(z_acc.blocked_at),
+            "reason_blocked": str(z_acc.reason_blocked),
+            "blocked_to": str(z_acc.blocked_to),
+            "type": "access",
         }
         refresh_token = create_jwt_token(
             refresh_payload, self.cfg.JWT_PRIVATE_KEY, delta=7 * 24 * 60 * 60
@@ -177,6 +185,10 @@ class AuthUseCase:
         access_payload = {
             "acc_id": payload["acc_id"],
             "role": payload["role"],
+            "is_banned": payload["is_banned"],
+            "blocked_at": payload["blocked_at"],
+            "reason_blocked": payload["reason_blocked"],
+            "blocked_to": payload["blocked_to"],
         }
         access_token = create_jwt_token(
             access_payload, self.cfg.JWT_PRIVATE_KEY, delta=3600

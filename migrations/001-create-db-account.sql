@@ -23,7 +23,8 @@ CREATE TABLE "Account"
     created_at      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at      TIMESTAMP       NULL,
     blocked_at      TIMESTAMP       NULL,
-    blocked_till    TIMESTAMP       NULL
+    reason_blocked  VARCHAR         NULL,
+    blocked_to    TIMESTAMP       NULL
 );
 --
 CREATE INDEX ON "Account" (id);
@@ -39,7 +40,8 @@ COMMENT ON COLUMN "Account".is_banned is 'Забанен ли аккаунт';
 COMMENT ON COLUMN "Account".created_at is 'Дата создания аккаута';
 COMMENT ON COLUMN "Account".updated_at is 'Дата обновления аккаунта';
 COMMENT ON COLUMN "Account".blocked_at is 'Дата блокировки аккаунта';
-COMMENT ON COLUMN "Account".blocked_till is 'Дата снятие блокировки';
+COMMENT ON COLUMN "Account".reason_blocked is 'Причина блокировки';
+COMMENT ON COLUMN "Account".blocked_to is 'Дата снятие блокировки';
 
 -- ------------------------
 
@@ -58,7 +60,7 @@ INSERT INTO "Account"(
     , created_at
     , updated_at
     , blocked_at
-    , blocked_till
+    , blocked_to
 )
 VALUES(
     '3a77e9c9-2861-4fbb-9fd9-522517f13021'
