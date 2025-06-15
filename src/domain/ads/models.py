@@ -85,7 +85,6 @@ class AdsComment(Base):
         updated_at (datetime | None): Дата и время последнего обновления комментария.
     """
 
-
     __tablename__ = "AdsComment"
 
     id = Column(

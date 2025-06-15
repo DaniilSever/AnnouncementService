@@ -14,6 +14,7 @@ class SuccessResp(BaseModel, Generic[T]):
         ok (bool): Флаг успешного выполнения, всегда True.
         payload (T | None): Объект ответа, может быть None.
     """
+
     ok: bool = True
     payload: T | None = Field(None, description="Объект ответа")
 
@@ -26,6 +27,7 @@ class ErrDetail(BaseModel):
         msg (str): Сообщение об ошибке.
         details (str | None): Дополнительные детали ошибки.
     """
+
     code: str = ""
     msg: str = ""
     details: str | None = None
@@ -38,6 +40,7 @@ class ErrResp(BaseModel):
         ok (bool): Флаг успешного выполнения, всегда False.
         err (ErrDetail): Объект с деталями ошибки.
     """
+
     ok: bool = False
     err: ErrDetail = Field(description="Объект ошибки")
 
