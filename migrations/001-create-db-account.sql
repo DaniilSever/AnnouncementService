@@ -40,6 +40,36 @@ COMMENT ON COLUMN "Account".blocked_till is 'Дата снятие блокир�
 
 -- ------------------------
 
+--SEED ADMIN
+-- Данные для входа: email | password:
+-- admin@ad.com | admin
+
+INSERT INTO "Account"(
+    id
+    , email
+    , pwd_hash
+    , salt
+    , role
+    , is_banned
+    , created_at
+    , updated_at
+    , blocked_at
+    , blocked_till
+)
+VALUES(
+    '3a77e9c9-2861-4fbb-9fd9-522517f13021'
+    , 'admin@ad.com'
+    , 'e1ee98334d5bfd0810fa6c03beef3cc3d05486a56c9d32e9b528d9af4477e3fa'
+    , 'a9330649b51c9ed1d905fddeabd606f7'
+    , 'admin'
+    , FALSE
+    , CURRENT_TIMESTAMP
+    , NULL
+    , NULL
+    , NULL
+);
+
+
 GRANT ALL PRIVILEGES ON DATABASE acc TO acc;
 GRANT ALL ON SCHEMA public TO acc;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO acc;
