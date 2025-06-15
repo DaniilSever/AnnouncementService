@@ -1,4 +1,5 @@
 from uuid import UUID
+
 from core.configs import AdsConfig
 from core.exception import ExpError, ExpCode
 
@@ -11,8 +12,11 @@ from domain.ads.dto import (
     QAddAdsComment,
     QUpdateAdsComment,
     QDelAdsComment,
+    ZAds,
+    ZAdsComment,
+    ZManyAds,
+    ZManyAdsComment,
 )
-from domain.ads.dto import ZAds, ZAdsComment, ZManyAds, ZManyAdsComment
 from domain.compl.dto import QCreateCompl, ZCompl
 
 from infra.ads.repo import AdsRepo

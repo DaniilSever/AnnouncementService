@@ -18,8 +18,16 @@ from core.exception import ExpError, ExpCode
 
 from app.account.uc import AccUseCase
 
-from domain.account.dto import BannedTo, QEmail, QEmailSignupData
-from domain.account.dto import ZAccount, ZAccountID, ZIsBusy, ZBanned
+from domain.account.dto import (
+    BannedTo,
+    QEmail,
+    QEmailSignupData,
+    ZAccount,
+    ZAccountID,
+    ZIsBusy,
+    ZBanned,
+)
+
 from domain.account.models import AccRole
 from domain.compl.dto import QCreateCompl, ZCompl
 from domain.compl.models import Service

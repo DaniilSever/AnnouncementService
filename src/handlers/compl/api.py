@@ -13,6 +13,7 @@ from domain.compl.models import Service
 from domain.account.models import AccRole
 
 from app.compl.uc import ComplUseCase
+
 from infra.compl.repo import ComplRepo, AsyncSession
 
 router = APIRouter(tags=["compl"])

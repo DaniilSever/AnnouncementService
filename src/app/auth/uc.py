@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from core.configs import AuthConfig
 from core.security import (
     create_confirm_code,
@@ -7,6 +8,7 @@ from core.security import (
     decode_jwt,
 )
 from core.exception import ExpError, ExpCode
+
 from domain.auth.dto import (
     # QDTO
     QEmailSignup,
@@ -27,8 +29,10 @@ from domain.account.dto import (
     # ZDTO
     ZAccount,
 )
+
 from infra.auth.repo import AuthRepo
 from infra.auth.xdao import XEmailSignup
+
 from services.account.svc import AccService
 from services.tg.client import TgClient
 from services.tg.const_msg import get_code_msg

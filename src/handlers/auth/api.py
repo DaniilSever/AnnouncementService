@@ -20,8 +20,11 @@ from domain.auth.dto import (
     QEmailSignin,
     QRefreshToken,
     QRevokeToken,
+    ZEmailSignup,
+    ZAccountID,
+    ZToken,
+    ZRevokedTokens,
 )
-from domain.auth.dto import ZEmailSignup, ZAccountID, ZToken, ZRevokedTokens
 
 from infra.auth.repo import AuthRepo, AsyncSession
 
