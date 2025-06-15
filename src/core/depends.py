@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from .configs import AccountConfig
 from services.account.svc import AccService
 
+
 async def get_account_repo_session() -> AsyncSession:
     """Получает асинхронную сессию репозитория аккаунтов.
 
@@ -22,6 +23,7 @@ async def get_auth_repo_session() -> AsyncSession:
     async with AsyncAuthRepoSession() as session:
         yield session
 
+
 async def get_ads_repo_session() -> AsyncSession:
     """Получает асинхронную сессию репозитория объявлений.
 
@@ -30,6 +32,7 @@ async def get_ads_repo_session() -> AsyncSession:
     """
     async with AsyncAdsRepoSession() as session:
         yield session
+
 
 def get_account_serivce() -> AccService:
     """Создаёт и возвращает сервис для работы с аккаунтами.

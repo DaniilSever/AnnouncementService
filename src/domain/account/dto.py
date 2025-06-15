@@ -2,11 +2,14 @@ from datetime import datetime
 from pydantic import BaseModel, EmailStr, UUID4
 from .models import AccRole
 
+
 class ZIsBusy(BaseModel):
     is_busy: bool
 
+
 class QEmail(BaseModel):
     email: str
+
 
 class QEmailSignupData(BaseModel):
     """Запись в бд SignupAccount"""
@@ -21,6 +24,7 @@ class QEmailSignupData(BaseModel):
     blocked_till: datetime | None = None
     attempts: int = 1
 
+
 class ZAccount(BaseModel):
     """Запись в бд Account"""
 
@@ -34,6 +38,7 @@ class ZAccount(BaseModel):
     updated_at: datetime | None = None
     blocked_at: datetime | None = None
     blocked_till: datetime | None = None
+
 
 class ZAccountID(BaseModel):
     id: UUID4

@@ -9,6 +9,7 @@ from domain.auth.models import SignupAccount, RefreshToken
 
 from .xdao import XEmailSignup, XRefreshToken
 
+
 class AuthRepo(IAuthRepo):
     """Репозиторий для работы с аутентификацией и регистрацией пользователей."""
 
@@ -20,7 +21,9 @@ class AuthRepo(IAuthRepo):
         """
         self.session: AsyncSession = _session
 
-    async def create_email_signup(self, email: str, pwd_hash: str, salt: str, code: int) -> XEmailSignup:
+    async def create_email_signup(
+        self, email: str, pwd_hash: str, salt: str, code: int
+    ) -> XEmailSignup:
         """Создаёт или обновляет запись регистрации по email с учётом попыток.
 
         Args:
@@ -85,10 +88,7 @@ class AuthRepo(IAuthRepo):
         Raises:
             KeyError: Если запись не найдена.
         """
-        req = (
-            select(SignupAccount)
-            .where(SignupAccount.id == signup_id)
-        )
+        req = select(SignupAccount).where(SignupAccount.id == signup_id)
         res = await self.session.execute(req)
         row = res.scalar_one_or_none()
         if row is None:
@@ -115,7 +115,9 @@ class AuthRepo(IAuthRepo):
         await self.session.execute(req)
         await self.session.commit()
 
-    async def inc_email_confirm_wrong_code_attempts(self, signup_id: UUID) -> XEmailSignup:
+    async def inc_email_confirm_wrong_code_attempts(
+        self, signup_id: UUID
+    ) -> XEmailSignup:
         """Увеличивает счётчик попыток неправильного ввода кода подтверждения.
 
         Args:
@@ -131,7 +133,7 @@ class AuthRepo(IAuthRepo):
             update(SignupAccount)
             .values(
                 attempts=SignupAccount.attempts + 1,
-                updated_at=text("CURRENT_TIMESTAMP(6)")
+                updated_at=text("CURRENT_TIMESTAMP(6)"),
             )
             .where(SignupAccount.id == signup_id)
             .execution_options(synchronize_session="fetch")
@@ -191,7 +193,9 @@ class AuthRepo(IAuthRepo):
             attempts=row.attempts,
         )
 
-    async def get_refresh_token_for_account(self, acc_id: UUID, token: str) -> XRefreshToken:
+    async def get_refresh_token_for_account(
+        self, acc_id: UUID, token: str
+    ) -> XRefreshToken:
         """Получает refresh-токен по аккаунту и значению токена.
 
         Args:
@@ -204,14 +208,11 @@ class AuthRepo(IAuthRepo):
         Raises:
             KeyError: Если токен не найден или не валиден.
         """
-        req = (
-            select(RefreshToken)
-            .where(
-                RefreshToken.account_id == acc_id,
-                RefreshToken.token == token,
-                RefreshToken.is_revoked is False,
-                RefreshToken.expires_at > text("NOW()")
-            )
+        req = select(RefreshToken).where(
+            RefreshToken.account_id == acc_id,
+            RefreshToken.token == token,
+            RefreshToken.is_revoked is False,
+            RefreshToken.expires_at > text("NOW()"),
         )
         res = await self.session.execute(req)
         await self.session.commit()
@@ -224,7 +225,7 @@ class AuthRepo(IAuthRepo):
             token=row.token,
             is_revoked=row.is_revoked,
             created_at=row.created_at,
-            expires_at=row.expires_at
+            expires_at=row.expires_at,
         )
 
     async def revoke_expired_tokens(self) -> None:
@@ -250,7 +251,7 @@ class AuthRepo(IAuthRepo):
             .values(
                 account_id=acc_id,
                 token=token,
-                expires_at=text("NOW() + INTERVAL '7 DAYS'")
+                expires_at=text("NOW() + INTERVAL '7 DAYS'"),
             )
             .returning(RefreshToken)
         )
@@ -263,7 +264,7 @@ class AuthRepo(IAuthRepo):
             token=row.token,
             is_revoked=row.is_revoked,
             created_at=row.created_at,
-            expires_at=row.expires_at
+            expires_at=row.expires_at,
         )
 
     async def revoke_tokens(self, acc_id: UUID) -> int:
@@ -281,10 +282,7 @@ class AuthRepo(IAuthRepo):
             .values(
                 is_revoked=True,
             )
-            .where(
-                RefreshToken.acc_id == acc_id,
-                RefreshToken.is_revoked is False
-            )
+            .where(RefreshToken.acc_id == acc_id, RefreshToken.is_revoked is False)
         )
         res = await self.session.execute(req)
         await self.session.commit()

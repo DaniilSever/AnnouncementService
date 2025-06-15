@@ -1,6 +1,7 @@
 from datetime import datetime
 from pydantic import BaseModel, UUID4
 
+
 class XAds(BaseModel):
     id: UUID4
     account_id: UUID4
@@ -15,6 +16,7 @@ class XAds(BaseModel):
     updated_at: datetime | None = None
     deleted_at: datetime | None = None
     reason_deletion: str | None = None
+
 
 class XAdsComment(BaseModel):
     id: UUID4

@@ -14,10 +14,7 @@ from domain.account.dto import ZAccount, ZAccountID, ZIsBusy
 from infra.account.repo import AccRepo
 
 router = APIRouter(tags=["account"])
-tags = {
-    "name": "account",
-    "description": "Внутренние эндпоинты работы с аккаунтом"
-}
+tags = {"name": "account", "description": "Внутренние эндпоинты работы с аккаунтом"}
 
 # @router.get(
 #     Enp.ACCOUNT_HEALTHCHECK,
@@ -35,11 +32,12 @@ tags = {
 # async def get_account_current():
 #     pass
 
+
 @router.get(
     Enp.ACCOUNT_GET_BY_ID,
     summary="Получить аккаунт по ID",
     status_code=200,
-    responses=responses(400, 404)
+    responses=responses(400, 404),
 )
 async def get_account_by_id(
     acc_id: Annotated[UUID, Path()],
@@ -50,50 +48,54 @@ async def get_account_by_id(
     res = await uc.get_account_by_id(acc_id)
     return SuccessResp[ZAccount](payload=res)
 
+
 @router.get(
     Enp.ACCOUNT_GET_BY_EMAIL,
     summary="Получить аккаунт по Email",
     status_code=200,
-    responses=responses(400, 404)
+    responses=responses(400, 404),
 )
 async def get_account_by_email(
     req: Annotated[QEmail, Path()],
-    _repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)]
+    _repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
 ) -> SuccessResp[ZAccount]:
     """Обрабатывает HTTP-запрос на получение аккаунта по email."""
     uc = AccUseCase(AccRepo(_repo_session))
     res = await uc.get_account_by_email(req)
     return SuccessResp[ZAccount](payload=res)
 
+
 @router.post(
     Enp.ACCOUNT_COPY_FOR_SIGNUP,
     summary="Копирование аккаунта после регистрации",
     status_code=200,
-    responses=responses(400,404)
+    responses=responses(400, 404),
 )
 async def copy_account_from_signup(
     req: Annotated[QEmailSignupData, Body()],
-    _repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)]
+    _repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
 ) -> SuccessResp[ZAccountID]:
     """Обрабатывает HTTP-запрос на копирование аккаунта после регистрации."""
     uc = AccUseCase(AccRepo(_repo_session))
     res = await uc.copy_account_from_signup(req)
     return SuccessResp[ZAccountID](payload=res)
 
+
 @router.post(
     Enp.ACCOUNT_IS_EMAIL_BUSY,
     summary="Проверка существования email",
     status_code=200,
-    responses=responses(404)
+    responses=responses(404),
 )
 async def is_email_busy(
     req: Annotated[QEmail, Path()],
-    _repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)]
+    _repo_session: Annotated[AsyncSession, Depends(get_account_repo_session)],
 ) -> SuccessResp[ZIsBusy]:
     """Обрабатывает HTTP-запрос на проверку существования email."""
     uc = AccUseCase(AccRepo(_repo_session))
     res = await uc.is_email_busy(req)
     return SuccessResp[ZIsBusy](payload=res)
+
 
 @router.get(
     Enp.ACCOUNT_GET_ALL,
@@ -107,6 +109,7 @@ async def get_accounts(
     uc = AccUseCase(AccRepo(_repo_session))
     res = await uc.get_accounts()
     return SuccessResp[list[ZAccount]](payload=res)
+
 
 # @router.get(
 #     Enp.ACCOUNT_GET_WARNINGS,

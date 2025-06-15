@@ -16,7 +16,9 @@ from .endpoints import Endpoints as Enp
 from .configs import AuthConfig
 
 cfg = AuthConfig()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl=Enp.AUTH_SIGNIN_EMAIL_FORM, auto_error=False)
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl=Enp.AUTH_SIGNIN_EMAIL_FORM, auto_error=False
+)
 
 ApiKeyHeader = Annotated[
     str | None,
@@ -30,7 +32,10 @@ ApiKeyHeader = Annotated[
     ),
 ]
 
-def create_password_hash(pwd: str, salt: str | None = None) -> tuple[str, str]:  # pragma: no cover
+
+def create_password_hash(
+    pwd: str, salt: str | None = None
+) -> tuple[str, str]:  # pragma: no cover
     """Генерирует хеш пароля с использованием соли.
 
     Args:
@@ -46,6 +51,7 @@ def create_password_hash(pwd: str, salt: str | None = None) -> tuple[str, str]: 
     hash_hex = hash_object.hexdigest()
     return hash_hex, salt
 
+
 def create_confirm_code() -> str:
     """Генерирует 10-значный код подтверждения.
 
@@ -57,7 +63,10 @@ def create_confirm_code() -> str:
     random_str = "".join(random.choice(alphabet) for _ in range(size))
     return random_str
 
-def create_jwt_token(payload: dict, private_key: str, delta: int | None = None) -> str:  # pragma: no cover
+
+def create_jwt_token(
+    payload: dict, private_key: str, delta: int | None = None
+) -> str:  # pragma: no cover
     """Генерирует JWT токен.
 
     Args:
@@ -111,6 +120,7 @@ async def decode_jwt(token: str, key: str) -> dict:  # pragma: no cover
     except InvalidTokenError as e:
         raise ValueError("incorrect jwt") from e
     return payload
+
 
 async def get_jwt_payload(
     token: Annotated[str, Depends(oauth2_scheme)],

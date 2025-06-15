@@ -10,16 +10,22 @@ from core.exception import ExpError, ExpCode
 
 from app.ads.uc import AdsUseCase
 
-from domain.ads.dto import QCreateAds, QAdsCategory, QFilter, QChangeAds, QAddAdsComment, QUpdateAdsComment, QDelAdsComment
+from domain.ads.dto import (
+    QCreateAds,
+    QAdsCategory,
+    QFilter,
+    QChangeAds,
+    QAddAdsComment,
+    QUpdateAdsComment,
+    QDelAdsComment,
+)
 from domain.ads.dto import ZAds, ZAdsComment, ZManyAds, ZManyAdsComment
 
 from infra.ads.repo import AdsRepo
 
 router = APIRouter(tags=["ads"])
-tags = {
-    "name": "ads",
-    "description": "Внутренние эндпоинты работы с объявлениями"
-}
+tags = {"name": "ads", "description": "Внутренние эндпоинты работы с объявлениями"}
+
 
 @router.post(
     Enp.ADS_CREATE,
@@ -47,11 +53,12 @@ async def create_ads(
     res = await uc.create_ads(req, ads_category, account_id)
     return SuccessResp[ZAds](payload=res)
 
+
 @router.get(
     Enp.ADS_GET_ALL,
     summary="Получить все объявление по фильтру",
     status_code=200,
-    responses=responses(400)
+    responses=responses(400),
 )
 async def get_ads_all(
     qfilter: Annotated[QFilter, Query()],
@@ -62,11 +69,12 @@ async def get_ads_all(
     res = await uc.get_ads_all(qfilter)
     return SuccessResp[ZManyAds](payload=res)
 
+
 @router.get(
     Enp.ADS_GET_BY_ID,
     summary="Получить объявление по его id",
     status_code=200,
-    responses=responses(400,404)
+    responses=responses(400, 404),
 )
 async def get_ads_by_id(
     ads_id: Annotated[UUID, Query()],
@@ -77,11 +85,12 @@ async def get_ads_by_id(
     res = await uc.get_ads_by_id(ads_id)
     return SuccessResp[ZAds](payload=res)
 
+
 @router.get(
     Enp.ADS_GET_BY_ACCOUNT,
     summary="Получить все объявления пользователя",
     status_code=200,
-    responses=responses(400, 404)
+    responses=responses(400, 404),
 )
 async def get_ads_by_account(
     acc_id: Annotated[UUID, Query()],
@@ -92,11 +101,12 @@ async def get_ads_by_account(
     res = await uc.get_ads_by_account_id(acc_id)
     return SuccessResp[ZManyAds](payload=res)
 
+
 @router.get(
     Enp.ADS_GET_BY_ME,
     summary="Получить мои объявления",
     status_code=200,
-    responses=responses(400, 404)
+    responses=responses(400, 404),
 )
 async def get_my_ads(
     jwt: AJwt,
@@ -116,7 +126,7 @@ async def get_my_ads(
     Enp.ADS_CHANGE,
     summary="Изменить мое объявление",
     status_code=200,
-    responses=responses(400, 404)
+    responses=responses(400, 404),
 )
 async def change_my_ads(
     jwt: AJwt,
@@ -132,11 +142,12 @@ async def change_my_ads(
     res = await uc.change_my_ads(req, acc_id)
     return SuccessResp[ZAds](payload=res)
 
+
 @router.patch(
     Enp.ADS_CHANGE_CATEGORY,
     summary="Изменить категорию объявления",
     status_code=200,
-    responses=responses(400, 404)
+    responses=responses(400, 404),
 )
 async def change_category_ads(
     jwt: AJwt,
@@ -153,11 +164,12 @@ async def change_category_ads(
     res = await uc.change_category_ads(ads_id, req, acc_id)
     return SuccessResp[ZAds](payload=res)
 
+
 @router.delete(
     Enp.ADS_DELETE,
     summary="Удалить объявление",
     status_code=200,
-    responses=responses(400, 404)
+    responses=responses(400, 404),
 )
 async def delete_ads(
     jwt: AJwt,
@@ -173,11 +185,12 @@ async def delete_ads(
     await uc.delete_ads(ads_id, acc_id)
     return SuccessResp()
 
+
 @router.post(
     Enp.ADS_ADD_COMMENTARY,
     summary="Добавить комментарий к объявлению",
     status_code=200,
-    responses=responses(400, 404)
+    responses=responses(400, 404),
 )
 async def create_ads_commentary(
     jwt: AJwt,
@@ -192,18 +205,16 @@ async def create_ads_commentary(
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
     acc_id = jwt["sub"]
 
-    req = QAddAdsComment(
-        ads_id=ads_id,
-        ads_comment=commentary
-    )
+    req = QAddAdsComment(ads_id=ads_id, ads_comment=commentary)
     res = await uc.create_ads_commentary(req, acc_id)
     return SuccessResp[ZAdsComment](payload=res)
 
-@router.get (
+
+@router.get(
     Enp.ADS_GET_COMMENTATIES,
     summary="Получить список комментариев в объявлении",
     status_code=200,
-    responses=responses(400, 404)
+    responses=responses(400, 404),
 )
 async def get_ads_commentaries(
     ads_id: Annotated[UUID, Path()],
@@ -214,11 +225,12 @@ async def get_ads_commentaries(
     res = await uc.get_ads_commentaries(ads_id)
     return SuccessResp[ZManyAdsComment](payload=res)
 
-@router.get (
+
+@router.get(
     Enp.ADS_ACTION_COMMENTARY,
     summary="Получить данные по комментарию в объявлении",
     status_code=200,
-    responses=responses(400, 404)
+    responses=responses(400, 404),
 )
 async def get_ads_commentary(
     ads_id: Annotated[UUID, Path()],
@@ -230,11 +242,12 @@ async def get_ads_commentary(
     res = await uc.get_ads_commentary(ads_id, comm_id)
     return SuccessResp[ZAdsComment](payload=res)
 
-@router.patch (
+
+@router.patch(
     Enp.ADS_ACTION_COMMENTARY,
     summary="Изменить комментарий в объявлении",
     status_code=200,
-    responses=responses(400, 404)
+    responses=responses(400, 404),
 )
 async def update_ads_commentary(
     jwt: AJwt,
@@ -251,19 +264,17 @@ async def update_ads_commentary(
     acc_id = jwt["sub"]
 
     req = QUpdateAdsComment(
-        comm_id=comm_id,
-        ads_id=ads_id,
-        acccount_id=acc_id,
-        ads_comment=commentary
+        comm_id=comm_id, ads_id=ads_id, acccount_id=acc_id, ads_comment=commentary
     )
     res = await uc.update_ads_commentary(req)
     return SuccessResp[ZAdsComment](payload=res)
 
-@router.delete (
+
+@router.delete(
     Enp.ADS_ACTION_COMMENTARY,
     summary="Удалить комментарий в объявлении",
     status_code=200,
-    responses=responses(400, 404)
+    responses=responses(400, 404),
 )
 async def delete_ads_commentary(
     jwt: AJwt,
@@ -278,10 +289,6 @@ async def delete_ads_commentary(
         raise ExpError(ExpCode.SYS_UNAUTHORIZE)
     acc_id = jwt["sub"]
 
-    req = QDelAdsComment(
-        comm_id=comm_id,
-        ads_id=ads_id,
-        account_id=acc_id
-    )
+    req = QDelAdsComment(comm_id=comm_id, ads_id=ads_id, account_id=acc_id)
     await uc.delete_ads_commentary(req)
     return SuccessResp()

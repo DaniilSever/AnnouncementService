@@ -11,13 +11,13 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import DeclarativeBase
 
 
-
 class Base(DeclarativeBase):
     """Базовый класс для всех моделей SQLAlchemy"""
 
 
 class AccRole(enum.Enum):
     """Роли пользователей"""
+
     USER = "user"
     ADMIN = "admin"
 
@@ -27,13 +27,22 @@ class Account(Base):
 
     __tablename__ = "Account"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4, comment="ID аккаунта в системе")
+    id = Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid4,
+        comment="ID аккаунта в системе",
+    )
     email = Column(String(255), nullable=False, comment="Email аккаунта")
     pwd_hash = Column(String(255), nullable=False, comment="SHA-256-хеш пароля")
     salt = Column(String, nullable=False, comment="Соль для хеша")
     role = Column(String, nullable=False, comment="Роли пользователей")
-    is_banned = Column(Boolean, nullable=False, default=False, comment="Забанен ли аккаунт")
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now, comment="Дата создания аккаута")
+    is_banned = Column(
+        Boolean, nullable=False, default=False, comment="Забанен ли аккаунт"
+    )
+    created_at = Column(
+        TIMESTAMP, nullable=False, default=datetime.now, comment="Дата создания аккаута"
+    )
     updated_at = Column(TIMESTAMP, nullable=True, comment="Дата обновления аккаунта")
     blocked_at = Column(TIMESTAMP, nullable=True, comment="Дата блокировки аккаунта")
     blocked_till = Column(TIMESTAMP, nullable=True, comment="Дата снятие блокировки")

@@ -1,8 +1,19 @@
 from datetime import datetime
 from core.configs import AuthConfig
-from core.security import create_confirm_code, create_password_hash, create_jwt_token, decode_jwt
+from core.security import (
+    create_confirm_code,
+    create_password_hash,
+    create_jwt_token,
+    decode_jwt,
+)
 from core.exception import ExpError, ExpCode
-from domain.auth.dto import QEmailSignup, QConfirmCode, QEmailSignin, QRefreshToken, QRevokeToken
+from domain.auth.dto import (
+    QEmailSignup,
+    QConfirmCode,
+    QEmailSignin,
+    QRefreshToken,
+    QRevokeToken,
+)
 from domain.auth.dto import ZEmailSignup, ZAccountID, ZToken, ZRevokedTokens
 from domain.auth.irepo import IAuthRepo
 from domain.account.dto import QEmailSignupData
@@ -10,6 +21,7 @@ from domain.account.dto import ZAccount
 from infra.auth.repo import AuthRepo
 from infra.auth.xdao import XEmailSignup
 from services.account.svc import AccService
+
 
 class AuthUseCase:
     """Управляет бизнес-логикой аунтификации."""
@@ -28,7 +40,6 @@ class AuthUseCase:
         self.repo: IAuthRepo = _repo
         self.acc_svc: AccService = _acc_svc
 
-
     async def signup_email(self, req: QEmailSignup) -> ZEmailSignup:
         """Создаёт заявку на регистрацию по email.
 
@@ -45,9 +56,13 @@ class AuthUseCase:
         pwd_hash, salt = create_password_hash(req.password)
 
         try:
-            x_signup: XEmailSignup = await self.repo.create_email_signup(req.email, pwd_hash, salt, code)
+            x_signup: XEmailSignup = await self.repo.create_email_signup(
+                req.email, pwd_hash, salt, code
+            )
         except RecursionError as e:
-            x_signup: XEmailSignup = await self.repo.block_email_confirm_by_email(req.email)
+            x_signup: XEmailSignup = await self.repo.block_email_confirm_by_email(
+                req.email
+            )
             raise ExpError(ExpCode.AUTH_MANY_REGISTRATION_ATTEMPTS, str(e)) from e
 
         return ZEmailSignup.model_validate(x_signup.model_dump(mode="json"))
@@ -108,13 +123,17 @@ class AuthUseCase:
             "sub": str(z_acc.id),
             "type": "access",
         }
-        access_token = create_jwt_token(access_payload, self.cfg.JWT_PRIVATE_KEY, delta=3600)
+        access_token = create_jwt_token(
+            access_payload, self.cfg.JWT_PRIVATE_KEY, delta=3600
+        )
 
         refresh_payload = {
             "sub": str(z_acc.id),
             "type": "refresh",
         }
-        refresh_token = create_jwt_token(refresh_payload, self.cfg.JWT_PRIVATE_KEY, delta=7 * 24 * 60 * 60)
+        refresh_token = create_jwt_token(
+            refresh_payload, self.cfg.JWT_PRIVATE_KEY, delta=7 * 24 * 60 * 60
+        )
 
         await self.repo.save_refresh_token(
             acc_id=z_acc.id,
@@ -144,10 +163,10 @@ class AuthUseCase:
         except KeyError as e:
             raise ExpError(ExpCode.AUTH_REFRESH_TOKEN_NOT_FOUND, str(e)) from e
 
-        access_payload = {
-            "sub": str(acc_id)
-        }
-        access_token = create_jwt_token(access_payload, self.cfg.JWT_PRIVATE_KEY, delta=3600)
+        access_payload = {"sub": str(acc_id)}
+        access_token = create_jwt_token(
+            access_payload, self.cfg.JWT_PRIVATE_KEY, delta=3600
+        )
 
         return ZToken(access_token=access_token, refresh_token=req.refresh_token)
 
@@ -165,10 +184,7 @@ class AuthUseCase:
         if count == 0:
             raise ExpError(ExpCode.AUTH_REVOKE_TOKEN_NOT_FOUND)
 
-        return ZRevokedTokens(
-            message=f"Успешно отозван(ы) {count} токен(ы) "
-        )
-
+        return ZRevokedTokens(message=f"Успешно отозван(ы) {count} токен(ы) ")
 
     # ------------------ Tools ------------------
 

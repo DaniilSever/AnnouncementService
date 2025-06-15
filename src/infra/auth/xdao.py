@@ -1,8 +1,10 @@
 from datetime import datetime
 from pydantic import BaseModel, EmailStr, UUID4
 
+
 class XEmailSignup(BaseModel):
     """Запись в бд SignupAccount"""
+
     id: UUID4
     email: EmailStr | str
     pwd_hash: str
@@ -13,8 +15,10 @@ class XEmailSignup(BaseModel):
     blocked_till: datetime | None = None
     attempts: int = 1
 
+
 class XRefreshToken(BaseModel):
     """Запись в бд RefershToken"""
+
     id: UUID4
     account_id: UUID4
     token: str

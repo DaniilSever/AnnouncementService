@@ -3,12 +3,16 @@ from pydantic import BaseModel, EmailStr, UUID4
 
 from domain.account.models import AccRole
 
+
 class XAccountID(BaseModel):
     """Запись ID в бд Account"""
+
     id: UUID4
+
 
 class XAccount(BaseModel):
     """Запись в бд Account"""
+
     id: UUID4
     email: str
     pwd_hash: str

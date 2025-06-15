@@ -3,21 +3,29 @@ from fastapi import APIRouter, Depends, Body
 from fastapi.security import OAuth2PasswordRequestForm
 
 from core.endpoints import Endpoints as Enp
-from core.depends import get_auth_repo_session, AsyncSession, get_account_serivce, AccService
+from core.depends import (
+    get_auth_repo_session,
+    AsyncSession,
+    get_account_serivce,
+    AccService,
+)
 from core.response import responses, SuccessResp
 
 from app.auth.uc import AuthUseCase
 
-from domain.auth.dto import QEmailSignup, QConfirmCode, QEmailSignin, QRefreshToken, QRevokeToken
+from domain.auth.dto import (
+    QEmailSignup,
+    QConfirmCode,
+    QEmailSignin,
+    QRefreshToken,
+    QRevokeToken,
+)
 from domain.auth.dto import ZEmailSignup, ZAccountID, ZToken, ZRevokedTokens
 
 from infra.auth.repo import AuthRepo
 
 router = APIRouter(tags=["auth"])
-tags = {
-    "name": "auth",
-    "description": "Внутренние эндпоинты авторизации"
-}
+tags = {"name": "auth", "description": "Внутренние эндпоинты авторизации"}
 
 # @router.get(
 #     Enp.AUTH_HEALTHCHECK,
@@ -34,7 +42,7 @@ tags = {
     Enp.AUTH_SIGNUP_EMAIL,
     summary="Регистрация по email+пароль, с отправкой кода подтверждения",
     status_code=200,
-    responses=responses(400, 404)
+    responses=responses(400, 404),
 )
 async def signup_email(
     req: Annotated[QEmailSignup, Body()],
@@ -46,11 +54,12 @@ async def signup_email(
     res = await uc.signup_email(req)
     return SuccessResp[ZEmailSignup](payload=res)
 
+
 @router.post(
     Enp.AUTH_CONFIRM_EMAIL,
     summary="Подтверждение емейла вводом кода",
     status_code=200,
-    responses=responses(400, 404)
+    responses=responses(400, 404),
 )
 async def confirm_email(
     req: Annotated[QConfirmCode, Body()],
@@ -62,11 +71,12 @@ async def confirm_email(
     res = await uc.confirm_email(req)
     return SuccessResp[ZAccountID](payload=res)
 
+
 @router.post(
     Enp.AUTH_SIGNIN_EMAIL,
     summary="Авторизация в системе",
     status_code=200,
-    responses=responses(400,404)
+    responses=responses(400, 404),
 )
 async def signin_email(
     req: Annotated[QEmailSignin, Body()],
@@ -78,11 +88,12 @@ async def signin_email(
     res = await uc.signin_email(req)
     return SuccessResp[ZToken](payload=res)
 
+
 @router.post(
     Enp.AUTH_SIGNIN_EMAIL_FORM,
     summary="Авторизация в системе (сваггер)",
     status_code=200,
-    responses=responses(400,404)
+    responses=responses(400, 404),
 )
 async def signin_email_form(
     form: Annotated[OAuth2PasswordRequestForm, Depends()],
@@ -100,7 +111,7 @@ async def signin_email_form(
     Enp.AUTH_REFRESH_TOKEN,
     summary="Рефреш токена",
     status_code=200,
-    responses=responses(400,404)
+    responses=responses(400, 404),
 )
 async def refresh_token(
     req: Annotated[QRefreshToken, Body()],
@@ -117,7 +128,7 @@ async def refresh_token(
     Enp.AUTH_REVOKE_TOKEN,
     summary="Деактивация докетов по acc_id",
     status_code=200,
-    responses=responses(400,404)
+    responses=responses(400, 404),
 )
 async def revoke_token(
     req: Annotated[QRevokeToken, Body()],

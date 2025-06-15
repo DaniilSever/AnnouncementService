@@ -23,23 +23,38 @@ class Ads(Base):
 
     __tablename__ = "Ads"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4, comment="ID объявления в системе")
-    account_id = Column(UUID(as_uuid=True), nullable=False, comment="ID аккаунта владельца объявления")
+    id = Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid4,
+        comment="ID объявления в системе",
+    )
+    account_id = Column(
+        UUID(as_uuid=True), nullable=False, comment="ID аккаунта владельца объявления"
+    )
     title = Column(String(255), nullable=False, comment="Название объявления")
     description = Column(String, nullable=False, comment="Описания объявления")
     ads_category = Column(String, nullable=False, comment="Категория объявления")
     price = Column(Integer, nullable=False, comment="Цена услуги")
-    count_views = Column(Integer, nullable=False, default=0, comment="Количество просмотров объявления")
-    count_comments = Column(Integer, nullable=False, default=0, comment="Количество комментариев")
-    is_deleted = Column(BOOLEAN, nullable=False, default=False, comment="Удалено ли объявление")
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now, comment="Дата создания")
+    count_views = Column(
+        Integer, nullable=False, default=0, comment="Количество просмотров объявления"
+    )
+    count_comments = Column(
+        Integer, nullable=False, default=0, comment="Количество комментариев"
+    )
+    is_deleted = Column(
+        BOOLEAN, nullable=False, default=False, comment="Удалено ли объявление"
+    )
+    created_at = Column(
+        TIMESTAMP, nullable=False, default=datetime.now, comment="Дата создания"
+    )
     updated_at = Column(TIMESTAMP, nullable=True, comment="Дата последнего изменения")
     deleted_at = Column(TIMESTAMP, nullable=True, comment="Дата удаления объявления")
-    reason_deletion = Column(String, nullable=True, comment="Причина удаления объявления")
-
-    __table_args__ = (
-        Index("ix_ads_account_id", "account_id"),
+    reason_deletion = Column(
+        String, nullable=True, comment="Причина удаления объявления"
     )
+
+    __table_args__ = (Index("ix_ads_account_id", "account_id"),)
 
 
 class AdsComment(Base):
@@ -47,11 +62,25 @@ class AdsComment(Base):
 
     __tablename__ = "AdsComment"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4, comment="ID комментария в системе")
-    ads_id = Column(UUID(as_uuid=True), ForeignKey("Ads.id", ondelete="CASCADE"), nullable=False, comment="ID Объявления")
-    account_id = Column(UUID(as_uuid=True), nullable=False, comment="ID Автора комментария")
+    id = Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid4,
+        comment="ID комментария в системе",
+    )
+    ads_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("Ads.id", ondelete="CASCADE"),
+        nullable=False,
+        comment="ID Объявления",
+    )
+    account_id = Column(
+        UUID(as_uuid=True), nullable=False, comment="ID Автора комментария"
+    )
     ads_comment = Column(String, nullable=False, comment="Комментарий в объявлении")
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now, comment="Дата создания")
+    created_at = Column(
+        TIMESTAMP, nullable=False, default=datetime.now, comment="Дата создания"
+    )
     updated_at = Column(TIMESTAMP, nullable=True, comment="Дата последнего изменения")
 
     __table_args__ = (

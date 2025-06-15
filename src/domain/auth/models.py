@@ -20,6 +20,7 @@ class Base(DeclarativeBase):
 
 class SignupAccount(Base):
     """Модель регистрации аккаунта по email"""
+
     __tablename__ = "SignupAccount"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
@@ -37,6 +38,7 @@ class SignupAccount(Base):
 
 class RefreshToken(Base):
     """Модель refresh-токена, используемого для продления сессии"""
+
     __tablename__ = "RefreshToken"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)

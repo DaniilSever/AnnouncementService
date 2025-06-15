@@ -7,7 +7,15 @@ from sqlalchemy.exc import NoResultFound
 from core.exception import ExpError, ExpCode
 
 from domain.ads.irepo import IAdsRepo
-from domain.ads.dto import QCreateAds, QFilter, QAdsCategory, QAdsPriceFilter, QChangeAds, QAddAdsComment, QUpdateAdsComment
+from domain.ads.dto import (
+    QCreateAds,
+    QFilter,
+    QAdsCategory,
+    QAdsPriceFilter,
+    QChangeAds,
+    QAddAdsComment,
+    QUpdateAdsComment,
+)
 from domain.ads.models import Ads, AdsComment
 
 from .xdao import XAds, XAdsComment
@@ -24,7 +32,9 @@ class AdsRepo(IAdsRepo):
         """
         self.session: AsyncSession = _session
 
-    async def create_ads(self, ads: QCreateAds, ads_category: QAdsCategory, acc_id: UUID | None = None) -> XAds:
+    async def create_ads(
+        self, ads: QCreateAds, ads_category: QAdsCategory, acc_id: UUID | None = None
+    ) -> XAds:
         """Создаёт объявление в базе данных.
 
         Args:
@@ -79,11 +89,7 @@ class AdsRepo(IAdsRepo):
         await self.session.commit()
         total = count_res.scalar_one()
 
-        req = (
-            select(Ads)
-            .limit(qfilter.limit)
-            .offset(qfilter.offset)
-        )
+        req = select(Ads).limit(qfilter.limit).offset(qfilter.offset)
         if qfilter.ads_category:
             req = req.where(Ads.ads_category == qfilter.ads_category.value)
 
@@ -134,13 +140,7 @@ class AdsRepo(IAdsRepo):
             XAds: Объявление с указанным ID.
         """
         req = (
-            update(Ads)
-            .values(
-                count_views = Ads.count_views + 1
-            )
-            .where(
-                Ads.id == ads_id
-            )
+            update(Ads).values(count_views=Ads.count_views + 1).where(Ads.id == ads_id)
         )
         try:
             res = await self.session.execute(req)
@@ -148,10 +148,7 @@ class AdsRepo(IAdsRepo):
             raise KeyError("Объявление не найдено") from e
         await self.session.commit()
 
-        req = (
-            select(Ads)
-            .where(Ads.id == ads_id)
-        )
+        req = select(Ads).where(Ads.id == ads_id)
         res = await self.session.execute(req)
         await self.session.commit()
         row = res.scalar_one_or_none()
@@ -227,12 +224,9 @@ class AdsRepo(IAdsRepo):
                 title=new_ads.title,
                 description=new_ads.description,
                 price=new_ads.price,
-                updated_at=text("NOW()")
+                updated_at=text("NOW()"),
             )
-            .where(
-                Ads.account_id == acc_id,
-                Ads.id == new_ads.ads_id
-            )
+            .where(Ads.account_id == acc_id, Ads.id == new_ads.ads_id)
             .returning(Ads)
         )
         try:
@@ -257,7 +251,9 @@ class AdsRepo(IAdsRepo):
             reason_deletion=row.reason_deletion,
         )
 
-    async def update_category_ads(self, ads_id: UUID, new_category: QAdsCategory, acc_id: UUID) -> XAds:
+    async def update_category_ads(
+        self, ads_id: UUID, new_category: QAdsCategory, acc_id: UUID
+    ) -> XAds:
         """Обновляет категорию объявления по ID объявления и аккаунта.
 
         Args:
@@ -270,10 +266,7 @@ class AdsRepo(IAdsRepo):
         """
         req = (
             update(Ads)
-            .values(
-                ads_category=new_category.value,
-                updated_at=text("NOW()")
-            )
+            .values(ads_category=new_category.value, updated_at=text("NOW()"))
             .where(Ads.account_id == acc_id, Ads.id == ads_id)
             .returning(Ads)
         )
@@ -309,13 +302,7 @@ class AdsRepo(IAdsRepo):
         Returns:
             None
         """
-        req = (
-            delete(Ads)
-            .where(
-                Ads.account_id == acc_id,
-                Ads.id == ads_id
-            )
-        )
+        req = delete(Ads).where(Ads.account_id == acc_id, Ads.id == ads_id)
         await self.session.execute(req)
         await self.session.commit()
 
@@ -326,7 +313,9 @@ class AdsRepo(IAdsRepo):
 
     # -------------------- AdsCommentary -------------------
 
-    async def create_ads_commentary(self, new_comment: QAddAdsComment, acc_id: UUID) -> XAdsComment:
+    async def create_ads_commentary(
+        self, new_comment: QAddAdsComment, acc_id: UUID
+    ) -> XAdsComment:
         """Создаёт комментарий к объявлению и увеличивает счётчик комментариев.
 
         Args:
@@ -338,12 +327,8 @@ class AdsRepo(IAdsRepo):
         """
         req = (
             update(Ads)
-            .values(
-                count_comments = Ads.count_comments + 1
-            )
-            .where(
-                Ads.id == new_comment.ads_id
-            )
+            .values(count_comments=Ads.count_comments + 1)
+            .where(Ads.id == new_comment.ads_id)
         )
         try:
             res = await self.session.execute(req)
@@ -356,7 +341,7 @@ class AdsRepo(IAdsRepo):
             .values(
                 ads_id=new_comment.ads_id,
                 account_id=acc_id,
-                ads_comment=new_comment.ads_comment
+                ads_comment=new_comment.ads_comment,
             )
             .returning(AdsComment)
         )
@@ -369,9 +354,8 @@ class AdsRepo(IAdsRepo):
             account_id=row.account_id,
             ads_comment=row.ads_comment,
             created_at=row.created_at,
-            updated_at=row.updated_at
+            updated_at=row.updated_at,
         )
-
 
     async def get_ads_commentary(self, ads_id: UUID, comment_id: UUID) -> XAdsComment:
         """Получает комментарий по ID объявления и комментария.
@@ -383,12 +367,8 @@ class AdsRepo(IAdsRepo):
         Returns:
             XAdsComment: Найденный комментарий.
         """
-        req = (
-            select(AdsComment)
-            .where(
-                AdsComment.ads_id == ads_id,
-                AdsComment.id == comment_id
-            )
+        req = select(AdsComment).where(
+            AdsComment.ads_id == ads_id, AdsComment.id == comment_id
         )
         res = await self.session.execute(req)
         await self.session.commit()
@@ -401,7 +381,7 @@ class AdsRepo(IAdsRepo):
             account_id=row.account_id,
             ads_comment=row.ads_comment,
             created_at=row.created_at,
-            updated_at=row.updated_at
+            updated_at=row.updated_at,
         )
 
     async def get_ads_commentaries(self, ads_id: UUID) -> tuple[int, list[XAdsComment]]:
@@ -418,12 +398,7 @@ class AdsRepo(IAdsRepo):
         await self.session.commit()
         total = count_res.scalar_one()
 
-        req = (
-            select(AdsComment)
-            .where(
-                AdsComment.ads_id == ads_id
-            )
-        )
+        req = select(AdsComment).where(AdsComment.ads_id == ads_id)
         xres = await self.session.execute(req)
         await self.session.commit()
         res = []
@@ -435,12 +410,14 @@ class AdsRepo(IAdsRepo):
                     account_id=row.account_id,
                     ads_comment=row.ads_comment,
                     created_at=row.created_at,
-                    updated_at=row.updated_at
+                    updated_at=row.updated_at,
                 )
             )
         return total, res
 
-    async def update_ads_commentary(self, update_comm: QUpdateAdsComment) -> XAdsComment:
+    async def update_ads_commentary(
+        self, update_comm: QUpdateAdsComment
+    ) -> XAdsComment:
         """Обновляет комментарий к объявлению.
 
         Args:
@@ -451,14 +428,11 @@ class AdsRepo(IAdsRepo):
         """
         req = (
             update(AdsComment)
-            .values(
-                ads_comment=update_comm.ads_comment,
-                updated_at=text("NOW()")
-            )
+            .values(ads_comment=update_comm.ads_comment, updated_at=text("NOW()"))
             .where(
                 AdsComment.account_id == update_comm.acccount_id,
                 AdsComment.ads_id == update_comm.ads_id,
-                AdsComment.id == update_comm.comm_id
+                AdsComment.id == update_comm.comm_id,
             )
             .returning(AdsComment)
         )
@@ -474,10 +448,12 @@ class AdsRepo(IAdsRepo):
             account_id=row.account_id,
             ads_comment=row.ads_comment,
             created_at=row.created_at,
-            updated_at=row.updated_at
+            updated_at=row.updated_at,
         )
 
-    async def delete_ads_commentary(self, ads_id: UUID, comm_id: UUID, acc_id: UUID) -> None:
+    async def delete_ads_commentary(
+        self, ads_id: UUID, comm_id: UUID, acc_id: UUID
+    ) -> None:
         """Удаляет комментарий к объявлению и обновляет счётчик комментариев.
 
         Args:
@@ -490,12 +466,8 @@ class AdsRepo(IAdsRepo):
         """
         req = (
             update(Ads)
-            .values(
-                count_comments = Ads.count_comments - 1
-            )
-            .where(
-                Ads.id == ads_id
-            )
+            .values(count_comments=Ads.count_comments - 1)
+            .where(Ads.id == ads_id)
         )
         try:
             await self.session.execute(req)
@@ -503,13 +475,10 @@ class AdsRepo(IAdsRepo):
             raise KeyError("Объявление не найдено") from e
         await self.session.commit()
 
-        req = (
-            delete(AdsComment)
-            .where(
-                AdsComment.account_id == acc_id,
-                AdsComment.ads_id == ads_id,
-                AdsComment.id == comm_id
-            )
+        req = delete(AdsComment).where(
+            AdsComment.account_id == acc_id,
+            AdsComment.ads_id == ads_id,
+            AdsComment.id == comm_id,
         )
         await self.session.execute(req)
         await self.session.commit()

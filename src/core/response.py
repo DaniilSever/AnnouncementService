@@ -14,8 +14,10 @@ class SuccessResp(BaseModel, Generic[T]):
         ok (bool): Флаг успешного выполнения, всегда True.
         payload (T | None): Объект ответа, может быть None.
     """
+
     ok: bool = True
-    payload: T | None  = Field(None, description="Объект ответа")
+    payload: T | None = Field(None, description="Объект ответа")
+
 
 class ErrDetail(BaseModel):
     """Модель детализации ошибки.
@@ -25,9 +27,11 @@ class ErrDetail(BaseModel):
         msg (str): Сообщение об ошибке.
         details (str | None): Дополнительные детали ошибки.
     """
+
     code: str = ""
     msg: str = ""
     details: str | None = None
+
 
 class ErrResp(BaseModel):
     """Модель ошибки в ответе API.
@@ -36,8 +40,10 @@ class ErrResp(BaseModel):
         ok (bool): Флаг успешного выполнения, всегда False.
         err (ErrDetail): Объект с деталями ошибки.
     """
+
     ok: bool = False
     err: ErrDetail = Field(description="Объект ошибки")
+
 
 responses_model = {
     400: {"model": ErrResp, "description": "Bad Request"},
@@ -46,6 +52,7 @@ responses_model = {
     500: {"model": ErrResp, "description": "Internal Server Error"},
     503: {"model": ErrResp, "description": "Service Unavailable"},
 }
+
 
 def responses(*args) -> dict:  # pragma: no cover
     """Возвращает словарь моделей ответов по переданным HTTP-кодам.

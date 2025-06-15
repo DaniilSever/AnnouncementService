@@ -2,10 +2,8 @@ import importlib
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, APIRouter, Request
-from fastapi.openapi.utils import get_openapi
 from fastapi.responses import ORJSONResponse
 from core.exception import ExpError
-from core.endpoints import Endpoints as Enp
 
 services = {
     "auth.api": ("handlers.auth.api", True),
@@ -25,6 +23,7 @@ async def lifespan(__app: FastAPI):
         None: Управление возвращается FastAPI во время работы приложения.
     """
     yield
+
 
 def get_services() -> tuple[list[APIRouter], list[dict]]:
     """Импортирует активные сервисы и извлекает их роутеры и метаданные.
@@ -51,6 +50,7 @@ def get_services() -> tuple[list[APIRouter], list[dict]]:
 
     return routers, metadata
 
+
 def create_app() -> FastAPI:
     """Создаёт и настраивает экземпляр FastAPI-приложения для сервиса объявлений.
 
@@ -74,8 +74,7 @@ def create_app() -> FastAPI:
     @__app.exception_handler(ExpError)
     async def error_exception_handler(_: Request, exc: ExpError):
         return ORJSONResponse(
-            status_code=int(exc.status_code),
-            content=exc.response.model_dump()
+            status_code=int(exc.status_code), content=exc.response.model_dump()
         )
 
     return __app

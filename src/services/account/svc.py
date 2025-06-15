@@ -5,13 +5,14 @@ from core.exception import ExpError
 from domain.account.dto import QEmailSignupData
 from domain.account.dto import ZAccount
 
+
 class AccService:
 
     def __init__(self, _base_url: str):
         self.base_url = _base_url
 
     async def is_email_busy(self, email: str) -> bool:
-        url = self.base_url + Enp.ACCOUNT_IS_EMAIL_BUSY.format(email = email)
+        url = self.base_url + Enp.ACCOUNT_IS_EMAIL_BUSY.format(email=email)
         async with httpx.AsyncClient() as client:
             resp = await client.post(url)
             resp_js = resp.json()
@@ -30,7 +31,7 @@ class AccService:
             res = resp_js["payload"]
             return res.get("id")
 
-    async def get_account_by_email(self, email:str) -> ZAccount:
+    async def get_account_by_email(self, email: str) -> ZAccount:
         url = self.base_url + Enp.ACCOUNT_GET_BY_EMAIL.format(email=email)
         async with httpx.AsyncClient() as client:
             resp = await client.get(url)

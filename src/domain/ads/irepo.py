@@ -1,12 +1,22 @@
 from uuid import UUID
 
-from domain.ads.dto import QCreateAds, QAdsCategory, QFilter, QChangeAds, QAddAdsComment, QUpdateAdsComment
+from domain.ads.dto import (
+    QCreateAds,
+    QAdsCategory,
+    QFilter,
+    QChangeAds,
+    QAddAdsComment,
+    QUpdateAdsComment,
+)
 from infra.ads.xdao import XAds, XAdsComment
+
 
 class IAdsRepo:
     """Интерфейс репозитория для работы с объявлениями и комментариями."""
 
-    async def create_ads(self, ads: QCreateAds, ads_category: QAdsCategory, acc_id: UUID | None = None) -> XAds:
+    async def create_ads(
+        self, ads: QCreateAds, ads_category: QAdsCategory, acc_id: UUID | None = None
+    ) -> XAds:
         """Создаёт объявление.
 
         Args:
@@ -64,7 +74,9 @@ class IAdsRepo:
         """
         raise NotImplementedError
 
-    async def update_category_ads(self, ads_id: UUID, new_category: QAdsCategory, acc_id: UUID) -> XAds:
+    async def update_category_ads(
+        self, ads_id: UUID, new_category: QAdsCategory, acc_id: UUID
+    ) -> XAds:
         """Обновляет категорию объявления.
 
         Args:
@@ -89,7 +101,9 @@ class IAdsRepo:
         """
         raise NotImplementedError
 
-    async def create_ads_commentary(self, new_comment: QAddAdsComment, acc_id: UUID) -> XAdsComment:
+    async def create_ads_commentary(
+        self, new_comment: QAddAdsComment, acc_id: UUID
+    ) -> XAdsComment:
         """Создаёт комментарий к объявлению.
 
         Args:
@@ -124,7 +138,9 @@ class IAdsRepo:
         """
         raise NotImplementedError
 
-    async def update_ads_commentary(self, update_comm: QUpdateAdsComment) -> XAdsComment:
+    async def update_ads_commentary(
+        self, update_comm: QUpdateAdsComment
+    ) -> XAdsComment:
         """Обновляет комментарий к объявлению.
 
         Args:
@@ -135,7 +151,9 @@ class IAdsRepo:
         """
         raise NotImplementedError
 
-    async def delete_ads_commentary(self, ads_id: UUID, comm_id: UUID, acc_id: UUID) -> None:
+    async def delete_ads_commentary(
+        self, ads_id: UUID, comm_id: UUID, acc_id: UUID
+    ) -> None:
         """Удаляет комментарий к объявлению.
 
         Args:

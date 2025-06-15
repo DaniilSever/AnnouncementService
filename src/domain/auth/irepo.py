@@ -2,10 +2,13 @@ from uuid import UUID
 
 from infra.auth.xdao import XEmailSignup, XRefreshToken
 
+
 class IAuthRepo:  # pragma: no cover
     """Интерфейс репозитория для операций, связанных с аутентификацией и управлением токенами."""
 
-    async def create_email_signup(self, email: str, pwd_hash: str, salt: str, code: int) -> XEmailSignup:
+    async def create_email_signup(
+        self, email: str, pwd_hash: str, salt: str, code: int
+    ) -> XEmailSignup:
         """Создаёт запись регистрации по email.
 
         Args:
@@ -38,7 +41,9 @@ class IAuthRepo:  # pragma: no cover
         """
         raise NotImplementedError
 
-    async def inc_email_confirm_wrong_code_attempts(self, signup_id: UUID) -> XEmailSignup:
+    async def inc_email_confirm_wrong_code_attempts(
+        self, signup_id: UUID
+    ) -> XEmailSignup:
         """Увеличивает счётчик неверных попыток ввода кода подтверждения по email.
 
         Args:
@@ -60,7 +65,9 @@ class IAuthRepo:  # pragma: no cover
         """
         raise NotImplementedError
 
-    async def get_refresh_token_for_account(self, acc_id: UUID, token: str) -> XRefreshToken:
+    async def get_refresh_token_for_account(
+        self, acc_id: UUID, token: str
+    ) -> XRefreshToken:
         """Получает refresh-токен по аккаунту и значению токена.
 
         Args:

@@ -9,6 +9,7 @@ from domain.account.dto import QEmailSignupData
 
 from .xdao import XAccount, XAccountID
 
+
 class AccRepo(IAccRepo):
     """Реализация репозитория для работы с пользовательскими аккаунтами через AsyncSession."""
 
@@ -33,10 +34,7 @@ class AccRepo(IAccRepo):
         Raises:
             KeyError: Если аккаунт не найден.
         """
-        req = (
-            select(Account)
-            .where(Account.id == acc_id)
-        )
+        req = select(Account).where(Account.id == acc_id)
         res = await self.session.execute(req)
         await self.session.commit()
         row = res.scalar_one_or_none()
@@ -67,10 +65,7 @@ class AccRepo(IAccRepo):
         Raises:
             KeyError: Если аккаунт не найден.
         """
-        req = (
-            select(Account)
-            .where(Account.email == email)
-        )
+        req = select(Account).where(Account.email == email)
         res = await self.session.execute(req)
         await self.session.commit()
         row = res.scalar_one_or_none()
@@ -104,7 +99,7 @@ class AccRepo(IAccRepo):
                 email=x_signup.email,
                 pwd_hash=x_signup.pwd_hash,
                 salt=x_signup.salt,
-                role=AccRole.USER.value
+                role=AccRole.USER.value,
             )
             .returning(Account)
         )
@@ -122,10 +117,7 @@ class AccRepo(IAccRepo):
         Returns:
             bool: True, если email занят, иначе False.
         """
-        req = (
-            select(Account)
-            .where(Account.email == email)
-        )
+        req = select(Account).where(Account.email == email)
         res = await self.session.execute(req)
         await self.session.commit()
         row = res.scalar_one_or_none()
@@ -137,10 +129,7 @@ class AccRepo(IAccRepo):
         Returns:
             list[XAccount]: Список аккаунтов.
         """
-        req = (
-            select(Account)
-            .limit(10)
-        )
+        req = select(Account).limit(10)
         xres = await self.session.execute(req)
         await self.session.commit()
         res = []
