@@ -6,10 +6,10 @@ from fastapi.responses import ORJSONResponse
 from core.exception import ExpError
 
 services = {
-    "auth.api": ("handlers.auth.api", True),
-    "acc.api": ("handlers.account.api", True),
-    "ads.api": ("handlers.ads.api", True),
-    "compl.api": ("handlers.compl.api", True),
+    "auth.api": ("auth.handler.api", True),
+    "acc.api": ("account.handler.api", True),
+    "ads.api": ("ads.handler.api", True),
+    "compl.api": ("compl.handler.api", True),
 }
 
 
