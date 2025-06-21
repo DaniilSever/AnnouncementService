@@ -1,10 +1,10 @@
 from uuid import UUID
 
-from domain.compl.dto import QCreateCompl, QFilter
+from ..domain.dto import QCreateCompl, QFilter
 
-from domain.compl.models import Service
+from ..domain.models import Service
 
-from infra.compl.xdao import XCompl
+from ..infra.xdao import XCompl
 
 
 class IComplRepo:

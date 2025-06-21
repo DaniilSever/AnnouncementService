@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from infra.auth.xdao import XEmailSignup, XRefreshToken
+from ..infra.xdao import XEmailSignup, XRefreshToken
 
 
 class IAuthRepo:  # pragma: no cover

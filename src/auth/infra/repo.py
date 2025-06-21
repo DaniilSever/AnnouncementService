@@ -4,8 +4,8 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy import select, delete, update, text
 from sqlalchemy.exc import IntegrityError
 
-from domain.auth.irepo import IAuthRepo
-from domain.auth.models import SignupAccount, RefreshToken
+from ..domain.irepo import IAuthRepo
+from ..domain.models import SignupAccount, RefreshToken
 
 from .xdao import XEmailSignup, XRefreshToken
 

@@ -1,9 +1,9 @@
 import httpx
 
-from core.endpoints import Endpoints as Enp
-from core.exception import ExpError
+from kernel.endpoints import Endpoints as Enp
+from kernel.exception import ExpError
 
-from domain.compl.dto import QCreateCompl, ZCompl
+from ..domain.dto import QCreateCompl, ZCompl
 
 
 class ComplService:

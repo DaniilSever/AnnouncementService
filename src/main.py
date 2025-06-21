@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, APIRouter, Request
 from fastapi.responses import ORJSONResponse
-from core.exception import ExpError
+from kernel.exception import ExpError
 
 services = {
     "auth.api": ("auth.handler.api", True),

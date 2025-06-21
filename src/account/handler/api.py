@@ -2,7 +2,7 @@ from uuid import UUID
 from typing import Annotated
 from fastapi import APIRouter, Depends, Path, Body, Query
 
-from core.depends import (
+from kernel.depends import (
     get_account_repo_session,
     get_ads_serivce,
     AdsService,
@@ -11,14 +11,14 @@ from core.depends import (
     get_tg_bot,
     TgClient,
 )
-from core.endpoints import Endpoints as Enp
-from core.response import responses, SuccessResp
-from core.security import AJwt
-from core.exception import ExpError, ExpCode
+from kernel.endpoints import Endpoints as Enp
+from kernel.response import responses, SuccessResp
+from kernel.security import AJwt
+from kernel.exception import ExpError, ExpCode
 
-from app.account.uc import AccUseCase
+from ..internal.uc import AccUseCase
 
-from domain.account.dto import (
+from ..domain.dto import (
     BannedTo,
     QEmail,
     QEmailSignupData,
@@ -28,11 +28,12 @@ from domain.account.dto import (
     ZBanned,
 )
 
-from domain.account.models import AccRole
-from domain.compl.dto import QCreateCompl, ZCompl
-from domain.compl.models import Service
+from ..domain.models import AccRole
 
-from infra.account.repo import AccRepo, AsyncSession
+from compl.domain.dto import QCreateCompl, ZCompl
+from compl.domain.models import Service
+
+from ..infra.repo import AccRepo, AsyncSession
 
 router = APIRouter(tags=["account"])
 tags = {"name": "account", "description": "Внутренние эндпоинты работы с аккаунтом"}

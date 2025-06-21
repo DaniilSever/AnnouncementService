@@ -1,10 +1,10 @@
 from uuid import UUID
 
-from core.configs import AdsConfig
-from core.exception import ExpError, ExpCode
+from kernel.configs import AdsConfig
+from kernel.exception import ExpError, ExpCode
 
-from domain.ads.irepo import IAdsRepo
-from domain.ads.dto import (
+from ..domain.irepo import IAdsRepo
+from ..domain.dto import (
     QCreateAds,
     QAdsCategory,
     QFilter,
@@ -17,14 +17,14 @@ from domain.ads.dto import (
     ZManyAds,
     ZManyAdsComment,
 )
-from domain.compl.dto import QCreateCompl, ZCompl
+from compl.domain.dto import QCreateCompl, ZCompl
 
-from infra.ads.repo import AdsRepo
-from infra.ads.xdao import XAds, XAdsComment
+from ..infra.repo import AdsRepo
+from ..infra.xdao import XAds, XAdsComment
 
-from services.compl.svc import ComplService
-from services.tg.client import TgClient
-from services.tg.const_msg import get_ads_warning_msg
+from compl.external.svc import ComplService
+from notice.external.tg.client import TgClient
+from notice.external.tg.const_msg import get_ads_warning_msg
 
 
 class AdsUseCase:

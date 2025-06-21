@@ -2,19 +2,19 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Body
 from fastapi.security import OAuth2PasswordRequestForm
 
-from core.endpoints import Endpoints as Enp
-from core.depends import (
+from kernel.endpoints import Endpoints as Enp
+from kernel.depends import (
     get_auth_repo_session,
     get_account_serivce,
     AccService,
     get_tg_bot,
     TgClient,
 )
-from core.response import responses, SuccessResp
+from kernel.response import responses, SuccessResp
 
-from app.auth.uc import AuthUseCase
+from ..internal.uc import AuthUseCase
 
-from domain.auth.dto import (
+from ..domain.dto import (
     QEmailSignup,
     QConfirmCode,
     QEmailSignin,
@@ -26,7 +26,7 @@ from domain.auth.dto import (
     ZRevokedTokens,
 )
 
-from infra.auth.repo import AuthRepo, AsyncSession
+from ..infra.repo import AuthRepo, AsyncSession
 
 router = APIRouter(tags=["auth"])
 tags = {"name": "auth", "description": "Внутренние эндпоинты авторизации"}

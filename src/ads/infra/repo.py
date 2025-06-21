@@ -4,10 +4,10 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy import select, delete, update, text, func
 from sqlalchemy.exc import NoResultFound
 
-from core.exception import ExpError, ExpCode
+from kernel.exception import ExpError, ExpCode
 
-from domain.ads.irepo import IAdsRepo
-from domain.ads.dto import (
+from ..domain.irepo import IAdsRepo
+from ..domain.dto import (
     QCreateAds,
     QFilter,
     QAdsCategory,
@@ -16,7 +16,7 @@ from domain.ads.dto import (
     QAddAdsComment,
     QUpdateAdsComment,
 )
-from domain.ads.models import Ads, AdsComment
+from ..domain.models import Ads, AdsComment
 
 from .xdao import XAds, XAdsComment
 

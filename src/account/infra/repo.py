@@ -4,9 +4,9 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy import select, delete, update, text
 from sqlalchemy.exc import NoResultFound
 
-from domain.account.irepo import IAccRepo
-from domain.account.models import Account, AccRole
-from domain.account.dto import QEmailSignupData, BannedTo
+from ..domain.irepo import IAccRepo
+from ..domain.models import Account, AccRole
+from ..domain.dto import QEmailSignupData, BannedTo
 
 from .xdao import XAccount, XAccountID
 

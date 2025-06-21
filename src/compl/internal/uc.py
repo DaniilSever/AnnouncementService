@@ -1,10 +1,10 @@
 from uuid import UUID
 
-from core.configs import ComplConfig
-from core.exception import ExpCode, ExpError
+from kernel.configs import ComplConfig
+from kernel.exception import ExpCode, ExpError
 
-from domain.compl.irepo import IComplRepo
-from domain.compl.dto import (
+from ..domain.irepo import IComplRepo
+from ..domain.dto import (
     Service,
     QCreateCompl,
     QFilter,
@@ -12,8 +12,8 @@ from domain.compl.dto import (
     ZManyCompl,
 )
 
-from infra.compl.repo import ComplRepo
-from infra.compl.xdao import XCompl
+from ..infra.repo import ComplRepo
+from ..infra.xdao import XCompl
 
 
 class ComplUseCase:

@@ -1,7 +1,7 @@
 from datetime import datetime
 from pydantic import BaseModel, UUID4
 
-from domain.account.models import AccRole
+from ..domain.models import AccRole
 
 
 class XAccountID(BaseModel):

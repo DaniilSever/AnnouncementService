@@ -1,10 +1,10 @@
 from uuid import UUID
 
-from core.configs import AccountConfig
-from core.exception import ExpError, ExpCode
+from kernel.configs import AccountConfig
+from kernel.exception import ExpError, ExpCode
 
-from domain.account.irepo import IAccRepo
-from domain.account.dto import (
+from ..domain.irepo import IAccRepo
+from ..domain.dto import (
     BannedTo,
     # QDTO
     QEmailSignupData,
@@ -14,16 +14,16 @@ from domain.account.dto import (
     ZAccountID,
     ZIsBusy,
 )
-from domain.account.models import AccRole
-from domain.compl.dto import QCreateCompl, ZCompl
+from ..domain.models import AccRole
+from compl.domain.dto import QCreateCompl, ZCompl
 
-from infra.account.repo import AccRepo
-from infra.account.xdao import XAccount
+from ..infra.repo import AccRepo
+from ..infra.xdao import XAccount
 
-from services.ads.svc import AdsService
-from services.compl.svc import ComplService
-from services.tg.client import TgClient
-from services.tg.const_msg import get_acc_ban_warning_msg, get_acc_unban_warning_msg
+from ads.external.svc import AdsService
+from compl.external.svc import ComplService
+from notice.external.tg.client import TgClient
+from notice.external.tg.const_msg import get_acc_ban_warning_msg, get_acc_unban_warning_msg
 
 
 class AccUseCase:

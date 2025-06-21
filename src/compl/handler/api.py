@@ -2,19 +2,19 @@ from uuid import UUID
 from typing import Annotated
 from fastapi import APIRouter, Depends, Body, Query, Path
 
-from core.endpoints import Endpoints as Enp
-from core.depends import get_compl_repo_session
-from core.response import responses, SuccessResp
-from core.security import AJwt
-from core.exception import ExpError, ExpCode
+from kernel.endpoints import Endpoints as Enp
+from kernel.depends import get_compl_repo_session
+from kernel.response import responses, SuccessResp
+from kernel.security import AJwt
+from kernel.exception import ExpError, ExpCode
 
-from domain.compl.dto import QCreateCompl, QFilter, ZCompl, ZManyCompl, ZBanned
-from domain.compl.models import Service
-from domain.account.models import AccRole
+from ..domain.dto import QCreateCompl, QFilter, ZCompl, ZManyCompl, ZBanned
+from ..domain.models import Service
+from account.domain.models import AccRole
 
-from app.compl.uc import ComplUseCase
+from ..internal.uc import ComplUseCase
 
-from infra.compl.repo import ComplRepo, AsyncSession
+from ..infra.repo import ComplRepo, AsyncSession
 
 router = APIRouter(tags=["compl"])
 tags = {"name": "compl", "description": "Внутренние эндпоинты жалоб"}

@@ -1,7 +1,7 @@
 from uuid import UUID
 
-from domain.account.dto import QEmailSignupData
-from infra.account.xdao import XAccount, XAccountID
+from ..domain.dto import QEmailSignupData
+from ..infra.xdao import XAccount, XAccountID
 
 
 class IAccRepo:

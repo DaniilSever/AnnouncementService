@@ -1,7 +1,7 @@
-from services.account.svc import AccService
-from services.ads.svc import AdsService
-from services.compl.svc import ComplService
-from services.tg.client import TgClient
+from account.external.svc import AccService
+from ads.external.svc import AdsService
+from compl.external.svc import ComplService
+from notice.external.tg.client import TgClient
 
 from .pg import (
     AsyncAccRepoSession,

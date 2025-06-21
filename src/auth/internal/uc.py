@@ -1,15 +1,15 @@
 from datetime import datetime
 
-from core.configs import AuthConfig
-from core.security import (
+from kernel.configs import AuthConfig
+from kernel.security import (
     create_confirm_code,
     create_password_hash,
     create_jwt_token,
     decode_jwt,
 )
-from core.exception import ExpError, ExpCode
+from kernel.exception import ExpError, ExpCode
 
-from domain.auth.dto import (
+from ..domain.dto import (
     # QDTO
     QEmailSignup,
     QConfirmCode,
@@ -22,20 +22,20 @@ from domain.auth.dto import (
     ZToken,
     ZRevokedTokens,
 )
-from domain.auth.irepo import IAuthRepo
-from domain.account.dto import (
+from ..domain.irepo import IAuthRepo
+from account.domain.dto import (
     # QDTO
     QEmailSignupData,
     # ZDTO
     ZAccount,
 )
 
-from infra.auth.repo import AuthRepo
-from infra.auth.xdao import XEmailSignup
+from ..infra.repo import AuthRepo
+from ..infra.xdao import XEmailSignup
 
-from services.account.svc import AccService
-from services.tg.client import TgClient
-from services.tg.const_msg import get_code_msg
+from account.external.svc import AccService
+from notice.external.tg.client import TgClient
+from notice.external.tg.const_msg import get_code_msg
 
 
 class AuthUseCase:

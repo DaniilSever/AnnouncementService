@@ -1,10 +1,10 @@
 from uuid import UUID
 import httpx
 
-from core.endpoints import Endpoints as Enp
-from core.exception import ExpError
+from kernel.endpoints import Endpoints as Enp
+from kernel.exception import ExpError
 
-from domain.account.dto import QEmailSignupData, ZAccount
+from ..domain.dto import QEmailSignupData, ZAccount
 
 
 class AccService:

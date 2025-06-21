@@ -2,21 +2,21 @@ from uuid import UUID
 from typing import Annotated
 from fastapi import APIRouter, Depends, Body, Header, Query, Path
 
-from core.endpoints import Endpoints as Enp
-from core.depends import (
+from kernel.endpoints import Endpoints as Enp
+from kernel.depends import (
     get_ads_repo_session,
     get_compl_serivce,
     ComplService,
     get_tg_bot,
     TgClient,
 )
-from core.response import responses, SuccessResp
-from core.security import AJwt, ApiKey
-from core.exception import ExpError, ExpCode
+from kernel.response import responses, SuccessResp
+from kernel.security import AJwt, ApiKey
+from kernel.exception import ExpError, ExpCode
 
-from app.ads.uc import AdsUseCase
+from ..internal.uc import AdsUseCase
 
-from domain.ads.dto import (
+from ..domain.dto import (
     # QDTO
     QCreateAds,
     QAdsCategory,
@@ -32,11 +32,11 @@ from domain.ads.dto import (
     ZManyAdsComment,
     ZBanned,
 )
-from domain.account.models import AccRole
-from domain.compl.dto import QCreateCompl, ZCompl
-from domain.compl.models import Service
+from account.domain.models import AccRole
+from compl.domain.dto import QCreateCompl, ZCompl
+from compl.domain.models import Service
 
-from infra.ads.repo import AdsRepo, AsyncSession
+from ..infra.repo import AdsRepo, AsyncSession
 
 router = APIRouter(tags=["ads"])
 tags = {"name": "ads", "description": "Внутренние эндпоинты работы с объявлениями"}

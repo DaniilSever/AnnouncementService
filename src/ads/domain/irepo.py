@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from domain.ads.dto import (
+from ..domain.dto import (
     QCreateAds,
     QAdsCategory,
     QFilter,
@@ -8,7 +8,7 @@ from domain.ads.dto import (
     QAddAdsComment,
     QUpdateAdsComment,
 )
-from infra.ads.xdao import XAds, XAdsComment
+from ..infra.xdao import XAds, XAdsComment
 
 
 class IAdsRepo:

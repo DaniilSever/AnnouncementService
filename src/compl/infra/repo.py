@@ -4,9 +4,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy import select, func
 
-from domain.compl.irepo import IComplRepo
-from domain.compl.dto import Service, QCreateCompl, QFilter
-from domain.compl.models import Complaints
+from ..domain.irepo import IComplRepo
+from ..domain.dto import Service, QCreateCompl, QFilter
+from ..domain.models import Complaints
 
 from .xdao import XCompl
 

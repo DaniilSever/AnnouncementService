@@ -1,7 +1,7 @@
 from datetime import datetime
 from pydantic import BaseModel, UUID4
 
-from domain.compl.models import Service
+from ..domain.models import Service
 
 
 class XCompl(BaseModel):
